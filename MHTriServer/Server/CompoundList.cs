@@ -44,6 +44,13 @@ namespace MHTriServer.Server
         public void Set(byte key, string value) => m_Data[key] = value;
         public void Set(byte key, byte[] value) => m_Data[key] = value;
 
+        /// <summary>
+        /// You must override TryRead and TryWrite
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        protected void Set(byte key, object value) => m_Data[key] = value;
+
         public bool TryGetValue<T>(byte key, [MaybeNullWhen(false)] out T value)
         {
             value = default;
@@ -121,7 +128,7 @@ namespace MHTriServer.Server
             return true;
         }
 
-        protected virtual bool TryWrite(byte id, object value, ExtendedBinaryWriter writer)
+        protected virtual bool TryWrite(byte key, object value, ExtendedBinaryWriter writer)
         {
             switch (value)
             {

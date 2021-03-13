@@ -105,6 +105,7 @@ namespace MHTriServer.Server.Packets
             RegisterWith<AnsUserSelectedSlot>(AnsUserSelectedSlot.PACKET_ID);
             RegisterWith<AnsUserStatusSet>(AnsUserStatusSet.PACKET_ID);
             RegisterWith<LmpConnect>(LmpConnect.PACKET_ID);
+            RegisterWith<NtcLayerUserNum>(NtcLayerUserNum.PACKET_ID);
             RegisterWith<NtcLogin>(NtcLogin.PACKET_ID);
             RegisterWith<ReqBinaryData>(ReqBinaryData.PACKET_ID);
             RegisterWith<ReqBinaryFoot>(ReqBinaryFoot.PACKET_ID);

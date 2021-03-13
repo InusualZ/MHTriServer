@@ -769,6 +769,18 @@ namespace MHTriServer.Player
                     break;
                 case 350:
                     {
+                        var unkData = new UserNumData() { 
+                            // UnknownField - Don't know what to send
+                            UnknownField2 = 2,
+                            UnknownField3 = 3,
+                            UnknownField4 = 4,
+                            UnknownField5 = 5,
+                            UnknownField6 = 6,
+                            UnknownField7 = 7,
+                        };
+
+                        SendPacket(new NtcLayerUserNum(1, unkData));
+
                         var gate1 = new LayerData()
                         {
                             UnknownField1 = 1,
