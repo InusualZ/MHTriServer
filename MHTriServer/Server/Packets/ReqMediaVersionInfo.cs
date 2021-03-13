@@ -11,13 +11,13 @@ namespace MHTriServer.Server.Packets
      * TODO: Find more meaningful name, this name was given because of the context in which the
      * packet get sent.
      */
-    public class AnsLoginSuccess : Packet
+    public class ReqMediaVersionInfo : Packet
     {
         public const uint PACKET_ID = 0x62410100;
 
-        public AnsLoginSuccess() : base(PACKET_ID) { }
+        public ReqMediaVersionInfo() : base(PACKET_ID) { }
 
-        public AnsLoginSuccess(uint id, ushort size, ushort counter) : base(id, size, counter) { }
+        public ReqMediaVersionInfo(uint id, ushort size, ushort counter) : base(id, size, counter) { }
 
         public override void Serialize(ExtendedBinaryWriter writer)
         {

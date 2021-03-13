@@ -2,15 +2,15 @@
 
 namespace MHTriServer.Server.Packets
 {
-    public class AnsServerWrong : Packet
+    public class ReqServerTime : Packet
     {
         public const uint PACKET_ID = 0x60020100;
 
         public uint UnknownField { get; private set; }
 
-        public AnsServerWrong(uint unknownField) : base(PACKET_ID) => (UnknownField) = (unknownField);
+        public ReqServerTime(uint unknownField) : base(PACKET_ID) => (UnknownField) = (unknownField);
 
-        public AnsServerWrong(uint id, ushort size, ushort counter) : base(id, size, counter) { }
+        public ReqServerTime(uint id, ushort size, ushort counter) : base(id, size, counter) { }
 
         public override void Serialize(ExtendedBinaryWriter writer)
         {

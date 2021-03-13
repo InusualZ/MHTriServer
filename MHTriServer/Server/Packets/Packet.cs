@@ -86,23 +86,17 @@ namespace MHTriServer.Server.Packets
             RegisterWith<AnsLayerStart>(AnsLayerStart.PACKET_ID);
             RegisterWith<AnsLayerUserList>(AnsLayerUserList.PACKET_ID);
             RegisterWith<AnsLoginInfo>(AnsLoginInfo.PACKET_ID);
-            RegisterWith<AnsLoginInfoSucess>(AnsLoginInfoSucess.PACKET_ID);
-            RegisterWith<AnsLoginSuccess>(AnsLoginSuccess.PACKET_ID);
-            RegisterWith<AnsLoginSuccess2>(AnsLoginSuccess2.PACKET_ID);
             RegisterWith<AnsMaintenance>(AnsMaintenance.PACKET_ID);
             RegisterWith<AnsServerTime>(AnsServerTime.PACKET_ID);
-            RegisterWith<AnsServerWrong>(AnsServerWrong.PACKET_ID);
             RegisterWith<AnsShut>(AnsShut.PACKET_ID);
             RegisterWith<AnsTicket>(AnsTicket.PACKET_ID);
             RegisterWith<AnsUserBinarySet>(AnsUserBinarySet.PACKET_ID);
             RegisterWith<AnsUserListData>(AnsUserListData.PACKET_ID);
-            RegisterWith<AnsUserListDataSucess>(AnsUserListDataSucess.PACKET_ID);
             RegisterWith<AnsUserListFoot>(AnsUserListFoot.PACKET_ID);
             RegisterWith<AnsUserListHead>(AnsUserListHead.PACKET_ID);
             RegisterWith<AnsUserObject>(AnsUserObject.PACKET_ID);
             RegisterWith<AnsUserSearchInfoMine>(AnsUserSearchInfoMine.PACKET_ID);
             RegisterWith<AnsUserSearchSet>(AnsUserSearchSet.PACKET_ID);
-            RegisterWith<AnsUserSelectedSlot>(AnsUserSelectedSlot.PACKET_ID);
             RegisterWith<AnsUserStatusSet>(AnsUserStatusSet.PACKET_ID);
             RegisterWith<LmpConnect>(LmpConnect.PACKET_ID);
             RegisterWith<NtcLayerUserNum>(NtcLayerUserNum.PACKET_ID);
@@ -129,16 +123,22 @@ namespace MHTriServer.Server.Packets
             RegisterWith<ReqLayerStart>(ReqLayerStart.PACKET_ID);
             RegisterWith<ReqLayerUserList>(ReqLayerUserList.PACKET_ID);
             RegisterWith<ReqLineCheck>(ReqLineCheck.PACKET_ID);
+            RegisterWith<ReqLoginInfo>(ReqLoginInfo.PACKET_ID);
+            RegisterWith<ReqMediaVersionInfo>(ReqMediaVersionInfo.PACKET_ID);
+            RegisterWith<ReqServerTime>(ReqServerTime.PACKET_ID);
             RegisterWith<ReqShut>(ReqShut.PACKET_ID);
+            RegisterWith<ReqTicketClient>(ReqTicketClient.PACKET_ID);
             RegisterWith<ReqUnknownCheck>(ReqUnknownCheck.PACKET_ID);
             RegisterWith<ReqUserBinarySet>(ReqUserBinarySet.PACKET_ID);
             RegisterWith<ReqUserListData>(ReqUserListData.PACKET_ID);
-            RegisterWith<ReqUserObjects>(ReqUserObjects.PACKET_ID);
+            RegisterWith<ReqUserListFoot>(ReqUserListFoot.PACKET_ID);
+            RegisterWith<ReqUserListHead>(ReqUserListHead.PACKET_ID);
+            RegisterWith<ReqUserObject>(ReqUserObject.PACKET_ID);
             RegisterWith<ReqUserSearchInfoMine>(ReqUserSearchInfoMine.PACKET_ID);
             RegisterWith<ReqUserSearchSet>(ReqUserSearchSet.PACKET_ID);
             RegisterWith<ReqUserStatusSet>(ReqUserStatusSet.PACKET_ID);
             RegisterWith<RfpConnect>(RfpConnect.PACKET_ID);
-            RegisterWith<Timeout>(Timeout.PACKET_ID);
+            RegisterWith<ServerTimeout>(ServerTimeout.PACKET_ID);
 
         }
 

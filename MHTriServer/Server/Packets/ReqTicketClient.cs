@@ -6,13 +6,13 @@ namespace MHTriServer.Server.Packets
      * TODO: Find more meaningful name, this name was given because of the context in which the
      * packet get sent.
      */
-    class AnsUserListDataSucess : Packet
+    class ReqTicketClient : Packet
     {
-        public const uint PACKET_ID = 0x61120100;
+        public const uint PACKET_ID = 0x60300100;
 
-        public AnsUserListDataSucess() : base(PACKET_ID) { }
+        public ReqTicketClient() : base(PACKET_ID) { }
 
-        public AnsUserListDataSucess(uint id, ushort size, ushort counter) : base(id, size, counter) { }
+        public ReqTicketClient(uint id, ushort size, ushort counter) : base(id, size, counter) { }
 
         public override void Serialize(ExtendedBinaryWriter writer)
         {

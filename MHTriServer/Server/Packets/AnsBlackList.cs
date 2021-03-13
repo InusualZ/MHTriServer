@@ -40,5 +40,6 @@ namespace MHTriServer.Server.Packets
                 m_friends.Add(CompoundList.Deserialize<FriendData>(reader));
             }
         }
+
     }
 }

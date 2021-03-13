@@ -160,7 +160,7 @@ namespace MHTriServer.Player
 
                 switch (packet)
                 {
-                    case Timeout _:
+                    case ServerTimeout _:
                         Console.WriteLine("Server Timeout");
                         m_NetworkStream.Dispose();
                         m_Socket.Dispose();
@@ -172,7 +172,7 @@ namespace MHTriServer.Player
                         break;
 
                     // TODO: Probably should do something with the data
-                    case ReqUserObjects _:
+                    case ReqUserListHead _:
                         NetworkState += 5;
                         break;
 
@@ -182,7 +182,7 @@ namespace MHTriServer.Player
                         break;
 
                     // TODO: Probably should do something with the data
-                    case AnsUserSelectedSlot ansUserSelectedSlot:
+                    case ReqUserObject ansUserSelectedSlot:
                         {
                             SentSlot = ansUserSelectedSlot.Slot;
                             NetworkState += 5;
@@ -330,7 +330,7 @@ namespace MHTriServer.Player
                         break;
 
 
-                    case AnsServerWrong _:
+                    case ReqServerTime _:
                         {
                             if (SendLastPacket)
                             {
@@ -348,11 +348,11 @@ namespace MHTriServer.Player
                     case ReqBinaryFoot _:
                     case ReqFmpListFoot _:
                     case ReqFmpListVersion _:
-                    case AnsUserListDataSucess _:
-                    case AnsLoginInfoSucess _:
+                    case ReqUserListFoot _:
+                    case ReqTicketClient _:
                     case ReqShut _:
-                    case AnsLoginSuccess _:
-                    case AnsLoginSuccess2 _:
+                    case ReqMediaVersionInfo _:
+                    case ReqLoginInfo _:
                         NetworkState += 5;
                         break;
                 }

@@ -8,15 +8,15 @@ namespace MHTriServer.Server.Packets
      * TODO: Find more meaningful name, this name was given because of the context in which the
      * packet get sent.
      */
-    public class AnsLoginSuccess2 : Packet
+    public class ReqLoginInfo : Packet
     {
         public const uint PACKET_ID = 0x61010100;
 
         public CompoundList Data { get; set; }
 
-        public AnsLoginSuccess2(CompoundList data) : base(PACKET_ID) => (Data) = (data);
+        public ReqLoginInfo(CompoundList data) : base(PACKET_ID) => (Data) = (data);
 
-        public AnsLoginSuccess2(uint id, ushort size, ushort counter) : base(id, size, counter) { }
+        public ReqLoginInfo(uint id, ushort size, ushort counter) : base(id, size, counter) { }
 
         public override void Serialize(ExtendedBinaryWriter writer)
         {

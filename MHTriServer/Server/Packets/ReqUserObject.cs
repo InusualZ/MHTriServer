@@ -2,36 +2,40 @@
 
 namespace MHTriServer.Server.Packets
 {
-    public class ReqUserObjects : Packet
+    public class ReqUserObject : Packet
     {
-        public const uint PACKET_ID = 0x61100100;
+        public const uint PACKET_ID = 0x61200100;
 
-        public uint UnknownField { get; private set; }
+        public bool SlotIsEmpty { get; private set; }
 
-        public uint ClientSlotCount { get; private set; }
+        public uint SlotIndex { get; private set; }
 
-        public byte[] Format { get; set; }
+        public UserSlot Slot { get; private set; }
 
-        public ReqUserObjects(uint unknownField, uint clientSlotCount, byte[] format) : base(PACKET_ID) => (UnknownField, ClientSlotCount, Format) = (unknownField, clientSlotCount, format);
+        public ReqUserObject(bool slotIsEmpty, uint slotIndex, UserSlot slot) : base(PACKET_ID) => (SlotIsEmpty, SlotIndex, Slot) = (slotIsEmpty, slotIndex, slot);
 
-        public ReqUserObjects(uint id, ushort size, ushort counter) : base(id, size, counter) { }
+        public ReqUserObject(uint id, ushort size, ushort counter) : base(id, size, counter) { }
 
         public override void Serialize(ExtendedBinaryWriter writer)
         {
             base.Serialize(writer);
-            writer.Write(UnknownField);
-            writer.Write(ClientSlotCount);
-
-            writer.WriteByteBytes(Format);
+            writer.Write(SlotIsEmpty);
+            writer.Write(SlotIndex);
+            Slot.Serialize(writer);
         }
 
         public override void Deserialize(ExtendedBinaryReader reader)
         {
             Debug.Assert(ID == PACKET_ID);
-            UnknownField = reader.ReadUInt32();
-            ClientSlotCount = reader.ReadUInt32();
 
-            Format = reader.ReadByteBytes();
+            SlotIsEmpty = reader.ReadBoolean();
+            SlotIndex = reader.ReadUInt32();
+            Slot = CompoundList.Deserialize<UserSlot>(reader);
+        }
+
+        public override string ToString()
+        {
+            return base.ToString() + $":\n\tSlotIsEmpty {SlotIsEmpty}\n\tSlotIndex {SlotIndex}\n\tSlot\n{Slot}";
         }
     }
 }

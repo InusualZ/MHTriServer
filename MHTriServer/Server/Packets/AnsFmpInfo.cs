@@ -31,7 +31,7 @@ namespace MHTriServer.Server.Packets
 
         public override string ToString()
         {
-            return base.ToString() + $":\n\tSlot {Slot}";
+            return base.ToString() + $":\n\tSlot\n{Slot}";
         }
     }
 }

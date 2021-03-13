@@ -21,7 +21,7 @@ namespace MHTriServer.Server.Packets
 
         public override string ToString()
         {
-            return base.ToString() + ":\n\t Data\n" + Data.ToString();
+            return base.ToString() + ":\n\tData\n" + Data.ToString();
         }
     }
 }
