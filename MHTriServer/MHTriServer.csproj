@@ -13,8 +13,4 @@
     <EmbeddedResource Include="Resources\ServerCertificate.p12" />
   </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="PcapngUtils" Version="1.0.7" />
-  </ItemGroup>
-
 </Project>
