@@ -14,7 +14,7 @@ namespace MHTriServer.Server
         private const byte FIELD_6 = 0x06;
         private const byte FIELD_7 = 0x07;
 
-        public UnknownDataStruct UnknownField1 { get => Get<UnknownDataStruct>(FIELD_1); set => Set(FIELD_1, value); }
+        public UnkShortArrayStruct UnknownField1 { get => Get<UnkShortArrayStruct>(FIELD_1); set => Set(FIELD_1, value); }
 
         public uint UnknownField2 { get => Get<uint>(FIELD_2); set => Set(FIELD_2, value); }
 
@@ -34,7 +34,7 @@ namespace MHTriServer.Server
             if (key == FIELD_1)
             {
                 // TEST type?
-                value = UnknownDataStruct.Deserialize(reader);
+                value = UnkShortArrayStruct.Deserialize(reader);
                 return true;
             }
             return base.TryRead(key, type, reader, out value);
@@ -42,7 +42,7 @@ namespace MHTriServer.Server
 
         protected override bool TryWrite(byte key, object value, ExtendedBinaryWriter writer)
         {
-            if (!(value is UnknownDataStruct unknownData))
+            if (!(value is UnkShortArrayStruct unknownData))
             {
                 return base.TryWrite(key, value, writer);
             }

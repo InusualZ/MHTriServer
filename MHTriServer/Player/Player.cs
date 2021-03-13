@@ -528,7 +528,7 @@ namespace MHTriServer.Player
                     break;
                 case 130:
                     {
-                        SendPacket(new AnsFmpListHead(1, true));
+                        SendPacket(new AnsFmpListHead(0, 1, true));
                         NetworkState += 5;
                     }
                     break;
@@ -985,7 +985,7 @@ namespace MHTriServer.Player
                     break;
                 case 20:
                     {
-                        SendPacket(new AnsFmpListHead(1));
+                        SendPacket(new AnsFmpListHead(0, 1));
                     }
                     break;
                 case 25:

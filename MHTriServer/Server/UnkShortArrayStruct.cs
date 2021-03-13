@@ -4,16 +4,15 @@ using System.Diagnostics;
 
 namespace MHTriServer.Server
 {
-    public class UnknownDataStruct
+    public class UnkShortArrayStruct
     {
-        public uint UnknownField { get; private set; }
+        public uint UnknownField { get; set; }
 
-        public uint UnknownField2 { get; private set; }
+        public uint UnknownField2 { get; set; }
 
-        private List<ushort> m_unknownField3;
-        public IReadOnlyList<ushort> UnknownField3 => m_unknownField3;
+        public List<ushort> UnknownField3 { get; set; }
 
-        public static UnknownDataStruct Deserialize(ExtendedBinaryReader reader)
+        public static UnkShortArrayStruct Deserialize(ExtendedBinaryReader reader)
         {
             var byteCount = reader.ReadUInt16();
             var unknownField = reader.ReadUInt32();
@@ -26,11 +25,11 @@ namespace MHTriServer.Server
                 unknownField3.Add(reader.ReadUInt16());
             }
 
-            return new UnknownDataStruct()
+            return new UnkShortArrayStruct()
             {
                 UnknownField = unknownField,
                 UnknownField2 = unknownField2,
-                m_unknownField3 = unknownField3
+                UnknownField3 = unknownField3
             };
         }
 
@@ -42,7 +41,7 @@ namespace MHTriServer.Server
             writer.Write(UnknownField);
             writer.Write(UnknownField2);
 
-            foreach(var val in m_unknownField3)
+            foreach(var val in UnknownField3)
             {
                 writer.Write(val);
             }

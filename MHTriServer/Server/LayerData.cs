@@ -27,6 +27,8 @@ namespace MHTriServer.Server
 
         public uint UnknownField1 { get => Get<uint>(FIELD_1); set => Set(FIELD_1, value); }
 
+        public UnkShortArrayStruct UnknownField2 { get => Get<UnkShortArrayStruct>(FIELD_2); set => Set(FIELD_2, value); }
+
         public string Name {
             get => Get<string>(FIELD_3);
             set {
@@ -79,5 +81,33 @@ namespace MHTriServer.Server
             }
         }
 
+
+        protected override bool TryRead(byte key, byte type, ExtendedBinaryReader reader, out object value)
+        {
+            if (key == FIELD_2)
+            {
+                // TEST type?
+                value = UnkShortArrayStruct.Deserialize(reader);
+                return true;
+            }
+            return base.TryRead(key, type, reader, out value);
+        }
+
+        protected override bool TryWrite(byte key, object value, ExtendedBinaryWriter writer)
+        {
+            if (!(value is UnkShortArrayStruct unknownData))
+            {
+                return base.TryWrite(key, value, writer);
+            }
+
+            if (key == FIELD_2)
+            {
+                // The client write this byte, since technically is a binary payload 
+                writer.Write((byte)0x06);
+                unknownData.Serialize(writer);
+            }
+
+            return base.TryWrite(key, value, writer);
+        }
     }
 }
