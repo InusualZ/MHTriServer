@@ -7,7 +7,7 @@ namespace MHTriServer.Server
 {
     public class LmpServer : BaseServer
     {
-        public const int DefaultPort = 8000;
+        public const int DefaultPort = 8210;
 
         private Player.Player m_PendingPlayer = null;
 

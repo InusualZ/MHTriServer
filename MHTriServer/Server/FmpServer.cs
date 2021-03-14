@@ -9,7 +9,7 @@ namespace MHTriServer.Server
 {
     public class FmpServer : BaseServer
     {
-        public const int DefaultPort = 8020;
+        public const int DefaultPort = 8220;
 
         private readonly PlayerManager m_PlayerManager = null;
 
