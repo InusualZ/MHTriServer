@@ -334,7 +334,7 @@ namespace MHTriServer.Player
                         {
                             if (SendLastPacket)
                             {
-                                SendPacket(new AnsServerTime(0, 0));
+                                SendPacket(new AnsServerTime(745, 0));
                             }
                             else
                             {
