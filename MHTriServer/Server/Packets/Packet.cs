@@ -173,7 +173,11 @@ namespace MHTriServer.Server.Packets
                 {
                     lineBuilder.Append("  ");
                 }
-                lineBuilder.Append(separator);
+
+                if (x < slice.Length - 1)
+                {
+                    lineBuilder.Append(separator);
+                }
             }
             return lineBuilder.ToString();
         }
@@ -200,7 +204,7 @@ namespace MHTriServer.Server.Packets
 
                 lineBuilder.Append(Hexstring(slice, ' ', 16));
 
-                lineBuilder.Append("| ");
+                lineBuilder.Append(" | ");
                 lineBuilder.Append(slice.Select(b => Convert2ASCII(b)).ToArray());
 
                 Console.WriteLine(lineBuilder.ToString());
