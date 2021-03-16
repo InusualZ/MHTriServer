@@ -100,6 +100,8 @@ namespace MHTriServer
         private readonly byte[] m_buffer = new byte[8];
         private readonly Encoding m_Encoding;
 
+        public long Position { get => BaseStream.Position; set => BaseStream.Position = value; }
+
         public ExtendedBinaryWriter(Stream input) : this(input, new ASCIIEncoding(), false, Endianness.Little) { }
 
         public ExtendedBinaryWriter(Stream input, Encoding encoding) : this(input, encoding, false, Endianness.Little) { }

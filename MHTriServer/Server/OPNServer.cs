@@ -69,7 +69,7 @@ namespace MHTriServer.Server
                 m_PlayerManager.RemovePlayer(player);
             }
 
-            player.HandlePacket();
+            player.ReadPacketFromStream();
 
             // Handle player closing his own socket.
             // Refactor asap
@@ -89,7 +89,7 @@ namespace MHTriServer.Server
                 return;
             }
 
-            player.HandleState();
+            player.HandleWrite();
 
             // Handle player closing his own socket.
             // Refactor asap

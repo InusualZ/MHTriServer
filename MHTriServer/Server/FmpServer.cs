@@ -66,7 +66,7 @@ namespace MHTriServer.Server
 
             try
             {
-                player.HandlePacket();
+                player.ReadPacketFromStream();
             }
             catch (Exception e) { }
 
@@ -89,7 +89,7 @@ namespace MHTriServer.Server
                 return;
             }
 
-            player.HandleState();
+            player.HandleWrite();
 
             // Handle player closing his own socket.
             // Refactor asap

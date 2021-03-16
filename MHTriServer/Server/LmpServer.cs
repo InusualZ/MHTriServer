@@ -70,7 +70,7 @@ namespace MHTriServer.Server
                 RemoveClient(socket);
                 // At this point we have to handle the later reconnection of this player. To the same server!!!
 
-                if (player.NetworkState == 35 && m_PendingPlayer == null)
+                if (m_PendingPlayer == null)
                 {
                     m_PendingPlayer = player;
                 }
@@ -83,7 +83,7 @@ namespace MHTriServer.Server
                 return;
             }
 
-            player.HandlePacket();
+            player.ReadPacketFromStream();
 
             // Handle player closing his own socket.
             // Refactor asap
@@ -103,7 +103,7 @@ namespace MHTriServer.Server
                 return;
             }
 
-            player.HandleState();
+            player.HandleWrite();
 
             // Handle player closing his own socket.
             // Refactor asap

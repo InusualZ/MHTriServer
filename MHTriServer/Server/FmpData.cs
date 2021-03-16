@@ -14,11 +14,9 @@ namespace MHTriServer.Server
         // private const byte FIELD_11 = 0x0b;
         private const byte FIELD_12 = 0x0c; // Used
 
-        // Probably Index
-        public uint UnknownField1 { get => Get<uint>(FIELD_1); set => Set(FIELD_1, value); }
+        public uint Index { get => Get<uint>(FIELD_1); set => Set(FIELD_1, value); }
 
-        // Probably Address
-        public string UnknownField2 {
+        public string ServerAddress {
             get => Get<string>(FIELD_2);
             set {
                 Debug.Assert(value.Length < 0x100);
@@ -26,18 +24,14 @@ namespace MHTriServer.Server
             }
         }
 
-        // Probably Port
-        public ushort UnknownField3 { get => Get<ushort>(FIELD_3); set => Set(FIELD_3, value); }
+        public ushort ServerPort { get => Get<ushort>(FIELD_3); set => Set(FIELD_3, value); }
 
         public ulong UnknownField7 { get => Get<ulong>(FIELD_7); set => Set(FIELD_7, value); }
 
-        // Probably user count
         public uint CurrentPopulation { get => Get<uint>(FIELD_8); set => Set(FIELD_8, value); }
 
-        // Probably max user count
         public uint MaxPopulation { get => Get<uint>(FIELD_9); set => Set(FIELD_9, value); }
 
-        // Probably server name
         public string ServerName {
             get => Get<string>(FIELD_10);
             set {
@@ -49,11 +43,11 @@ namespace MHTriServer.Server
         public uint UnknownField12 { get => Get<uint>(FIELD_12); set => Set(FIELD_12, value); }
 
 
-        public static FmpData Simple(uint unknownField1, uint currentPopulation, uint maxPopulation, ulong unknownField7, 
+        public static FmpData Simple(uint index, uint currentPopulation, uint maxPopulation, ulong unknownField7, 
             string serverName, uint unknownField12)
         {
             return new FmpData() { 
-                UnknownField1 = unknownField1,
+                Index = index,
                 CurrentPopulation = currentPopulation,
                 MaxPopulation = maxPopulation,
                 UnknownField7 = unknownField7,
@@ -66,7 +60,7 @@ namespace MHTriServer.Server
         {
             return new FmpData()
             {
-                UnknownField1 = unknownField1,
+                Index = unknownField1,
                 CurrentPopulation = currentPopulation,
                 MaxPopulation = maxPopulation,
             };
@@ -76,8 +70,8 @@ namespace MHTriServer.Server
         {
             return new FmpData()
             {
-                UnknownField2 = address,
-                UnknownField3 = port,
+                ServerAddress = address,
+                ServerPort = port,
             };
         }
     }

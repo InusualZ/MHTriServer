@@ -9,9 +9,10 @@ namespace MHTriServer.Server.Packets
 
         public uint FmpListVersion { get; private set; }
 
+        // Seems to be always 1
         public uint UnknownField { get; private set; }
 
-        public uint UnknownField2 { get; private set; }
+        public uint MaxServerCount { get; private set; }
 
         public byte[] Format { get; private set; }
 
@@ -26,7 +27,7 @@ namespace MHTriServer.Server.Packets
             base.Serialize(writer);
             writer.Write(FmpListVersion);
             writer.Write(UnknownField);
-            writer.Write(UnknownField2);
+            writer.Write(MaxServerCount);
             writer.WriteByteBytes(Format);
         }
 
@@ -35,14 +36,14 @@ namespace MHTriServer.Server.Packets
             Debug.Assert(ID == PACKET_ID || ID == PACKET_ID_FMP);
             FmpListVersion = reader.ReadUInt32();
             UnknownField = reader.ReadUInt32();
-            UnknownField2 = reader.ReadUInt32();
+            MaxServerCount = reader.ReadUInt32();
             Format = reader.ReadByteBytes();
         }
 
         public override string ToString()
         {
             return base.ToString() + $":\n\tFmpListVersion {FmpListVersion}\n\tUnknownField {UnknownField}" +
-                $"\n\tUnknownField2 {UnknownField2}\n\tFormat '{Packet.Hexstring(Format, ' ')}'";
+                $"\n\tMaxServerCount {MaxServerCount}\n\tFormat '{Packet.Hexstring(Format, ' ')}'";
         }
     }
 }

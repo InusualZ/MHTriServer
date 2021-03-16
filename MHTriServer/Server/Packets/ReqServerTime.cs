@@ -25,5 +25,10 @@ namespace MHTriServer.Server.Packets
 
             UnknownField = reader.ReadUInt32();
         }
+
+        public override string ToString()
+        {
+            return base.ToString() + $":\n\tUnknownField {UnknownField}";
+        }
     }
 }

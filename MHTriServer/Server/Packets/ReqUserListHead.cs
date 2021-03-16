@@ -8,11 +8,11 @@ namespace MHTriServer.Server.Packets
 
         public uint UnknownField { get; private set; }
 
-        public uint ClientSlotCount { get; private set; }
+        public uint SlotCount { get; private set; }
 
         public byte[] Format { get; set; }
 
-        public ReqUserListHead(uint unknownField, uint clientSlotCount, byte[] format) : base(PACKET_ID) => (UnknownField, ClientSlotCount, Format) = (unknownField, clientSlotCount, format);
+        public ReqUserListHead(uint unknownField, uint slotCount, byte[] format) : base(PACKET_ID) => (UnknownField, SlotCount, Format) = (unknownField, slotCount, format);
 
         public ReqUserListHead(uint id, ushort size, ushort counter) : base(id, size, counter) { }
 
@@ -20,8 +20,7 @@ namespace MHTriServer.Server.Packets
         {
             base.Serialize(writer);
             writer.Write(UnknownField);
-            writer.Write(ClientSlotCount);
-
+            writer.Write(SlotCount);
             writer.WriteByteBytes(Format);
         }
 
@@ -29,9 +28,13 @@ namespace MHTriServer.Server.Packets
         {
             Debug.Assert(ID == PACKET_ID);
             UnknownField = reader.ReadUInt32();
-            ClientSlotCount = reader.ReadUInt32();
-
+            SlotCount = reader.ReadUInt32();
             Format = reader.ReadByteBytes();
+        }
+
+        public override string ToString()
+        {
+            return base.ToString() + $":\n\tUnknownField {UnknownField}\n\tSlotCount {SlotCount}\n\tFormat {Packet.Hexstring(Format, ' ')}";
         }
     }
 }
