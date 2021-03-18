@@ -25,6 +25,7 @@ namespace MHTriServer.Player
 
         private bool AfterFirstConnection = false;
         private ushort m_PacketCounter = 0;
+        private ushort m_LastCounter = 0;
         private bool m_ConnectionRequest = false;
 
         public EndPoint RemoteEndPoint => m_Socket.RemoteEndPoint;
@@ -33,7 +34,12 @@ namespace MHTriServer.Player
 
         public bool ConnectionAccepted { get; private set; }
 
-        
+        /*
+         * TEMP VARIABLES
+         */
+
+        private bool AfterLayerChildData = false;
+
         internal Player(ConnectionType connectionType, Socket socket, Stream networkStream)
         {
             m_LastSent = new Stopwatch();
@@ -126,7 +132,7 @@ namespace MHTriServer.Player
                 // Reset pointer, since we are going to handle the entire stream here
                 m_ReadingPosition = 0;
 
-                var packetCounter = reader.ReadUInt16();
+                var packetCounter = m_LastCounter = reader.ReadUInt16();
                 var packetId = reader.ReadUInt32();
                 var packet = Packet.CreateFrom(packetId, packetSize, packetCounter);
                 if (packet == null)
@@ -286,7 +292,7 @@ namespace MHTriServer.Player
                         }
                         else if (ConnectionType == ConnectionType.FMP) 
                         {
-                            // TODO: Implement me
+                            SendPacket(new AnsFmpListVersion(2));
                         }
                     }
                     break;
@@ -299,7 +305,7 @@ namespace MHTriServer.Player
                         }
                         else
                         {
-                            // TODO: Implement me
+                            SendPacket(new AnsFmpListHead(0, 1));
                         }
                     }
                     break;
@@ -315,20 +321,17 @@ namespace MHTriServer.Player
                         }
                         else
                         {
-                            // TODO: Implement me
+                            var servers = new List<FmpData>() {
+                                FmpData.Simple(1, 0, 4, 4, "Valor1", 0)
+                            };
+
+                            SendPacket(new AnsFmpListData(servers));
                         }
                     }
                     break;
                 case ReqFmpListFoot _:
                     {
-                        if (ConnectionType == ConnectionType.LMP)
-                        {
-                            SendPacket(new AnsFmpListFoot());
-                        }
-                        else
-                        {
-                            // TODO: Implement me
-                        }
+                        SendPacket(new AnsFmpListFoot());
                     }
                     break;
 
@@ -393,6 +396,173 @@ namespace MHTriServer.Player
                     }
                     break;
 
+                case ReqLayerStart reqLayerStart:
+                    {
+                        var data = new LayerData()
+                        {
+                            Name = "Joe",
+                            UnknownField5 = (ushort)"Joe".Length,
+                            CurrentPopulation = 0,
+                            UnknownField7 = 100,
+                            UnknownField10 = 0,
+                            UnknownField11 = 0,
+                            UnknownField17 = 0,
+                            UnknownField18 = true
+                        };
+                        SendPacket(new AnsLayerStart(data));
+                    }
+                    break;
+
+                case ReqCircleInfoNoticeSet _:
+                    {
+                        SendPacket(new AnsCircleInfoNoticeSet());
+                    }
+                    break;
+
+                case ReqUserBinarySet reqUserBinarySet:
+                    {
+                        // TODO: What am I suppose to do with the binary data?
+                        SendPacket(new AnsUserBinarySet());
+                    }
+                    break;
+
+                case ReqUserSearchSet reqUserSearchSet:
+                    {
+                        // TODO: What am I suppose to do with the binary data?
+                        SendPacket(new AnsUserSearchSet());
+                    }
+                    break;
+
+                case ReqBinaryVersion reqBinaryVersion:
+                    {
+                        // The client doesn't seems to care about what we send in the parameter
+                        if (reqBinaryVersion.UnknownField == 1)
+                        {
+                            SendPacket(new AnsBinaryVersion(0, 0));
+                        }
+                        else
+                        {
+                            SendPacket(new AnsBinaryVersion(0, 0));
+                        }
+                    }
+                    break;
+
+                case ReqFriendList reqFriendList:
+                    {
+                        var friends = new List<FriendData>();
+                        SendPacket(new AnsFriendList(friends));
+                    }
+                    break;
+
+                case ReqBlackList reqBlackList:
+                    {
+                        var blackList = new List<FriendData>();
+                        SendPacket(new AnsBlackList(blackList));
+                    }
+                    break;
+
+                case ReqLayerChildInfo reqLayerChildInfo:
+                    {
+                        if (AfterLayerChildData) {
+                            var userNumData = new UserNumData()
+                            {
+                                // UnknownField - Don't know what to send
+                                UnknownField2 = 2,
+                                UnknownField3 = 3,
+                                UnknownField4 = 4,
+                                UnknownField5 = 5,
+                                UnknownField6 = 6,
+                                UnknownField7 = 7,
+                            };
+
+                            // SendPacket(new NtcLayerUserNum(1, userNumData));
+
+                            // TODO: Figure out what this packet does, and also. we should probably what we send in AnsLayerChildInfo too
+                        }
+
+                        var data = new LayerData()
+                        {
+                            Name = "Joe",
+                            UnknownField5 = 0,
+                            CurrentPopulation = 1,
+                            UnknownField7 = 100,
+                            UnknownField10 = 3,
+                            UnknownField11 = 2,
+                            UnknownField12 = 1,
+                            UnknownField17 = 4,
+                            UnknownField18 = true
+                        };
+
+                        var unkData = new List<UnkByteIntStruct>() {
+                            new UnkByteIntStruct() {
+                                UnknownField = 7,
+                                ContainUnknownField3 = true,
+                                UnknownField3 = 8
+                            }
+                        };
+
+
+                        SendPacket(new AnsLayerChildInfo(1, data, unkData));
+                    }
+                    break;
+
+                case ReqLayerChildListHead reqChildListHead:
+                    {
+                        SendPacket(new AnsLayerChildListHead(1));
+                    }
+                    break;
+
+                case ReqLayerChildListData reqLayerChildListData:
+                    {
+                        var childsData = new List<LayerChildData>();
+                        childsData.Add(new LayerChildData() { 
+                            ChildData = new LayerData()
+                            {
+                                Name = "Valor2",
+                                UnknownField5 = 1,
+                                CurrentPopulation = 0,
+                                MaxPopulation = 100,
+                                UnknownField7 = 5,
+                                UnknownField10 = 3,
+                                UnknownField11 = 2,
+                                UnknownField12 = 1,
+                                UnknownField16 = 1, // Value must be 1 or 2. Seems to be a Enum of some kind
+                                UnknownField17 = 4,
+                                UnknownField18 = true
+                            },
+                            UnknownField2 = new List<UnkByteIntStruct>() { 
+                                new UnkByteIntStruct() {
+                                    UnknownField = 5,
+                                    ContainUnknownField3 = true,
+                                    UnknownField3 = 6
+                                }
+                            }
+                        });
+
+                        AfterLayerChildData = true;
+
+                        SendPacket(new AnsLayerChildListData(childsData));
+                    }
+                    break;
+
+                case ReqLayerChildListFoot _:
+                    {
+                        SendPacket(new AnsLayerChildListFoot());
+                    }
+                    break;
+
+                case ReqLayerDown reqLayerDown:
+                    {
+                        SendPacket(new AnsLayerDown(2));
+                    }
+                    break;
+
+                case ReqUserStatusSet reqUserStatusSet:
+                    {
+                        SendPacket(new AnsUserStatusSet());
+                    }
+                    break;
+
                 case ReqShut _:
                     {
                         SendPacket(new AnsShut(0));
@@ -437,7 +607,15 @@ namespace MHTriServer.Player
             // Rewind
             m_SendStream.Position = initialPosition;
             m_SendStream.Write((ushort)packetSize);
-            m_SendStream.Write(m_PacketCounter++);
+
+            if ((packet.ID & 0x0000ff00) == 2)
+            {
+                m_SendStream.Write(m_LastCounter);
+            }
+            else
+            {
+                m_SendStream.Write(m_PacketCounter++);
+            }
             m_SendStream.Position += packetSize + 4;
 
             if (flushImmediatly)

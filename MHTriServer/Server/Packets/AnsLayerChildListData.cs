@@ -7,11 +7,9 @@ namespace MHTriServer.Server.Packets
     {
         public const uint PACKET_ID = 0x64250200;
 
-        private List<LayerData> m_slots;
+        public List<LayerChildData> Data { get; private set; }
 
-        public IReadOnlyList<LayerData> Slots => m_slots;
-
-        public AnsLayerChildListData(List<LayerData> slots) : base(PACKET_ID) => m_slots = slots;
+        public AnsLayerChildListData(List<LayerChildData> data) : base(PACKET_ID) => Data = data;
 
         public AnsLayerChildListData(uint id, ushort size, ushort counter) : base(id, size, counter) { }
 
@@ -19,11 +17,12 @@ namespace MHTriServer.Server.Packets
         {
             base.Serialize(writer);
             writer.Write((uint)0); // This field is read, but not used.
-            writer.Write((uint) Slots.Count);
+            writer.Write((uint) Data.Count);
 
-            foreach(var slot in m_slots)
+            foreach(var data in Data)
             {
-                slot.Serialize(writer);
+                data.ChildData.Serialize(writer);
+                UnkByteIntStruct.SerializeArray(data.UnknownField2, writer);
             }
         }
 
@@ -32,12 +31,16 @@ namespace MHTriServer.Server.Packets
             Debug.Assert(ID == PACKET_ID);
 
             _ = reader.ReadUInt32();
+            var listCount = reader.ReadUInt32();
 
-            var slotListCount = reader.ReadUInt32();
-            m_slots = new List<LayerData>((int)slotListCount);
-            for (var i = 0; i < slotListCount; ++i)
+            Data = new List<LayerChildData>((int)listCount);
+            for (var i = 0; i < listCount; ++i)
             {
-                m_slots.Add(CompoundList.Deserialize<LayerData>(reader));
+                Data.Add(new LayerChildData()
+                {
+                    ChildData = CompoundList.Deserialize<LayerData>(reader),
+                    UnknownField2 = UnkByteIntStruct.DeserializeArray(reader)
+                });
             }
         }
     }

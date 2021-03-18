@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace MHTriServer.Server.Packets
 {
@@ -10,10 +11,10 @@ namespace MHTriServer.Server.Packets
 
         public LayerData UnknownField2 { get; private set; }
 
-        // public byte[] UnknownField3 { get; private set; }
+        public List<UnkByteIntStruct> UnknownField3 { get; private set; }
 
-        public AnsLayerChildInfo(ushort unknownField, LayerData layerData) : base(PACKET_ID)
-            => (UnknownField, UnknownField2) = (unknownField, layerData);
+        public AnsLayerChildInfo(ushort unknownField, LayerData layerData, List<UnkByteIntStruct> unknownField3) : base(PACKET_ID)
+            => (UnknownField, UnknownField2, UnknownField3) = (unknownField, layerData, unknownField3);
 
         public AnsLayerChildInfo(uint id, ushort size, ushort counter) : base(id, size, counter) { }
 
@@ -23,8 +24,7 @@ namespace MHTriServer.Server.Packets
             writer.Write(UnknownField);
             UnknownField2.Serialize(writer);
 
-            // FIXME: Data would be left unwritten
-            writer.Write((byte)0);
+            UnkByteIntStruct.SerializeArray(UnknownField3, writer);
         }
 
         public override void Deserialize(ExtendedBinaryReader reader)
@@ -32,12 +32,22 @@ namespace MHTriServer.Server.Packets
             Debug.Assert(ID == PACKET_ID);
             UnknownField = reader.ReadUInt16();
             UnknownField2 = CompoundList.Deserialize<LayerData>(reader);
-            // FIXME: Data would be left unread
+            UnknownField3 = UnkByteIntStruct.DeserializeArray(reader);
         }
 
         public override string ToString()
         {
-            return base.ToString() + $":\n\tUnknownField {UnknownField}\n\tUnknownField2({UnknownField2})";
+            var str = $":\n\tUnknownField {UnknownField}\n\tUnknownField2\n\t{UnknownField2})\n\tUnknownField3({UnknownField3.Count})";
+            for (var i = 0; i < UnknownField3.Count; ++i)
+            {
+                var data = UnknownField3[i];
+                str += $"\n\t  [{i}] =>\n\t    UnknownField {data.UnknownField}";
+                if (data.ContainUnknownField3)
+                {
+                    str += $"\n\t    UnknownField3 {data.UnknownField3}";
+                }
+            }
+            return base.ToString() + str;
         }
     }
 }

@@ -6,20 +6,20 @@ namespace MHTriServer.Server
     public class LayerData : CompoundList
     {
         private const byte FIELD_1 = 0x01;
-        private const byte FIELD_2 = 0x02; // Weird field
-        private const byte FIELD_3 = 0x03;
-        private const byte FIELD_5 = 0x05;
-        private const byte FIELD_6 = 0x06;
-        private const byte FIELD_7 = 0x07;
+        private const byte FIELD_2 = 0x02;
+        private const byte FIELD_3 = 0x03; // Used
+        private const byte FIELD_5 = 0x05; // Used
+        private const byte FIELD_6 = 0x06; // Used
+        private const byte FIELD_7 = 0x07; // Used
         private const byte FIELD_8 = 0x08;
         private const byte FIELD_9 = 0x09;
-        private const byte FIELD_10 = 0x0a;
-        private const byte FIELD_11 = 0x0b;
+        private const byte FIELD_10 = 0x0a; // Used
+        private const byte FIELD_11 = 0x0b; // Used
         private const byte FIELD_12 = 0x0c;
         private const byte FIELD_13 = 0x0d;
         private const byte FIELD_16 = 0x10;
-        private const byte FIELD_17 = 0x11;
-        private const byte FIELD_18 = 0x12;
+        private const byte FIELD_17 = 0x11; // Used
+        private const byte FIELD_18 = 0x12; // Used
         private const byte FIELD_21 = 0x15;
         private const byte FIELD_22 = 0x16;
         private const byte FIELD_23 = 0x17;
@@ -37,7 +37,7 @@ namespace MHTriServer.Server
             }
         }
 
-        // Any value that you put here, when the client receive it. It would substract one
+        // Any value that you put here, when the client receive it would substract one
         public ushort UnknownField5 { get => Get<ushort>(FIELD_5); set => Set(FIELD_5, value); }
 
         public uint CurrentPopulation { get => Get<uint>(FIELD_6); set => Set(FIELD_6, value); }
@@ -60,7 +60,7 @@ namespace MHTriServer.Server
 
         public uint UnknownField17 { get => Get<uint>(FIELD_17); set => Set(FIELD_17, value); }
 
-        public byte UnknownField18 { get => Get<byte>(FIELD_18); set => Set(FIELD_18, value); }
+        public bool UnknownField18 { get => Get<byte>(FIELD_18) == 0x01; set => Set(FIELD_18, value ? 0x01 : 0x00); }
 
         // Any value that you put here, when the client receive it. It would substract one
         public byte UnknownField21 { get => Get<byte>(FIELD_21); set => Set(FIELD_21, value); }

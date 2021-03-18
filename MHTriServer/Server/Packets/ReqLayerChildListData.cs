@@ -8,10 +8,10 @@ namespace MHTriServer.Server.Packets
 
         public uint UnknownField { get; private set; }
 
-        public uint UnknownField2 { get; private set; }
+        public uint ExpectedDataCount { get; private set; }
 
         public ReqLayerChildListData(uint unknownField, uint unknownField2) : base(PACKET_ID)
-            => (UnknownField, UnknownField2) = (unknownField, unknownField2);
+            => (UnknownField, ExpectedDataCount) = (unknownField, unknownField2);
 
         public ReqLayerChildListData(uint id, ushort size, ushort counter) : base(id, size, counter) { }
 
@@ -19,7 +19,7 @@ namespace MHTriServer.Server.Packets
         {
             base.Serialize(writer);
             writer.Write(UnknownField);
-            writer.Write(UnknownField2);
+            writer.Write(ExpectedDataCount);
         }
 
         public override void Deserialize(ExtendedBinaryReader reader)
@@ -27,12 +27,12 @@ namespace MHTriServer.Server.Packets
             Debug.Assert(ID == PACKET_ID);
             Debug.Assert(Size == 8);
             UnknownField = reader.ReadUInt32();
-            UnknownField2 = reader.ReadUInt32();
+            ExpectedDataCount = reader.ReadUInt32();
         }
 
         public override string ToString()
         {
-            return base.ToString() + $":\n\tUnknownField {UnknownField}\n\tUnknownField2 {UnknownField2}";
+            return base.ToString() + $":\n\tUnknownField {UnknownField}\n\tExpectedDataCount {ExpectedDataCount}";
         }
     }
 }
