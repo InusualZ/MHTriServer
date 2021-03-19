@@ -85,6 +85,7 @@ namespace MHTriServer.Server.Packets
             RegisterWith<AnsLayerEnd>(AnsLayerEnd.PACKET_ID);
             RegisterWith<AnsLayerStart>(AnsLayerStart.PACKET_ID);
             RegisterWith<AnsLayerUserList>(AnsLayerUserList.PACKET_ID);
+            RegisterWith<AnsLineCheck>(AnsLineCheck.PACKET_ID);
             RegisterWith<AnsLoginInfo>(AnsLoginInfo.PACKET_ID);
             RegisterWith<AnsMaintenance>(AnsMaintenance.PACKET_ID);
             RegisterWith<AnsServerTime>(AnsServerTime.PACKET_ID);
@@ -101,6 +102,7 @@ namespace MHTriServer.Server.Packets
             RegisterWith<LmpConnect>(LmpConnect.PACKET_ID);
             RegisterWith<NtcLayerUserNum>(NtcLayerUserNum.PACKET_ID);
             RegisterWith<NtcLogin>(NtcLogin.PACKET_ID);
+            RegisterWith<ReqAuthenticationToken>(ReqAuthenticationToken.PACKET_ID);
             RegisterWith<ReqBinaryData>(ReqBinaryData.PACKET_ID);
             RegisterWith<ReqBinaryFoot>(ReqBinaryFoot.PACKET_ID);
             RegisterWith<ReqBinaryHead>(ReqBinaryHead.PACKET_ID);
@@ -124,6 +126,7 @@ namespace MHTriServer.Server.Packets
             RegisterWith<ReqLayerUserList>(ReqLayerUserList.PACKET_ID);
             RegisterWith<ReqLineCheck>(ReqLineCheck.PACKET_ID);
             RegisterWith<ReqLoginInfo>(ReqLoginInfo.PACKET_ID);
+            RegisterWith<ReqMaintenance>(ReqMaintenance.PACKET_ID);
             RegisterWith<ReqMediaVersionInfo>(ReqMediaVersionInfo.PACKET_ID);
             RegisterWith<ReqServerTime>(ReqServerTime.PACKET_ID);
             RegisterWith<ReqShut>(ReqShut.PACKET_ID);

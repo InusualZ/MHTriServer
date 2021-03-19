@@ -110,7 +110,7 @@ namespace MHTriServer.Player
                     var notRead = m_ReadBuffer[((int)packetStream.Position)..((int)packetStream.Length)];
                     m_ReadingPosition = (int)packetStream.Position;
                     Console.Error.WriteLine($"Not enough data for a packet {Packet.Hexstring(notRead, ' ')}");
-                    return;
+                    break;
                 }
 
                 var packetSize = reader.ReadUInt16();
@@ -176,6 +176,9 @@ namespace MHTriServer.Player
 
                 Handle(packet);
             }
+
+            // Make sure we are reading everything!
+            Debug.Assert(reader.BaseStream.Position >= reader.BaseStream.Length);
         }
 
         private void Handle(Packet packet)
@@ -189,20 +192,33 @@ namespace MHTriServer.Player
                         if (ConnectionType == ConnectionType.OPN)
                         {
                             // TODO: Figure out what login type 3 means?
-                            SendPacket(new NtcLogin(3));
+                            SendPacket(new NtcLogin(ServerLoginType.OPN_SERVER_SOON_MAINTENANCE));
                         }
                         else if (ConnectionType == ConnectionType.LMP)
                         {
                             // TODO: Figure out what login type 1 means?
                             // In this case if we don't send 1, the client just kick us
-                            SendPacket(new NtcLogin(!AfterFirstConnection ? (byte)1 : (byte)2));
+                            SendPacket(new NtcLogin(!AfterFirstConnection ? ServerLoginType.LMP_NORMAL_FIRST: ServerLoginType.LMP_NORMAL_SECOND));
                         }
                         else if (ConnectionType == ConnectionType.FMP)
                         {
                             // TODO: Figure out what login type 3/5 means.
                             // Value need to be 3 or 5 in order to proceed with the login process
-                            SendPacket(new NtcLogin(3));
+                            SendPacket(new NtcLogin(ServerLoginType.FMP_NORMAL));
                         }
+                    }
+                    break;
+
+                case ReqAuthenticationToken reqAuthenticationToken:
+                    {
+                        // TODO: Should probably store the token
+                        SendPacket(new AnsAuthenticationToken());
+                    }
+                    break;
+
+                case ReqMaintenance _:
+                    {
+                        SendPacket(new AnsMaintenance("<BODY><CENTER><SIZE=62>MHTri Server<BR><BODY>Custom Server Implementation<BR><BR><BODY><LEFT>Special Thanks<BR><BODY><COLOR=2>Sepalani<BR><BODY>Dolphin Emulator Team<BR><BR><BODY><CENTER><SIZE=40><COLOR=7>Without their work this project would not be possible<END>"));
                     }
                     break;
 
@@ -625,8 +641,9 @@ namespace MHTriServer.Player
                 case ServerTimeout _:
                     m_NetworkStream.Dispose();
                     m_Socket.Dispose();
-                    return;
+                    break;
             }
+
         }
 
         internal void HandleWrite()
@@ -647,6 +664,14 @@ namespace MHTriServer.Player
             if (m_SendStream.Position > 0)
             {
                 FlushPackets();
+            }
+            else
+            {
+                // Ping System
+                if (m_LastSent.ElapsedMilliseconds >= 30000) 
+                {
+                    SendPacket(new ReqLineCheck(), true);
+                }
             }
         }
 
