@@ -218,7 +218,13 @@ namespace MHTriServer.Player
 
                 case ReqMaintenance _:
                     {
-                        SendPacket(new AnsMaintenance("<BODY><CENTER><SIZE=62>MHTri Server<BR><BODY>Custom Server Implementation<BR><BR><BODY><LEFT>Special Thanks<BR><BODY><COLOR=2>Sepalani<BR><BODY>Dolphin Emulator Team<BR><BR><BODY><CENTER><SIZE=40><COLOR=7>Without their work this project would not be possible<END>"));
+                        SendPacket(new AnsMaintenance(Constants.MAINTENANCE_MESSAGE));
+                    }
+                    break;
+
+                case ReqTermsVersion _:
+                    {
+                        SendPacket(new AnsTermsVersion(Constants.TERMS_AND_CONDITIONS_VERSION, (uint)Constants.TERMS_AND_CONDITIONS.Length));
                     }
                     break;
 
@@ -229,7 +235,7 @@ namespace MHTriServer.Player
                         // It seems that there is a bug or something, in their network loop.
                         // I can bypass a lot of thing by sending LmpConnect next
 
-                        SendPacket(new LmpConnect("127.0.0.1", LmpServer.DefaultPort));
+                        // SendPacket(new LmpConnect("127.0.0.1", LmpServer.DefaultPort));
                     }
                     break;
 
