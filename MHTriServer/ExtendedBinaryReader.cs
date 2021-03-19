@@ -102,7 +102,7 @@ namespace MHTriServer
 
         public long Position { get => BaseStream.Position; set => BaseStream.Position = value; }
 
-        public ExtendedBinaryWriter(Stream input) : this(input, new ASCIIEncoding(), false, Endianness.Little) { }
+        public ExtendedBinaryWriter(Stream input) : this(input, Encoding.ASCII, false, Endianness.Little) { }
 
         public ExtendedBinaryWriter(Stream input, Encoding encoding) : this(input, encoding, false, Endianness.Little) { }
 
@@ -110,7 +110,7 @@ namespace MHTriServer
             this(input, encoding, leaveOpen, Endianness.Little) {}
 
         public ExtendedBinaryWriter(Stream input, Endianness endianness) : 
-            this(input, new ASCIIEncoding(), false, endianness) { }
+            this(input, Encoding.ASCII, false, endianness) { }
 
         public ExtendedBinaryWriter(Stream input, Encoding encoding, Endianness endianness) :
             this(input,encoding, false, endianness) { }
