@@ -355,6 +355,18 @@ namespace MHTriServer.Player
                         {
                             binaryLength = 10;
                         }
+                        else if (reqBinaryHead.BinaryType == 2)
+                        {
+                            binaryLength = 12;
+                        }
+                        else if (reqBinaryHead. BinaryType == 3)
+                        {
+                            binaryLength = 4;
+                        }
+                        else if (reqBinaryHead.BinaryType == 4)
+                        {
+                            binaryLength = 4;
+                        }
                         else
                         {
 
@@ -370,13 +382,27 @@ namespace MHTriServer.Player
                         byte[] binaryData = null;
                         if (reqBinaryData.BinaryType == 5)
                         {
-                            // The server doesn't seems to
+                            // Unknown Data
                             binaryData = new byte[] { 0x09, 0x09, 0, 0, 0, 0, 0, 0, 0, 0 };
 
                         }
-                        else
+                        else if (reqBinaryData.BinaryType == 2)
                         {
-
+                            // Lobby Weather Data *Sandstorm*
+                            binaryData = new byte[] { 
+                                0x00, 0x00, 0x01, 0xF4, 
+                                0x00, 0x00, 0x00, 0x01, 
+                                0x00, 0x00, 0x50, 0x00
+                            };
+                        }
+                        else if (reqBinaryData.BinaryType == 3)
+                        {
+                            // ???
+                            binaryData = new byte[] { 0x09, 0x09, 0, 0 };
+                        }
+                        else if (reqBinaryData.BinaryType == 4)
+                        {
+                            binaryData = new byte[] { 0x09, 0x09, 0, 0 };
                         }
 
                         SendPacket(new AnsBinaryData(reqBinaryData.BinaryType, unkField2, (uint)binaryData.Length, binaryData));
@@ -442,7 +468,7 @@ namespace MHTriServer.Player
                         }
                         else
                         {
-                            SendPacket(new AnsBinaryVersion(0, 0));
+                            SendPacket(new AnsBinaryVersion(1,1));
                         }
                     }
                     break;
@@ -463,46 +489,73 @@ namespace MHTriServer.Player
 
                 case ReqLayerChildInfo reqLayerChildInfo:
                     {
-                        if (AfterLayerChildData) {
+                        if (AfterLayerChildData)
+                        {
                             var userNumData = new UserNumData()
                             {
                                 // UnknownField - Don't know what to send
-                                UnknownField2 = 2,
-                                UnknownField3 = 3,
-                                UnknownField4 = 4,
-                                UnknownField5 = 5,
-                                UnknownField6 = 6,
-                                UnknownField7 = 7,
+                                UnknownField2 = 1,
+                                UnknownField3 = 2,
+                                UnknownField4 = 3,
+                                UnknownField5 = 4,
+                                UnknownField6 = 5,
+                                UnknownField7 = 6,
                             };
 
-                            // SendPacket(new NtcLayerUserNum(1, userNumData));
+                            // TODO: Figure out what this packet doe
 
-                            // TODO: Figure out what this packet does, and also. we should probably what we send in AnsLayerChildInfo too
+                            SendPacket(new NtcLayerUserNum(1, userNumData));
+
+                            var data = new LayerData()
+                            {
+                                Name = "Joe",
+                                UnknownField5 = 2,
+                                CurrentPopulation = 1,
+                                UnknownField7 = 100,
+                                UnknownField10 = 3,
+                                UnknownField11 = 2,
+                                UnknownField12 = 1,
+                                UnknownField17 = 4,
+                                UnknownField18 = false
+                            };
+
+                            var unkData = new List<UnkByteIntStruct>() {
+                                new UnkByteIntStruct() {
+                                    UnknownField = 7,
+                                    ContainUnknownField3 = true,
+                                    UnknownField3 = 8
+                                }
+                            };
+
+                            SendPacket(new AnsLayerChildInfo(1, data, unkData));
+                        }
+                        else
+                        {
+
+                            var data = new LayerData()
+                            {
+                                Name = "Joe",
+                                UnknownField5 = 0,
+                                CurrentPopulation = 1,
+                                UnknownField7 = 100,
+                                UnknownField10 = 3,
+                                UnknownField11 = 2,
+                                UnknownField12 = 1,
+                                UnknownField17 = 4,
+                                UnknownField18 = true
+                            };
+
+                            var unkData = new List<UnkByteIntStruct>() {
+                                new UnkByteIntStruct() {
+                                    UnknownField = 7,
+                                    ContainUnknownField3 = true,
+                                    UnknownField3 = 8
+                                }
+                            };
+
+                            SendPacket(new AnsLayerChildInfo(1, data, unkData));
                         }
 
-                        var data = new LayerData()
-                        {
-                            Name = "Joe",
-                            UnknownField5 = 0,
-                            CurrentPopulation = 1,
-                            UnknownField7 = 100,
-                            UnknownField10 = 3,
-                            UnknownField11 = 2,
-                            UnknownField12 = 1,
-                            UnknownField17 = 4,
-                            UnknownField18 = true
-                        };
-
-                        var unkData = new List<UnkByteIntStruct>() {
-                            new UnkByteIntStruct() {
-                                UnknownField = 7,
-                                ContainUnknownField3 = true,
-                                UnknownField3 = 8
-                            }
-                        };
-
-
-                        SendPacket(new AnsLayerChildInfo(1, data, unkData));
                     }
                     break;
 
@@ -526,7 +579,7 @@ namespace MHTriServer.Player
                                 UnknownField10 = 3,
                                 UnknownField11 = 2,
                                 UnknownField12 = 1,
-                                UnknownField16 = 1, // Value must be 1 or 2. Seems to be a Enum of some kind
+                                UnknownField16 = 2, // Value must be 1 or 2. Seems to be a Enum of some kind
                                 UnknownField17 = 4,
                                 UnknownField18 = true
                             },
