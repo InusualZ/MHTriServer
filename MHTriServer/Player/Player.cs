@@ -192,7 +192,7 @@ namespace MHTriServer.Player
                         if (ConnectionType == ConnectionType.OPN)
                         {
                             // TODO: Figure out what login type 3 means?
-                            SendPacket(new NtcLogin(ServerLoginType.OPN_SERVER_SOON_MAINTENANCE));
+                            SendPacket(new NtcLogin((ServerLoginType) 0x04));
                         }
                         else if (ConnectionType == ConnectionType.LMP)
                         {

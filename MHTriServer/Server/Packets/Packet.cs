@@ -95,6 +95,7 @@ namespace MHTriServer.Server.Packets
             RegisterWith<AnsLineCheck>(AnsLineCheck.PACKET_ID);
             RegisterWith<AnsLoginInfo>(AnsLoginInfo.PACKET_ID);
             RegisterWith<AnsMaintenance>(AnsMaintenance.PACKET_ID);
+            RegisterWith<AnsMediaVersionInfo>(AnsMediaVersionInfo.PACKET_ID);
             RegisterWith<AnsServerTime>(AnsServerTime.PACKET_ID);
             RegisterWith<AnsShut>(AnsShut.PACKET_ID);
             RegisterWith<AnsTerms>(AnsTerms.PACKET_ID);
