@@ -252,6 +252,12 @@ namespace MHTriServer.Player
                     }
                     break;
 
+                case ReqNoCharge _:
+                    {
+                        SendPacket(new AnsNoCharge("hello Wordl2"));
+                    }
+                    break;
+
                 // TODO: Do something with the data
                 case ReqLoginInfo _:
                     {

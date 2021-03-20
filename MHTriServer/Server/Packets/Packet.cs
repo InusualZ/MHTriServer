@@ -97,6 +97,7 @@ namespace MHTriServer.Server.Packets
             RegisterWith<AnsLoginInfo>(AnsLoginInfo.PACKET_ID);
             RegisterWith<AnsMaintenance>(AnsMaintenance.PACKET_ID);
             RegisterWith<AnsMediaVersionInfo>(AnsMediaVersionInfo.PACKET_ID);
+            RegisterWith<AnsNoCharge>(AnsNoCharge.PACKET_ID);
             RegisterWith<AnsServerTime>(AnsServerTime.PACKET_ID);
             RegisterWith<AnsShut>(AnsShut.PACKET_ID);
             RegisterWith<AnsTerms>(AnsTerms.PACKET_ID);
@@ -140,6 +141,7 @@ namespace MHTriServer.Server.Packets
             RegisterWith<ReqLoginInfo>(ReqLoginInfo.PACKET_ID);
             RegisterWith<ReqMaintenance>(ReqMaintenance.PACKET_ID);
             RegisterWith<ReqMediaVersionInfo>(ReqMediaVersionInfo.PACKET_ID);
+            RegisterWith<ReqNoCharge>(ReqNoCharge.PACKET_ID);
             RegisterWith<ReqServerTime>(ReqServerTime.PACKET_ID);
             RegisterWith<ReqShut>(ReqShut.PACKET_ID);
             RegisterWith<ReqTerms>(ReqTerms.PACKET_ID);
