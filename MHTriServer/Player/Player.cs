@@ -275,7 +275,15 @@ namespace MHTriServer.Player
                 case ReqCommonKey reqCommonKey:
                     {
                         // This probably have to do with encryption
-                        SendPacket(new AnsCommonKey(""));
+                        // TODO: Extract the encryption/decryption method that way, we can send the packet.
+                        // SendPacket(new AnsCommonKey(""));
+                        SendPacket(new AnsAuthenticationToken());
+                    }
+                    break;
+
+                case ReqLmpConnect _:
+                    {
+                        SendPacket(new LmpConnect("127.0.0.1", LmpServer.DefaultPort));
                     }
                     break;
 
@@ -680,15 +688,7 @@ namespace MHTriServer.Player
 
                 case ReqShut reqShut:
                     {
-                        if (reqShut.UnknownField == 1)
-                        {
-                            // This doesn't feel right
-                            SendPacket(new LmpConnect("127.0.0.1", LmpServer.DefaultPort));
-                        }
-                        else
-                        {
-                            SendPacket(new AnsShut(0));
-                        }
+                        SendPacket(new AnsShut(0));
                     }
                     break;
 

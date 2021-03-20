@@ -142,6 +142,7 @@ namespace MHTriServer.Server.Packets
             RegisterWith<ReqLayerStart>(ReqLayerStart.PACKET_ID);
             RegisterWith<ReqLayerUserList>(ReqLayerUserList.PACKET_ID);
             RegisterWith<ReqLineCheck>(ReqLineCheck.PACKET_ID);
+            RegisterWith<ReqLmpConnect>(ReqLmpConnect.PACKET_ID);
             RegisterWith<ReqLoginInfo>(ReqLoginInfo.PACKET_ID);
             RegisterWith<ReqMaintenance>(ReqMaintenance.PACKET_ID);
             RegisterWith<ReqMediaVersionInfo>(ReqMediaVersionInfo.PACKET_ID);
