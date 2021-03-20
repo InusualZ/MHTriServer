@@ -70,6 +70,7 @@ namespace MHTriServer.Server.Packets
                 }
             }
 
+            RegisterWith<AnsAnnounce>(AnsAnnounce.PACKET_ID);
             RegisterWith<AnsAuthenticationToken>(AnsAuthenticationToken.PACKET_ID);
             RegisterWith<AnsBinaryData>(AnsBinaryData.PACKET_ID);
             RegisterWith<AnsBinaryFoot>(AnsBinaryFoot.PACKET_ID);
@@ -112,6 +113,7 @@ namespace MHTriServer.Server.Packets
             RegisterWith<LmpConnect>(LmpConnect.PACKET_ID);
             RegisterWith<NtcLayerUserNum>(NtcLayerUserNum.PACKET_ID);
             RegisterWith<NtcLogin>(NtcLogin.PACKET_ID);
+            RegisterWith<ReqAnnounce>(ReqAnnounce.PACKET_ID);
             RegisterWith<ReqAuthenticationToken>(ReqAuthenticationToken.PACKET_ID);
             RegisterWith<ReqBinaryData>(ReqBinaryData.PACKET_ID);
             RegisterWith<ReqBinaryFoot>(ReqBinaryFoot.PACKET_ID);

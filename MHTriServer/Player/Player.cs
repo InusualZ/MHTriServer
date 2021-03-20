@@ -119,7 +119,6 @@ namespace MHTriServer.Player
                     // Wait for more data
                     if (packetStartPosition > 0)
                     {
-
                         return;
                     }
                     else
@@ -238,10 +237,18 @@ namespace MHTriServer.Player
                     {
                         Debug.Assert(ConnectionType == ConnectionType.OPN);
 
-                        // It seems that there is a bug or something, in their network loop.
+                        SendPacket(new AnsMediaVersionInfo("V1.0.0", "Alpha", "Hello World1"));
+
+                        // It seems that there is a bug or something in their network loop.
                         // I can bypass a lot of thing by sending LmpConnect next
 
                         // SendPacket(new LmpConnect("127.0.0.1", LmpServer.DefaultPort));
+                    }
+                    break;
+
+                case ReqAnnounce _:
+                    {
+                        SendPacket(new AnsAnnounce(Constants.ANNOUNCEMENT_MESSAGE));
                     }
                     break;
 
@@ -644,9 +651,17 @@ namespace MHTriServer.Player
                     }
                     break;
 
-                case ReqShut _:
+                case ReqShut reqShut:
                     {
-                        SendPacket(new AnsShut(0));
+                        if (reqShut.UnknownField == 1)
+                        {
+                            // This doesn't feel right
+                            SendPacket(new LmpConnect("127.0.0.1", LmpServer.DefaultPort));
+                        }
+                        else
+                        {
+                            SendPacket(new AnsShut(0));
+                        }
                     }
                     break;
 
