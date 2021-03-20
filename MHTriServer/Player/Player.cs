@@ -228,6 +228,12 @@ namespace MHTriServer.Player
                     }
                     break;
 
+                case ReqTerms reqTerms:
+                    {
+                        SendPacket(new AnsTerms(reqTerms.TermsCurrentLength, (uint)Constants.TERMS_AND_CONDITIONS.Length, Constants.TERMS_AND_CONDITIONS));
+                    }
+                    break;
+
                 case ReqMediaVersionInfo _:
                     {
                         Debug.Assert(ConnectionType == ConnectionType.OPN);

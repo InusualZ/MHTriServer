@@ -34,7 +34,7 @@ namespace MHTriServer.Server.Packets
 
         public override string ToString()
         {
-            return base.ToString() + $"\n\tSomeVersion {SomeVersion}\n\tBinaryLength {BinaryLength}";
+            return base.ToString() + $":\n\tSomeVersion {SomeVersion}\n\tBinaryLength {BinaryLength}";
         }
     }
 }
