@@ -4,7 +4,7 @@ namespace MHTriServer.Server.Packets
 {
     class AnsNoCharge : Packet
     {
-        public const uint PACKET_ID = 0x62300200;
+        public const uint PACKET_ID = 0x62310200;
 
         public string Message { get; set; }
 
