@@ -191,13 +191,13 @@ namespace MHTriServer.Player
                         if (ConnectionType == ConnectionType.OPN)
                         {
                             // TODO: Figure out what login type 3 means?
-                            SendPacket(new NtcLogin((ServerLoginType) 0x04));
+                            SendPacket(new NtcLogin((ServerLoginType)0x04));
                         }
                         else if (ConnectionType == ConnectionType.LMP)
                         {
                             // TODO: Figure out what login type 1 means?
                             // In this case if we don't send 1, the client just kick us
-                            SendPacket(new NtcLogin(!AfterFirstConnection ? ServerLoginType.LMP_NORMAL_FIRST: ServerLoginType.LMP_NORMAL_SECOND));
+                            SendPacket(new NtcLogin(!AfterFirstConnection ? ServerLoginType.LMP_NORMAL_FIRST : ServerLoginType.LMP_NORMAL_SECOND));
                         }
                         else if (ConnectionType == ConnectionType.FMP)
                         {
@@ -269,6 +269,13 @@ namespace MHTriServer.Player
                     {
                         const string message = "HelloWorld3";
                         SendPacket(new AnsVulgarityLow(reqVulgarityLow.InfoType, reqVulgarityLow.CurrentLength, (uint)message.Length, message));
+                    }
+                    break;
+
+                case ReqCommonKey reqCommonKey:
+                    {
+                        // This probably have to do with encryption
+                        SendPacket(new AnsCommonKey(""));
                     }
                     break;
 
