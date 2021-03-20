@@ -27,7 +27,7 @@ namespace MHTriServer.Server.Packets
         public override void Deserialize(ExtendedBinaryReader reader)
         {
             Debug.Assert(ID == PACKET_ID);
-            Debug.Assert(Size == 12);
+            Debug.Assert(Size >= 10);
             Offset = reader.ReadUInt32();
             UnknownField = reader.ReadUInt32();
             TermsMessage = reader.ReadString();

@@ -111,6 +111,8 @@ namespace MHTriServer.Server.Packets
             RegisterWith<AnsUserSearchInfoMine>(AnsUserSearchInfoMine.PACKET_ID);
             RegisterWith<AnsUserSearchSet>(AnsUserSearchSet.PACKET_ID);
             RegisterWith<AnsUserStatusSet>(AnsUserStatusSet.PACKET_ID);
+            RegisterWith<AnsVulgarityInfoLow>(AnsVulgarityInfoLow.PACKET_ID);
+            RegisterWith<AnsVulgarityLow>(AnsVulgarityLow.PACKET_ID);
             RegisterWith<LmpConnect>(LmpConnect.PACKET_ID);
             RegisterWith<NtcLayerUserNum>(NtcLayerUserNum.PACKET_ID);
             RegisterWith<NtcLogin>(NtcLogin.PACKET_ID);
@@ -156,6 +158,8 @@ namespace MHTriServer.Server.Packets
             RegisterWith<ReqUserSearchInfoMine>(ReqUserSearchInfoMine.PACKET_ID);
             RegisterWith<ReqUserSearchSet>(ReqUserSearchSet.PACKET_ID);
             RegisterWith<ReqUserStatusSet>(ReqUserStatusSet.PACKET_ID);
+            RegisterWith<ReqVulgarityInfoLow>(ReqVulgarityInfoLow.PACKET_ID);
+            RegisterWith<ReqVulgarityLow>(ReqVulgarityLow.PACKET_ID);
             RegisterWith<RfpConnect>(RfpConnect.PACKET_ID);
             RegisterWith<ServerTimeout>(ServerTimeout.PACKET_ID);
 

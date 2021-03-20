@@ -258,6 +258,20 @@ namespace MHTriServer.Player
                     }
                     break;
 
+                case ReqVulgarityInfoLow reqVulgarityInfoLow:
+                    {
+                        const string message = "HelloWorld3";
+                        SendPacket(new AnsVulgarityInfoLow(1, reqVulgarityInfoLow.UnknownField, (uint)message.Length));
+                    }
+                    break;
+
+                case ReqVulgarityLow reqVulgarityLow:
+                    {
+                        const string message = "HelloWorld3";
+                        SendPacket(new AnsVulgarityLow(reqVulgarityLow.InfoType, reqVulgarityLow.CurrentLength, (uint)message.Length, message));
+                    }
+                    break;
+
                 // TODO: Do something with the data
                 case ReqLoginInfo _:
                     {
