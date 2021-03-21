@@ -103,7 +103,7 @@ namespace MHTriServer.Server.Packets
             RegisterWith<AnsShut>(AnsShut.PACKET_ID);
             RegisterWith<AnsTerms>(AnsTerms.PACKET_ID);
             RegisterWith<AnsTermsVersion>(AnsTermsVersion.PACKET_ID);
-            RegisterWith<AnsTicket>(AnsTicket.PACKET_ID);
+            RegisterWith<AnsTicketClient>(AnsTicketClient.PACKET_ID);
             RegisterWith<AnsUserBinarySet>(AnsUserBinarySet.PACKET_ID);
             RegisterWith<AnsUserListData>(AnsUserListData.PACKET_ID);
             RegisterWith<AnsUserListFoot>(AnsUserListFoot.PACKET_ID);

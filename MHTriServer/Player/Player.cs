@@ -14,6 +14,9 @@ namespace MHTriServer.Player
     {
         private const string DEFAULT_USER_ID = "AAAA";
 
+        // TODO: Replace with a proper db to store this token
+        public static string PlayerToken;
+
         private Stream m_NetworkStream;
         private Socket m_Socket;
 
@@ -177,7 +180,7 @@ namespace MHTriServer.Player
             }
 
             // Make sure we are reading everything!
-            Debug.Assert(reader.BaseStream.Position >= reader.BaseStream.Length);
+            Debug.Assert(reader.BaseStream.Position == reader.BaseStream.Length);
         }
 
         private void Handle(Packet packet)
@@ -190,8 +193,7 @@ namespace MHTriServer.Player
                         ConnectionAccepted = true;
                         if (ConnectionType == ConnectionType.OPN)
                         {
-                            // TODO: Figure out what login type 3 means?
-                            SendPacket(new NtcLogin((ServerLoginType)0x04));
+                            SendPacket(new NtcLogin(ServerLoginType.OPN_SERVER_ANOUNCE));
                         }
                         else if (ConnectionType == ConnectionType.LMP)
                         {
@@ -211,6 +213,7 @@ namespace MHTriServer.Player
                 case ReqAuthenticationToken reqAuthenticationToken:
                     {
                         // TODO: Should probably store the token
+                        PlayerToken = reqAuthenticationToken.Token;
                         SendPacket(new AnsAuthenticationToken());
                     }
                     break;
@@ -309,9 +312,7 @@ namespace MHTriServer.Player
 
                 case ReqTicketClient _:
                     {
-                        // TODO: Replace sent packet
-                        // The only purpose of sending this packet is to advance the client's network state
-                        SendPacket(new AnsUserListFoot());
+                        SendPacket(new AnsTicketClient(PlayerToken));
                     }
                     break;
 
