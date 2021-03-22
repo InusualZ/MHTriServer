@@ -39,8 +39,6 @@ namespace MHTriServer.Server.Packets
             Debug.Assert(ID == PACKET_ID);
 
             Format = reader.ReadShortBytes();
-
-            var count = reader.ReadByte();
             CheckData = CompoundList.Deserialize<UnknownCheckData>(reader);
         }
 
