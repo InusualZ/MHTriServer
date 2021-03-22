@@ -14,7 +14,7 @@ namespace MHTriServer.Server
         private const byte FIELD_6 = 0x06;
         private const byte FIELD_7 = 0x07;
 
-        public UnkShortArrayStruct UnknownField1 { get => Get<UnkShortArrayStruct>(FIELD_1); set => Set(FIELD_1, value); }
+        public UnkShortArrayStruct UnknownField { get => Get<UnkShortArrayStruct>(FIELD_1); set => Set(FIELD_1, value); }
 
         public uint UnknownField2 { get => Get<uint>(FIELD_2); set => Set(FIELD_2, value); }
 

@@ -1,9 +1,11 @@
 ﻿using MHTriServer.Server;
 using MHTriServer.Server.Packets;
 using System;
+using System.Buffers.Binary;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -312,6 +314,7 @@ namespace MHTriServer.Player
 
                 case ReqTicketClient _:
                     {
+                        // I doubt this is correct? Need more RE
                         SendPacket(new AnsTicketClient(PlayerToken));
                     }
                     break;
@@ -386,14 +389,14 @@ namespace MHTriServer.Player
                         if (ConnectionType == ConnectionType.LMP)
                         {
                             var servers = new List<FmpData>() {
-                                FmpData.Simple(1, 2, 3, 2, "Valor1", 1)
+                                FmpData.Server(1, 2, 3, 2, "Valor1", 1),
                             };
                             SendPacket(new AnsFmpListData(servers));
                         }
                         else
                         {
                             var servers = new List<FmpData>() {
-                                FmpData.Simple(1, 0, 4, 4, "Valor1", 0)
+                                FmpData.Server(1, 0, 4, 4, "Valor1", 0)
                             };
 
                             SendPacket(new AnsFmpListData(servers));
@@ -414,7 +417,8 @@ namespace MHTriServer.Player
                         }
                         else
                         {
-
+                            // Make it connect to the same server, I don't know what is the purpose of this
+                            SendPacket(new AnsFmpInfo(FmpData.Address("127.0.0.1", FmpServer.DefaultPort)));
                         }
                     }
                     break;
@@ -424,23 +428,27 @@ namespace MHTriServer.Player
                         uint binaryLength = 0;
                         if (reqBinaryHead.BinaryType == 5)
                         {
+                            // Arbitrary Length
                             binaryLength = 10;
                         }
                         else if (reqBinaryHead.BinaryType == 2)
                         {
+                            // Confirmed Weather Data Length
                             binaryLength = 12;
                         }
                         else if (reqBinaryHead. BinaryType == 3)
                         {
-                            binaryLength = 4;
+                            // Confirmed Unknown Data Length
+                            binaryLength = 0x904;
                         }
                         else if (reqBinaryHead.BinaryType == 4)
                         {
-                            binaryLength = 4;
+                            // Confirmed Unknown Data Length
+                            binaryLength = 0xf0;
                         }
                         else
                         {
-
+                            // Unknown
                         }
 
                         SendPacket(new AnsBinaryHead(reqBinaryHead.BinaryType, binaryLength));
@@ -459,21 +467,23 @@ namespace MHTriServer.Player
                         }
                         else if (reqBinaryData.BinaryType == 2)
                         {
-                            // Lobby Weather Data *Sandstorm*
+                            // Lobby Weather Data 
                             binaryData = new byte[] { 
-                                0x00, 0x00, 0x01, 0xF4, 
-                                0x00, 0x00, 0x00, 0x01, 
-                                0x00, 0x00, 0x50, 0x00
+                                0x00, 0x00, 0x01, 0xF4,
+                                0x00, 0x00, 0x00, 0x01, // Fog
+                                0x00, 0x00, 0x50, 0x00 // *Sandstorm*
                             };
                         }
                         else if (reqBinaryData.BinaryType == 3)
                         {
                             // ???
-                            binaryData = new byte[] { 0x09, 0x09, 0, 0 };
+                            binaryData = new byte[reqBinaryData.BinaryDataExpectedSize];
+                            var flag = 0 | 1 | 2 | 4 | 8;
+                            BinaryPrimitives.WriteUInt32BigEndian(new Span<byte>(binaryData, binaryData.Length - 4, 4), (uint)flag);
                         }
                         else if (reqBinaryData.BinaryType == 4)
                         {
-                            binaryData = new byte[] { 0x09, 0x09, 0, 0 };
+                            binaryData = new byte[reqBinaryData.BinaryDataExpectedSize];
                         }
 
                         SendPacket(new AnsBinaryData(reqBinaryData.BinaryType, unkField2, (uint)binaryData.Length, binaryData));
@@ -499,12 +509,12 @@ namespace MHTriServer.Player
                         {
                             Name = "Joe",
                             UnknownField5 = (ushort)"Joe".Length,
-                            CurrentPopulation = 0,
+                            CurrentPopulation = 1,
                             UnknownField7 = 100,
-                            UnknownField10 = 0,
-                            UnknownField11 = 0,
-                            UnknownField17 = 0,
-                            UnknownField18 = true
+                            UnknownField10 = 1,
+                            UnknownField11 = 1,
+                            UnknownField17 = 1,
+                            UnknownField18 = false
                         };
                         SendPacket(new AnsLayerStart(data));
                     }
@@ -562,20 +572,28 @@ namespace MHTriServer.Player
                     {
                         if (AfterLayerChildData)
                         {
-                            var userNumData = new UserNumData()
                             {
-                                // UnknownField - Don't know what to send
-                                UnknownField2 = 1,
-                                UnknownField3 = 2,
-                                UnknownField4 = 3,
-                                UnknownField5 = 4,
-                                UnknownField6 = 5,
-                                UnknownField7 = 6,
-                            };
+                                var userNumData = new UserNumData()
+                                {
+                                    UnknownField = new UnkShortArrayStruct()
+                                    {
+                                        UnknownField = 0,
+                                        UnknownField2 = 1,
+                                        UnknownField3 = new List<ushort>() {
+                                        2, 3, 4
+                                    },
+                                    },
+                                    UnknownField2 = 2,
+                                    UnknownField3 = 3,
+                                    UnknownField4 = 4,
+                                    UnknownField5 = 5,
+                                    UnknownField6 = 6,
+                                    UnknownField7 = 7,
+                                };
 
-                            // TODO: Figure out what this packet doe
-
-                            SendPacket(new NtcLayerUserNum(1, userNumData));
+                                // TODO: Figure out what this packet does
+                                SendPacket(new NtcLayerUserNum(4, userNumData));
+                            }
 
                             var data = new LayerData()
                             {
@@ -639,29 +657,57 @@ namespace MHTriServer.Player
                 case ReqLayerChildListData reqLayerChildListData:
                     {
                         var childsData = new List<LayerChildData>();
-                        childsData.Add(new LayerChildData() { 
-                            ChildData = new LayerData()
-                            {
-                                Name = "Valor2",
-                                UnknownField5 = 1,
-                                CurrentPopulation = 0,
-                                MaxPopulation = 100,
-                                UnknownField7 = 5,
-                                UnknownField10 = 3,
-                                UnknownField11 = 2,
-                                UnknownField12 = 1,
-                                UnknownField16 = 2, // Value must be 1 or 2. Seems to be a Enum of some kind
-                                UnknownField17 = 4,
-                                UnknownField18 = true
-                            },
-                            UnknownField2 = new List<UnkByteIntStruct>() { 
-                                new UnkByteIntStruct() {
-                                    UnknownField = 5,
-                                    ContainUnknownField3 = true,
-                                    UnknownField3 = 6
+                        childsData.Add(
+                            new LayerChildData() { 
+                                ChildData = new LayerData()
+                                {
+                                    Name = "City Gate1",
+                                    UnknownField5 = 1,
+                                    CurrentPopulation = 0,
+                                    MaxPopulation = 100,
+                                    UnknownField7 = 5,
+                                    UnknownField10 = 3,
+                                    UnknownField11 = 2,
+                                    UnknownField12 = 1,
+                                    UnknownField16 = 2, // Value must be 1 or 2. Seems to be a Enum of some kind
+                                    UnknownField17 = 4,
+                                    UnknownField18 = true
+                                },
+                                UnknownField2 = new List<UnkByteIntStruct>() { 
+                                    new UnkByteIntStruct() {
+                                        UnknownField = 5,
+                                        ContainUnknownField3 = true,
+                                        UnknownField3 = 6
+                                    }
                                 }
                             }
-                        });
+                        );
+
+                        childsData.Add(new LayerChildData()
+                        {
+                            ChildData = new LayerData()
+                            {
+                                Name = "City Gate2",
+                                UnknownField5 = 2,
+                                CurrentPopulation = 0,
+                                MaxPopulation = 100,
+                                UnknownField7 = 1,
+                                UnknownField10 = 2,
+                                UnknownField11 = 3,
+                                UnknownField12 = 4,
+                                UnknownField16 = 1, // Value must be 1 or 2. Seems to be a Enum of some kind
+                                UnknownField17 = 5,
+                                UnknownField18 = true
+                            },
+                            UnknownField2 = new List<UnkByteIntStruct>() {
+                                    new UnkByteIntStruct() {
+                                        UnknownField = 6,
+                                        ContainUnknownField3 = true,
+                                        UnknownField3 = 7
+                                    }
+                                }
+                            }
+                        );
 
                         AfterLayerChildData = true;
 
@@ -684,6 +730,12 @@ namespace MHTriServer.Player
                 case ReqUserStatusSet reqUserStatusSet:
                     {
                         SendPacket(new AnsUserStatusSet());
+                    }
+                    break;
+
+                case ReqLayerEnd reqLayerEnd:
+                    {
+                        SendPacket(new AnsLayerEnd());
                     }
                     break;
 
