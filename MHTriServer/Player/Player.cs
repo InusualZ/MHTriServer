@@ -187,28 +187,50 @@ namespace MHTriServer.Player
 
         private void Handle(Packet packet)
         {
+            if (packet is ServerTimeout)
+            {
+                m_NetworkStream.Dispose();
+                m_Socket.Dispose();
+                return;
+            }
+            else if (packet is ReqShut)
+            {
+                SendPacket(new AnsShut(0));
+                return;
+            }
+
+
+            if (ConnectionType == ConnectionType.OPN)
+            {
+                HandleOPN(packet);
+            }
+            else if (ConnectionType == ConnectionType.LMP)
+            {
+                HandleLMP(packet);
+            }
+            else if (ConnectionType == ConnectionType.FMP)
+            {
+                HandleFMP(packet);
+            }
+            else if (ConnectionType == ConnectionType.RFP)
+            {
+                HandleRFP(packet);
+            }
+            else
+            {
+                Console.WriteLine($"Received {ConnectionType}:{packet.ToString()}");
+            }
+        }
+
+        private void HandleOPN(Packet packet)
+        {
             switch (packet)
             {
                 // TODO: Do something with the data
                 case AnsConnection _:
                     {
                         ConnectionAccepted = true;
-                        if (ConnectionType == ConnectionType.OPN)
-                        {
-                            SendPacket(new NtcLogin(ServerLoginType.OPN_SERVER_ANOUNCE));
-                        }
-                        else if (ConnectionType == ConnectionType.LMP)
-                        {
-                            // TODO: Figure out what login type 1 means?
-                            // In this case if we don't send 1, the client just kick us
-                            SendPacket(new NtcLogin(!AfterFirstConnection ? ServerLoginType.LMP_NORMAL_FIRST : ServerLoginType.LMP_NORMAL_SECOND));
-                        }
-                        else if (ConnectionType == ConnectionType.FMP)
-                        {
-                            // TODO: Figure out what login type 3/5 means.
-                            // Value need to be 3 or 5 in order to proceed with the login process
-                            SendPacket(new NtcLogin(ServerLoginType.FMP_NORMAL));
-                        }
+                        SendPacket(new NtcLogin(ServerLoginType.OPN_SERVER_ANOUNCE));
                     }
                     break;
 
@@ -242,12 +264,12 @@ namespace MHTriServer.Player
                     {
                         Debug.Assert(ConnectionType == ConnectionType.OPN);
 
-                        SendPacket(new AnsMediaVersionInfo("V1.0.0", "Alpha", "Hello World1"));
-
                         // It seems that there is a bug or something in their network loop.
                         // I can bypass a lot of thing by sending LmpConnect next
 
                         // SendPacket(new LmpConnect("127.0.0.1", LmpServer.DefaultPort));
+
+                        SendPacket(new AnsMediaVersionInfo("V1.0.0", "Alpha", "Hello World1"));
                     }
                     break;
 
@@ -289,6 +311,31 @@ namespace MHTriServer.Player
                 case ReqLmpConnect _:
                     {
                         SendPacket(new LmpConnect("127.0.0.1", LmpServer.DefaultPort));
+                    }
+                    break;
+            }
+        }
+
+        private void HandleLMP(Packet packet)
+        {
+            switch (packet)
+            {
+                // TODO: Do something with the data
+                case AnsConnection _:
+                    {
+                        ConnectionAccepted = true;
+                        if (ConnectionType == ConnectionType.LMP)
+                        {
+                            // TODO: Figure out what login type 1 means?
+                            // In this case if we don't send 1, the client just kick us
+                            SendPacket(new NtcLogin(!AfterFirstConnection ? ServerLoginType.LMP_NORMAL_FIRST : ServerLoginType.LMP_NORMAL_SECOND));
+                        }
+                        else if (ConnectionType == ConnectionType.FMP)
+                        {
+                            // TODO: Figure out what login type 3/5 means.
+                            // Value need to be 3 or 5 in order to proceed with the login process
+                            SendPacket(new NtcLogin(ServerLoginType.FMP_NORMAL));
+                        }
                     }
                     break;
 
@@ -360,47 +407,22 @@ namespace MHTriServer.Player
 
                 case ReqFmpListVersion _:
                     {
-                        if (ConnectionType == ConnectionType.LMP)
-                        {
-                            SendPacket(new AnsFmpListVersion(1));
-                        }
-                        else if (ConnectionType == ConnectionType.FMP) 
-                        {
-                            SendPacket(new AnsFmpListVersion(2));
-                        }
+                        SendPacket(new AnsFmpListVersion(1));
                     }
                     break;
 
                 case ReqFmpListHead _:
                     {
-                        if (ConnectionType == ConnectionType.LMP)
-                        {
-                            SendPacket(new AnsFmpListHead(0, 1));
-                        }
-                        else
-                        {
-                            SendPacket(new AnsFmpListHead(0, 1));
-                        }
+                        SendPacket(new AnsFmpListHead(0, 1));
                     }
                     break;
 
                 case ReqFmpListData _:
                     {
-                        if (ConnectionType == ConnectionType.LMP)
-                        {
-                            var servers = new List<FmpData>() {
-                                FmpData.Server(1, 2, 3, 2, "Valor1", 1),
-                            };
-                            SendPacket(new AnsFmpListData(servers));
-                        }
-                        else
-                        {
-                            var servers = new List<FmpData>() {
-                                FmpData.Server(1, 0, 4, 4, "Valor1", 0)
-                            };
-
-                            SendPacket(new AnsFmpListData(servers));
-                        }
+                        var servers = new List<FmpData>() {
+                            FmpData.Server(1, 2, 3, 2, "Valor333333", 1),
+                        };
+                        SendPacket(new AnsFmpListData(servers));
                     }
                     break;
                 case ReqFmpListFoot _:
@@ -411,15 +433,113 @@ namespace MHTriServer.Player
 
                 case ReqFmpInfo reqFmpInfo:
                     {
-                        if (ConnectionType == ConnectionType.LMP)
+                        SendPacket(new AnsFmpInfo(FmpData.Address("127.0.0.1", FmpServer.DefaultPort)));
+                    }
+                    break;
+
+                case ReqBinaryHead reqBinaryHead:
+                    {
+                        uint binaryLength = 0;
+                        if (reqBinaryHead.BinaryType == 5)
                         {
-                            SendPacket(new AnsFmpInfo(FmpData.Address("127.0.0.1", FmpServer.DefaultPort)));
+                            // Arbitrary Length
+                            binaryLength = 10;
                         }
                         else
                         {
-                            // Make it connect to the same server, I don't know what is the purpose of this
-                            SendPacket(new AnsFmpInfo(FmpData.Address("127.0.0.1", FmpServer.DefaultPort)));
+                            // Unknown
                         }
+
+                        SendPacket(new AnsBinaryHead(reqBinaryHead.BinaryType, binaryLength));
+                    }
+                    break;
+
+                case ReqBinaryData reqBinaryData:
+                    {
+                        uint unkField2 = 0;
+                        byte[] binaryData = null;
+                        if (reqBinaryData.BinaryType == 5)
+                        {
+                            // Unknown Data
+                            binaryData = new byte[] { 0x09, 0x09, 0, 0, 0, 0, 0, 0, 0, 0 };
+                        }
+
+                        SendPacket(new AnsBinaryData(reqBinaryData.BinaryType, unkField2, (uint)binaryData.Length, binaryData));
+                    }
+                    break;
+
+                case ReqUserSearchInfoMine _:
+                    {
+                        // The client won't even read the that we would send, so why bother.
+                        SendPacket(new AnsUserSearchInfoMine(new CompoundList()));
+                    }
+                    break;
+
+                case ReqBinaryFoot _:
+                    {
+                        SendPacket(new AnsBinaryFoot());
+                    }
+                    break;
+            }
+        }
+
+        private void HandleFMP(Packet packet)
+        {
+            switch (packet)
+            {
+                // TODO: Do something with the data
+                case AnsConnection _:
+                    {
+                        ConnectionAccepted = true;
+                        if (ConnectionType == ConnectionType.FMP)
+                        {
+                            // TODO: Figure out what login type 3/5 means.
+                            // Value need to be 3 or 5 in order to proceed with the login process
+                            SendPacket(new NtcLogin(ServerLoginType.FMP_NORMAL));
+                        }
+                    }
+                    break;
+
+                case ReqServerTime _:
+                    {
+                        SendPacket(new AnsServerTime(1500, 0));
+                    }
+                    break;
+
+                case ReqFmpListVersion _:
+                    {
+                        SendPacket(new AnsFmpListVersion(2));
+                    }
+                    break;
+
+                case ReqFmpListHead _:
+                    {
+                        SendPacket(new AnsFmpListHead(0, 4));
+                    }
+                    break;
+
+                case ReqFmpListData _:
+                    {
+                        var servers = new List<FmpData>() {
+                            FmpData.Server(1, 0, 4, 1, "Valor1", 4),
+                            FmpData.Server(2, 0, 4, 1, "Valor2", 3),
+                            FmpData.Server(3, 0, 4, 1, "Valor3", 2),
+                            FmpData.Server(4, 0, 4, 1, "Valor4", 1)
+                        };
+
+                        SendPacket(new AnsFmpListData(servers));
+                    }
+                    break;
+                case ReqFmpListFoot _:
+                    {
+                        SendPacket(new AnsFmpListFoot());
+                    }
+                    break;
+
+                case ReqFmpInfo reqFmpInfo:
+                    {
+                        // Make it connect to the same server, I don't know what is the purpose of this
+                        SendPacket(new AnsFmpInfo(FmpData.Address("127.0.0.1", FmpServer.DefaultPort)));
                     }
                     break;
 
@@ -436,7 +556,7 @@ namespace MHTriServer.Player
                             // Confirmed Weather Data Length
                             binaryLength = 12;
                         }
-                        else if (reqBinaryHead. BinaryType == 3)
+                        else if (reqBinaryHead.BinaryType == 3)
                         {
                             // Confirmed Unknown Data Length
                             binaryLength = 0x904;
@@ -468,7 +588,7 @@ namespace MHTriServer.Player
                         else if (reqBinaryData.BinaryType == 2)
                         {
                             // Lobby Weather Data 
-                            binaryData = new byte[] { 
+                            binaryData = new byte[] {
                                 0x00, 0x00, 0x01, 0xF4,
                                 0x00, 0x00, 0x00, 0x01, // Fog
                                 0x00, 0x00, 0x50, 0x00 // *Sandstorm*
@@ -549,7 +669,7 @@ namespace MHTriServer.Player
                         }
                         else
                         {
-                            SendPacket(new AnsBinaryVersion(1,1));
+                            SendPacket(new AnsBinaryVersion(1, 1));
                         }
                     }
                     break;
@@ -658,7 +778,8 @@ namespace MHTriServer.Player
                     {
                         var childsData = new List<LayerChildData>();
                         childsData.Add(
-                            new LayerChildData() { 
+                            new LayerChildData()
+                            {
                                 ChildData = new LayerData()
                                 {
                                     Name = "City Gate1",
@@ -673,7 +794,7 @@ namespace MHTriServer.Player
                                     UnknownField17 = 4,
                                     UnknownField18 = true
                                 },
-                                UnknownField2 = new List<UnkByteIntStruct>() { 
+                                UnknownField2 = new List<UnkByteIntStruct>() {
                                     new UnkByteIntStruct() {
                                         UnknownField = 5,
                                         ContainUnknownField3 = true,
@@ -706,7 +827,7 @@ namespace MHTriServer.Player
                                         UnknownField3 = 7
                                     }
                                 }
-                            }
+                        }
                         );
 
                         AfterLayerChildData = true;
@@ -738,19 +859,12 @@ namespace MHTriServer.Player
                         SendPacket(new AnsLayerEnd());
                     }
                     break;
-
-                case ReqShut reqShut:
-                    {
-                        SendPacket(new AnsShut(0));
-                    }
-                    break;
-
-                case ServerTimeout _:
-                    m_NetworkStream.Dispose();
-                    m_Socket.Dispose();
-                    break;
             }
+        }
 
+        private void HandleRFP(Packet packet)
+        {
+            throw new NotImplementedException();
         }
 
         internal void HandleWrite()

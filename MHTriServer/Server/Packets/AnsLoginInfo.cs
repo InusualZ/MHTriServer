@@ -35,8 +35,7 @@ namespace MHTriServer.Server.Packets
 
         public override string ToString()
         {
-            var chargeInfoLine = string.Join("\n\t", Data.ToString().Split('\n'));
-            return base.ToString() + $":\n\tUnknownByte {UnknownByte}\n\tUnknownString {UnknownString}\n\tChargeInfo\n\t{chargeInfoLine}";
+            return base.ToString() + $":\n\tUnknownByte {UnknownByte}\n\tUnknownString {UnknownString}\n\tChargeInfo\n\t{Data}";
         }
     }
 }
