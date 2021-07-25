@@ -23,5 +23,10 @@ namespace MHTriServer.Server.Packets
             Debug.Assert(ID == PACKET_ID);
             CompoundList.Deserialize<LayerData>(reader);
         }
+
+        public override string ToString()
+        {
+            return base.ToString() + $"\n\tLayerData {Data}";
+        }
     }
 }
