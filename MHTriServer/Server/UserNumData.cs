@@ -42,12 +42,7 @@ namespace MHTriServer.Server
 
         protected override bool TryWrite(byte key, object value, ExtendedBinaryWriter writer)
         {
-            if (!(value is UnkShortArrayStruct unknownData))
-            {
-                return base.TryWrite(key, value, writer);
-            }
-
-            if (key == FIELD_1)
+            if (key == FIELD_1 && value is UnkShortArrayStruct unknownData)
             {
                 // The client write this byte, since technically is a binary payload 
                 writer.Write((byte)0x06);
