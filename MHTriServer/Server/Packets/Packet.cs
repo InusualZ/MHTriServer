@@ -152,7 +152,7 @@ namespace MHTriServer.Server.Packets
             RegisterWith<ReqTerms>(ReqTerms.PACKET_ID);
             RegisterWith<ReqTermsVersion>(ReqTermsVersion.PACKET_ID);
             RegisterWith<ReqTicketClient>(ReqTicketClient.PACKET_ID);
-            RegisterWith<ReqUnknownCheck>(ReqUnknownCheck.PACKET_ID);
+            RegisterWith<ReqCheatDataCheck>(ReqCheatDataCheck.PACKET_ID);
             RegisterWith<ReqUserBinarySet>(ReqUserBinarySet.PACKET_ID);
             RegisterWith<ReqUserListData>(ReqUserListData.PACKET_ID);
             RegisterWith<ReqUserListFoot>(ReqUserListFoot.PACKET_ID);

@@ -5,7 +5,10 @@ using System.Text;
 
 namespace MHTriServer.Server.Packets
 {
-    public class ReqUnknownCheck : Packet
+    /// <summary>
+    ///  Send cheat check data
+    /// </summary>
+    public class ReqCheatDataCheck : Packet
     {
         public class UnknownCheckData : CompoundList
         {
@@ -23,9 +26,9 @@ namespace MHTriServer.Server.Packets
 
         public UnknownCheckData CheckData { get; private set; }
 
-        public ReqUnknownCheck() : base(PACKET_ID) { }
+        public ReqCheatDataCheck() : base(PACKET_ID) { }
 
-        public ReqUnknownCheck(uint id, ushort size, ushort counter) : base(id, size, counter) { }
+        public ReqCheatDataCheck(uint id, ushort size, ushort counter) : base(id, size, counter) { }
 
         public override void Serialize(ExtendedBinaryWriter writer)
         {
