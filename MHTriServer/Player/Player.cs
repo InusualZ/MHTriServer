@@ -508,6 +508,10 @@ namespace MHTriServer.Player
 
                 case ReqFmpListVersion _:
                     {
+                        // If the Fmp List Verion sent in the LMP server, mistmatch this version
+                        // the client would send a request that allow us to rewrite the previous sent list
+                        // but, if the versions matches the previously sended version, the client would send a request to update
+                        // the population and max population of the server.
                         SendPacket(new AnsFmpListVersion(2));
                     }
                     break;
