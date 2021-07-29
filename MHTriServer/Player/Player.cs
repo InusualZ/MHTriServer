@@ -572,6 +572,7 @@ namespace MHTriServer.Player
                         }
                         else
                         {
+                            Debug.Assert(false);
                             // Unknown
                         }
 
@@ -616,7 +617,7 @@ namespace MHTriServer.Player
 
                 case ReqUserSearchInfoMine _:
                     {
-                        // The client won't even read the that we would send, so why bother.
+                        // The client won't even read the data that we would send, so why bother.
                         SendPacket(new AnsUserSearchInfoMine(new CompoundList()));
                     }
                     break;
@@ -629,15 +630,39 @@ namespace MHTriServer.Player
 
                 case ReqLayerStart reqLayerStart:
                     {
+                        /*
+                         * Why does this packet send two formats, when the answer to this packet is only
+                         * one compound data struct
+                         * 
+                         *  reqLayerStart.Format
+                         *  reqLayerStart.Format2
+                         *  
+                         *  Also, it seems that some parts of this response are copied into the NetworkLayerPat
+                         *  struct, but nothing else is done with the data. No read, write or anything.
+                         *  Atleast up until the server selection screen.
+                         */
+
                         var data = new LayerData()
                         {
+                            UnknownField1 = 1,
+                            UnknownField2 = new UnkShortArrayStruct()
+                            {
+                                UnknownField = 2,
+                                UnknownField2 = 3,
+                                UnknownField3 = new List<ushort>() { 4, 5 }
+                            },
                             Name = "Joe",
                             UnknownField5 = (ushort)"Joe".Length,
-                            CurrentPopulation = 1,
-                            UnknownField7 = 100,
-                            UnknownField10 = 1,
-                            UnknownField11 = 1,
-                            UnknownField17 = 1,
+                            CurrentPopulation = 6,
+                            UnknownField7 = 7,
+                            UnknownField8 = 8,
+                            MaxPopulation = 9,
+                            UnknownField10 = 10,
+                            UnknownField11 = 11,
+                            UnknownField12 = 12, 
+                            UnknownField13 = 13,
+                            UnknownField16 = 1, // Value must be 1 or 2. Seems to be a Enum of some kind
+                            UnknownField17 = 14,
                             UnknownField18 = false
                         };
                         SendPacket(new AnsLayerStart(data));
