@@ -576,7 +576,7 @@ namespace MHTriServer.Player
                         uint binaryLength = 0;
                         if (reqBinaryHead.BinaryType == 5)
                         {
-                            // Arbitrary Length
+                            // Unconfirmed expected length of 0x140c
                             binaryLength = (uint)BINARY_DATA_5_TEST.Length;
                         }
                         else if (reqBinaryHead.BinaryType == 2)
