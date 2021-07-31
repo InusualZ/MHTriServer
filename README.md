@@ -82,10 +82,6 @@ Servers
 -----------
 Open the solution file, then **Build** *->* **Run** the solution to start the server. When a client connect, you would see all the packet being logged to the console. You would also need the Nintendo Wifi Connection server running.
 
-Community
----
-- [Discord Server](https://discord.gg/CSqVc3Ke)
-
 Special Thanks
 -----------
 - [Sepalani](https://github.com/sepalani)
