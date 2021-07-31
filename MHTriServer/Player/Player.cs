@@ -19,6 +19,8 @@ namespace MHTriServer.Player
         // TODO: Replace with a proper db to store this token
         public static string PlayerToken;
 
+        private static uint BINARY_VERSION_COUNT = 0;
+
         private Stream m_NetworkStream;
         private Socket m_Socket;
 
@@ -39,7 +41,7 @@ namespace MHTriServer.Player
 
         public bool ConnectionAccepted { get; private set; }
 
-        public readonly string BINARY_DATA_TEST = "\t\tWhat!!!!\n\t\tHello World\n\t\tInusualZ\n\t\tHello Dev";
+        public readonly string BINARY_DATA_TEST = "\t\tWhat!!!!\n\t\tHello World\n\t\tInusualZ\n\t\tHello Dev\n\t\tMore\n\t\tDude\n\t\tStop\n\t\tPlease";
 
         /*
          * TEMP VARIABLES
@@ -550,6 +552,19 @@ namespace MHTriServer.Player
                     }
                     break;
 
+
+                case ReqBinaryVersion reqBinaryVersion:
+                    {
+                        // This packet means that the client is asking you 
+                        // If the binary data of type {reqBinaryVersion.BinaryType} has change.
+
+                        // For now, we are going to always send a new version, because we want to know
+                        // every single binary requets there is...
+
+                        SendPacket(new AnsBinaryVersion(reqBinaryVersion.BinaryType, ++BINARY_VERSION_COUNT));
+                    }
+                    break;
+
                 case ReqBinaryHead reqBinaryHead:
                     {
                         uint binaryLength = 0;
@@ -572,6 +587,10 @@ namespace MHTriServer.Player
                         {
                             // Confirmed Unknown Data Length
                             binaryLength = 0xf0;
+                        }
+                        else if (reqBinaryHead.BinaryType == 1)
+                        {
+                            binaryLength = (uint)BINARY_DATA_TEST.Length;
                         }
                         else
                         {
@@ -612,6 +631,14 @@ namespace MHTriServer.Player
                         else if (reqBinaryData.BinaryType == 4)
                         {
                             binaryData = new byte[reqBinaryData.BinaryDataExpectedSize];
+                        }
+                        else if (reqBinaryData.BinaryType == 1)
+                        {
+                            binaryData = Encoding.ASCII.GetBytes(BINARY_DATA_TEST);
+                        }
+                        else
+                        {
+                            Debug.Assert(false);
                         }
 
                         SendPacket(new AnsBinaryData(reqBinaryData.BinaryType, unkField2, (uint)binaryData.Length, binaryData));
@@ -689,20 +716,6 @@ namespace MHTriServer.Player
                     {
                         // TODO: What am I suppose to do with the binary data?
                         SendPacket(new AnsUserSearchSet());
-                    }
-                    break;
-
-                case ReqBinaryVersion reqBinaryVersion:
-                    {
-                        // The client doesn't seems to care about what we send in the parameter
-                        if (reqBinaryVersion.UnknownField == 1)
-                        {
-                            SendPacket(new AnsBinaryVersion(0, 0));
-                        }
-                        else
-                        {
-                            SendPacket(new AnsBinaryVersion(1, 1));
-                        }
                     }
                     break;
 
