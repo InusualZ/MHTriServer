@@ -6,42 +6,41 @@ namespace MHTriServer.Server.Packets
     {
         public const uint PACKET_ID = 0x63030200;
 
-        public uint BinaryDataVersion { get; private set; }
+        public uint Version { get; private set; }
 
-        public uint UnknownField2 { get; private set; }
+        public uint Offset { get; private set; }
 
-        public uint BinarySize { get; private set; }
+        public uint DataSize { get; private set; }
 
-        public byte[] BinaryData { get; private set; }
+        public byte[] Data { get; private set; }
 
-        public AnsBinaryData(uint binaryDataVersion, uint unknownField2, uint binarySize, byte[] binaryData) : base(PACKET_ID) 
-            => (BinaryDataVersion, UnknownField2, BinarySize, BinaryData) = (binaryDataVersion, unknownField2, binarySize, binaryData);
+        public AnsBinaryData(uint version, uint offset, byte[] data) : base(PACKET_ID) 
+            => (Version, Offset, DataSize, Data) = (version, offset, (uint)data.Length, data);
 
         public AnsBinaryData(uint id, ushort size, ushort counter) : base(id, size, counter) { }
 
         public override void Serialize(ExtendedBinaryWriter writer)
         {
             base.Serialize(writer);
-            writer.Write(BinaryDataVersion);
-            writer.Write(UnknownField2);
-            writer.Write(BinarySize);
-
-            writer.WriteShortBytes(BinaryData);
+            writer.Write(Version);
+            writer.Write(Offset);
+            writer.Write(DataSize);
+            writer.WriteShortBytes(Data);
         }
 
         public override void Deserialize(ExtendedBinaryReader reader)
         {
             Debug.Assert(ID == PACKET_ID);
-            BinaryDataVersion = reader.ReadUInt32();
-            UnknownField2 = reader.ReadUInt32();
-            BinarySize = reader.ReadUInt32();
-            BinaryData = reader.ReadShortBytes();
+            Version = reader.ReadUInt32();
+            Offset = reader.ReadUInt32();
+            DataSize = reader.ReadUInt32();
+            Data = reader.ReadShortBytes();
         }
 
         public override string ToString()
         {
-            return base.ToString() + $"\n\tBinaryDataVersion {BinaryDataVersion}\n\tUnknownField2 {UnknownField2}\n\tBinarySize {BinarySize}" +
-                $"\n\tUnknownField4 {Packet.Hexstring(BinaryData, ' ')}";
+            return base.ToString() + $"\n\tVersion {Version}\n\tOffset {Offset}\n\tSize {DataSize}" +
+                $"\n\tData {Packet.Hexstring(Data, ' ')}";
         }
     }
 }

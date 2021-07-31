@@ -41,7 +41,8 @@ namespace MHTriServer.Player
 
         public bool ConnectionAccepted { get; private set; }
 
-        public readonly string BINARY_DATA_TEST = "\t\tWhat!!!!\n\t\tHello World\n\t\tInusualZ\n\t\tHello Dev\n\t\tMore\n\t\tDude\n\t\tStop\n\t\tPlease";
+        public readonly string BINARY_DATA_5_TEST = "\t\tWhat!!!!\n\t\tHello World\n\t\tInusualZ\n\t\tHello Dev\n\t\tMore\n\t\tDude\n\t\tStop\n\t\tPlease";
+        public readonly string BINARY_DATA_1_TEST = "Open\0Open server for anyone\0Rookie\0Only hunters HR 30 or lower may enter\0Expert\0Only hunter HR 31 or higher may enter\0Recruiting\0Guild recruiting any kind of hunter";
 
         /*
          * TEMP VARIABLES
@@ -447,7 +448,7 @@ namespace MHTriServer.Player
                         if (reqBinaryHead.BinaryType == 5)
                         {
                             // Arbitrary Length
-                            binaryLength = (uint)BINARY_DATA_TEST.Length;
+                            binaryLength = (uint)BINARY_DATA_5_TEST.Length;
                         }
                         else
                         {
@@ -461,15 +462,15 @@ namespace MHTriServer.Player
 
                 case ReqBinaryData reqBinaryData:
                     {
-                        uint unkField2 = 0;
+                        uint offset = 0;
                         byte[] binaryData = null;
-                        if (reqBinaryData.BinaryType == 5)
+                        if (reqBinaryData.Type == 5)
                         {
                             // Unknown Data
-                            binaryData = Encoding.ASCII.GetBytes(BINARY_DATA_TEST);
+                            binaryData = Encoding.ASCII.GetBytes(BINARY_DATA_5_TEST);
                         }
 
-                        SendPacket(new AnsBinaryData(reqBinaryData.BinaryType, unkField2, (uint)binaryData.Length, binaryData));
+                        SendPacket(new AnsBinaryData(reqBinaryData.Type, offset, binaryData));
                     }
                     break;
 
@@ -571,7 +572,7 @@ namespace MHTriServer.Player
                         if (reqBinaryHead.BinaryType == 5)
                         {
                             // Arbitrary Length
-                            binaryLength = (uint)BINARY_DATA_TEST.Length;
+                            binaryLength = (uint)BINARY_DATA_5_TEST.Length;
                         }
                         else if (reqBinaryHead.BinaryType == 2)
                         {
@@ -590,7 +591,7 @@ namespace MHTriServer.Player
                         }
                         else if (reqBinaryHead.BinaryType == 1)
                         {
-                            binaryLength = (uint)BINARY_DATA_TEST.Length;
+                            binaryLength = (uint)BINARY_DATA_1_TEST.Length;
                         }
                         else
                         {
@@ -604,15 +605,14 @@ namespace MHTriServer.Player
 
                 case ReqBinaryData reqBinaryData:
                     {
-                        uint unkField2 = 0;
                         byte[] binaryData = null;
-                        if (reqBinaryData.BinaryType == 5)
+                        if (reqBinaryData.Type == 5)
                         {
                             // Unknown Data
-                            binaryData = Encoding.ASCII.GetBytes(BINARY_DATA_TEST);
+                            binaryData = Encoding.ASCII.GetBytes(BINARY_DATA_5_TEST);
 
                         }
-                        else if (reqBinaryData.BinaryType == 2)
+                        else if (reqBinaryData.Type == 2)
                         {
                             // Lobby Weather Data 
                             binaryData = new byte[] {
@@ -621,27 +621,27 @@ namespace MHTriServer.Player
                                 0x00, 0x00, 0x50, 0x00 // *Sandstorm*
                             };
                         }
-                        else if (reqBinaryData.BinaryType == 3)
+                        else if (reqBinaryData.Type == 3)
                         {
                             // ???
-                            binaryData = new byte[reqBinaryData.BinaryDataExpectedSize];
+                            binaryData = new byte[reqBinaryData.DataExpectedSize];
                             var flag = 0 | 1 | 2 | 4 | 8;
                             BinaryPrimitives.WriteUInt32BigEndian(new Span<byte>(binaryData, binaryData.Length - 4, 4), (uint)flag);
                         }
-                        else if (reqBinaryData.BinaryType == 4)
+                        else if (reqBinaryData.Type == 4)
                         {
-                            binaryData = new byte[reqBinaryData.BinaryDataExpectedSize];
+                            binaryData = new byte[reqBinaryData.DataExpectedSize];
                         }
-                        else if (reqBinaryData.BinaryType == 1)
+                        else if (reqBinaryData.Type == 1)
                         {
-                            binaryData = Encoding.ASCII.GetBytes(BINARY_DATA_TEST);
+                            binaryData = Encoding.ASCII.GetBytes(BINARY_DATA_1_TEST);
                         }
                         else
                         {
                             Debug.Assert(false);
                         }
 
-                        SendPacket(new AnsBinaryData(reqBinaryData.BinaryType, unkField2, (uint)binaryData.Length, binaryData));
+                        SendPacket(new AnsBinaryData(reqBinaryData.Version, reqBinaryData.Offset, binaryData));
                     }
                     break;
 
