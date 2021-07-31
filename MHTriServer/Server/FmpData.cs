@@ -26,7 +26,7 @@ namespace MHTriServer.Server
 
         public ushort ServerPort { get => Get<ushort>(FIELD_3); set => Set(FIELD_3, value); }
 
-        public ulong UnknownField7 { get => Get<ulong>(FIELD_7); set => Set(FIELD_7, value); }
+        public ulong ServerTypeIndex { get => Get<ulong>(FIELD_7); set => Set(FIELD_7, value); }
 
         public uint CurrentPopulation { get => Get<uint>(FIELD_8); set => Set(FIELD_8, value); }
 
@@ -43,14 +43,14 @@ namespace MHTriServer.Server
         public uint UnknownField12 { get => Get<uint>(FIELD_12); set => Set(FIELD_12, value); }
 
 
-        public static FmpData Server(uint index, uint currentPopulation, uint maxPopulation, ulong unknownField7, 
+        public static FmpData Server(uint index, uint currentPopulation, uint maxPopulation, ulong ServerTypeIndex, 
             string serverName, uint unknownField12)
         {
             return new FmpData() { 
                 Index = index,
                 CurrentPopulation = currentPopulation,
                 MaxPopulation = maxPopulation,
-                UnknownField7 = unknownField7,
+                ServerTypeIndex = ServerTypeIndex,
                 ServerName = serverName, 
                 UnknownField12 = unknownField12
             };

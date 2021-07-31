@@ -42,7 +42,12 @@ namespace MHTriServer.Player
         public bool ConnectionAccepted { get; private set; }
 
         public readonly string BINARY_DATA_5_TEST = "\t\tWhat!!!!\n\t\tHello World\n\t\tInusualZ\n\t\tHello Dev\n\t\tMore\n\t\tDude\n\t\tStop\n\t\tPlease";
-        public readonly string BINARY_DATA_1_TEST = "Open\0Open server for anyone\0Rookie\0Only hunters HR 30 or lower may enter\0Expert\0Only hunter HR 31 or higher may enter\0Recruiting\0Guild recruiting any kind of hunter";
+        public static readonly byte[] BINARY_DATA_1;
+
+        static Player()
+        {
+            BINARY_DATA_1 = ServerType.GenerateBinaryData();
+        }
 
         /*
          * TEMP VARIABLES
@@ -531,10 +536,10 @@ namespace MHTriServer.Player
                 case ReqFmpListData _:
                     {
                         var servers = new List<FmpData>() {
-                            FmpData.Server(1, 0, 4, 1, "Valor1", 4),
-                            FmpData.Server(2, 0, 4, 1, "Valor2", 3),
-                            FmpData.Server(3, 0, 4, 1, "Valor3", 2),
-                            FmpData.Server(4, 0, 4, 1, "Valor4", 1)
+                            FmpData.Server(1, 0, 4, 1, "Valor1", 5),
+                            FmpData.Server(2, 0, 4, 2, "Valor2", 6),
+                            FmpData.Server(3, 0, 4, 3, "Valor3", 7),
+                            FmpData.Server(4, 0, 4, 4, "Valor4", 8)
                         };
 
                         SendPacket(new AnsFmpListData(servers));
@@ -591,7 +596,7 @@ namespace MHTriServer.Player
                         }
                         else if (reqBinaryHead.BinaryType == 1)
                         {
-                            binaryLength = (uint)BINARY_DATA_1_TEST.Length;
+                            binaryLength = (uint)BINARY_DATA_1.Length;
                         }
                         else
                         {
@@ -634,7 +639,7 @@ namespace MHTriServer.Player
                         }
                         else if (reqBinaryData.Type == 1)
                         {
-                            binaryData = Encoding.ASCII.GetBytes(BINARY_DATA_1_TEST);
+                            binaryData = BINARY_DATA_1;
                         }
                         else
                         {
