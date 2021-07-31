@@ -39,6 +39,8 @@ namespace MHTriServer.Player
 
         public bool ConnectionAccepted { get; private set; }
 
+        public readonly string BINARY_DATA_TEST = "\t\tWhat!!!!\n\t\tHello World\n\t\tInusualZ\n\t\tHello Dev";
+
         /*
          * TEMP VARIABLES
          */
@@ -443,10 +445,11 @@ namespace MHTriServer.Player
                         if (reqBinaryHead.BinaryType == 5)
                         {
                             // Arbitrary Length
-                            binaryLength = 10;
+                            binaryLength = (uint)BINARY_DATA_TEST.Length;
                         }
                         else
                         {
+                            Debug.Assert(false);
                             // Unknown
                         }
 
@@ -461,7 +464,7 @@ namespace MHTriServer.Player
                         if (reqBinaryData.BinaryType == 5)
                         {
                             // Unknown Data
-                            binaryData = new byte[] { 0x09, 0x09, 0, 0, 0, 0, 0, 0, 0, 0 };
+                            binaryData = Encoding.ASCII.GetBytes(BINARY_DATA_TEST);
                         }
 
                         SendPacket(new AnsBinaryData(reqBinaryData.BinaryType, unkField2, (uint)binaryData.Length, binaryData));
@@ -553,7 +556,7 @@ namespace MHTriServer.Player
                         if (reqBinaryHead.BinaryType == 5)
                         {
                             // Arbitrary Length
-                            binaryLength = 10;
+                            binaryLength = (uint)BINARY_DATA_TEST.Length;
                         }
                         else if (reqBinaryHead.BinaryType == 2)
                         {
@@ -587,7 +590,7 @@ namespace MHTriServer.Player
                         if (reqBinaryData.BinaryType == 5)
                         {
                             // Unknown Data
-                            binaryData = new byte[] { 0x09, 0x09, 0, 0, 0, 0, 0, 0, 0, 0 };
+                            binaryData = Encoding.ASCII.GetBytes(BINARY_DATA_TEST);
 
                         }
                         else if (reqBinaryData.BinaryType == 2)
