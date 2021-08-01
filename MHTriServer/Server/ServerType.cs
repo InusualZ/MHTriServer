@@ -39,7 +39,7 @@ namespace MHTriServer.Server
 
         public static byte[] GenerateBinaryData(params ServerType[] serverTypes)
         {
-            Debug.Assert(serverTypes.Length <= 4);
+            Debug.Assert(serverTypes.Length <= MAX_SERVER_TYPE);
 
             // TODO: Move the generation of this big binary blob, elsewhere
             var asciiEncoder = Encoding.ASCII;
