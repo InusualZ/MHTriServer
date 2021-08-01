@@ -471,7 +471,7 @@ namespace MHTriServer.Player
                         byte[] binaryData = null;
                         if (reqBinaryData.Type == 5)
                         {
-                            // Unknown Data
+                            // Unknown request, max size is 0x1ff
                             binaryData = Encoding.ASCII.GetBytes(BINARY_DATA_5_TEST);
                         }
 
@@ -537,9 +537,9 @@ namespace MHTriServer.Player
                     {
                         var servers = new List<FmpData>() {
                             FmpData.Server(1, 0, 4, 1, "Valor1", 5),
-                            FmpData.Server(2, 0, 4, 2, "Valor2", 6),
-                            FmpData.Server(3, 0, 4, 3, "Valor3", 7),
-                            FmpData.Server(4, 0, 4, 4, "Valor4", 8)
+                            FmpData.Server(2, 0, 4, 2, "Rookies1", 6),
+                            FmpData.Server(3, 0, 4, 3, "Veterans1", 7),
+                            FmpData.Server(4, 0, 4, 4, "Greed1", 8)
                         };
 
                         SendPacket(new AnsFmpListData(servers));
@@ -561,7 +561,7 @@ namespace MHTriServer.Player
 
                 case ReqBinaryVersion reqBinaryVersion:
                     {
-                        // This packet means that the client is asking you 
+                        // This packet means that the client is asking the server 
                         // If the binary data of type {reqBinaryVersion.BinaryType} has change.
 
                         // For now, we are going to always send a new version, because we want to know
@@ -576,7 +576,7 @@ namespace MHTriServer.Player
                         uint binaryLength = 0;
                         if (reqBinaryHead.BinaryType == 5)
                         {
-                            // Unconfirmed expected length of 0x140c
+                            // Unknown request, max size is 0x1ff
                             binaryLength = (uint)BINARY_DATA_5_TEST.Length;
                         }
                         else if (reqBinaryHead.BinaryType == 2)
@@ -596,6 +596,7 @@ namespace MHTriServer.Player
                         }
                         else if (reqBinaryHead.BinaryType == 1)
                         {
+                            // Unconfirmed expected length of 0x140c
                             binaryLength = (uint)BINARY_DATA_1.Length;
                         }
                         else
