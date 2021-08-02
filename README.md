@@ -4,7 +4,7 @@ Monster Hunter Tri Custom Server Implementation
 
 Current Status
 --------------
-![Progress](https://i.imgur.com/eRaTuhu.gif)
+![Progress](https://i.imgur.com/t4Xpfnt.gif)
 
 As you can see the project is not yet functional. We are stuck at Spawning the player at the gate.
 
@@ -16,9 +16,9 @@ Todo:
   - [X] Send specific time
   - [ ] Simulate day/night cycle
   - [x] Sandstorm
-- [ ] Gate:
+- [X] Gate:
   - [X] Gate Selection
-  - [ ] Spawn At Gate
+  - [X] Spawn At Gate
 - [ ] City 
   - [ ] Create a city
   - [ ] Join a city
@@ -81,6 +81,11 @@ If you are using a local Nintendo Wifi Connection Server and patched the game wi
 Servers
 -----------
 Open the solution file, then **Build** *->* **Run** the solution to start the server. When a client connect, you would see all the packet being logged to the console. You would also need the Nintendo Wifi Connection server running.
+
+Community
+-----------
+
+- [Discord](https://discord.gg/rP55eE24QC)
 
 Special Thanks
 -----------
