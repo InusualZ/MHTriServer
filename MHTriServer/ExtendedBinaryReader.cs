@@ -75,8 +75,12 @@ namespace MHTriServer
         public override string ReadString()
         {
             var length = ReadUInt16(m_Endianness);
-            var chars = ReadBytes(length);
-            return m_Encoding.GetString(chars);
+            if (length > 0)
+            {
+                var chars = ReadBytes(length);
+                return m_Encoding.GetString(chars);
+            }
+            return string.Empty;
         }
 
         // TODO: Better name
