@@ -905,6 +905,12 @@ namespace MHTriServer.Player
                     }
                     break;
 
+                case ReqUserBinaryNotice reqUserBinaryNotice:
+                    {
+                        SendPacket(new AnsUserBinaryNotice());
+                    }
+                    break;
+
                 case ReqLayerEnd reqLayerEnd:
                     {
                         SendPacket(new AnsLayerEnd());

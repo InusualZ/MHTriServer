@@ -104,6 +104,7 @@ namespace MHTriServer.Server.Packets
             RegisterWith<AnsTerms>(AnsTerms.PACKET_ID);
             RegisterWith<AnsTermsVersion>(AnsTermsVersion.PACKET_ID);
             RegisterWith<AnsTicketClient>(AnsTicketClient.PACKET_ID);
+            RegisterWith<AnsUserBinaryNotice>(AnsUserBinaryNotice.PACKET_ID);
             RegisterWith<AnsUserBinarySet>(AnsUserBinarySet.PACKET_ID);
             RegisterWith<AnsUserListData>(AnsUserListData.PACKET_ID);
             RegisterWith<AnsUserListFoot>(AnsUserListFoot.PACKET_ID);
@@ -153,6 +154,7 @@ namespace MHTriServer.Server.Packets
             RegisterWith<ReqTermsVersion>(ReqTermsVersion.PACKET_ID);
             RegisterWith<ReqTicketClient>(ReqTicketClient.PACKET_ID);
             RegisterWith<ReqCheatDataCheck>(ReqCheatDataCheck.PACKET_ID);
+            RegisterWith<ReqUserBinaryNotice>(ReqUserBinaryNotice.PACKET_ID);
             RegisterWith<ReqUserBinarySet>(ReqUserBinarySet.PACKET_ID);
             RegisterWith<ReqUserListData>(ReqUserListData.PACKET_ID);
             RegisterWith<ReqUserListFoot>(ReqUserListFoot.PACKET_ID);
