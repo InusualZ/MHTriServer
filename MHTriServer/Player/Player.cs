@@ -958,7 +958,7 @@ namespace MHTriServer.Player
             m_SendStream.Position = initialPosition;
             m_SendStream.Write((ushort)packetSize);
 
-            if ((packet.ID & 0x0000ff00) == 2)
+            if ((packet.ID & 0x0000ff00) == 0x200)
             {
                 m_SendStream.Write(m_LastCounter);
             }
