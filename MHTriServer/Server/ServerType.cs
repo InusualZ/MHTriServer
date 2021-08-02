@@ -56,6 +56,14 @@ namespace MHTriServer.Server
                 ++index;
             }
 
+            // Confirmed! It control how long last the day/night cycle
+            // Need more RE in order to know how exactly it work
+            // 2 uint array
+            // Offset: 0x304
+            // Used: @8042d91c
+            BinaryPrimitives.WriteUInt32BigEndian(new Span<byte>(blob, 0x304 + (0 * sizeof(uint)), sizeof(uint)), 100);
+            BinaryPrimitives.WriteUInt32BigEndian(new Span<byte>(blob, 0x304 + (1 * sizeof(uint)), sizeof(uint)), 100);
+
             return blob;
         }
     }
