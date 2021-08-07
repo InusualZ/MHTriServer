@@ -6,8 +6,6 @@ Current Status
 --------------
 ![Progress](https://i.imgur.com/t4Xpfnt.gif)
 
-As you can see the project is not yet functional. We are stuck at Spawning the player at the gate.
-
 Todo:
 - [x] Bypass Nintendo Servers
 - [x] Capcom ID selection:
