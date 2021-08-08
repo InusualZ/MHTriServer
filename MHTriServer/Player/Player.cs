@@ -54,6 +54,7 @@ namespace MHTriServer.Player
          */
 
         private bool AfterLayerChildData = false;
+        private bool AfterUserBinaryNotice = false;
 
         internal Player(ConnectionType connectionType, Socket socket, Stream networkStream)
         {
@@ -821,67 +822,109 @@ namespace MHTriServer.Player
 
                 case ReqLayerChildListHead reqChildListHead:
                     {
-                        SendPacket(new AnsLayerChildListHead(1));
+                        if (AfterUserBinaryNotice)
+                        {
+                            SendPacket(new AnsLayerChildListHead(10));
+                        }
+                        else
+                        {
+                            SendPacket(new AnsLayerChildListHead(1));
+                        }
                     }
                     break;
 
                 case ReqLayerChildListData reqLayerChildListData:
                     {
                         var childsData = new List<LayerChildData>();
-                        childsData.Add(
-                            new LayerChildData()
+
+                        if (AfterUserBinaryNotice)
+                        {
+                            // Format: 01 02 03 05 06 07 08 09 0A 0B 0C 0D 10 11 12
+
+                            for (var cityIndex = 0; cityIndex < reqLayerChildListData.ExpectedDataCount; ++cityIndex)
                             {
-                                ChildData = new LayerData()
+                                childsData.Add(new LayerChildData()
                                 {
-                                    Name = "City Gate1",
-                                    UnknownField5 = 1,
-                                    CurrentPopulation = 0,
-                                    MaxPopulation = 100,
-                                    UnknownField7 = 5,
-                                    UnknownField10 = 3,
-                                    UnknownField11 = 2,
-                                    UnknownField12 = 1,
-                                    UnknownField16 = 2, // Value must be 1 or 2. Seems to be a Enum of some kind
-                                    UnknownField17 = 4,
-                                    UnknownField18 = true
-                                },
-                                UnknownField2 = new List<UnkByteIntStruct>() {
+                                    ChildData = new LayerData()
+                                    {
+                                        Name = $"City {cityIndex + 1}",
+                                        UnknownField5 = 1,
+                                        CurrentPopulation = 0,
+                                        MaxPopulation = 4,
+                                        UnknownField7 = 5,
+                                        UnknownField10 = 3,
+                                        UnknownField11 = 1,
+                                        UnknownField12 = 1,
+                                        UnknownField16 = 2, // Value must be 1 or 2. (1) City is Empty, (2) City is created
+                                        UnknownField17 = 4,
+                                    },
+                                    UnknownField2 = new List<UnkByteIntStruct>() {
                                     new UnkByteIntStruct() {
                                         UnknownField = 5,
                                         ContainUnknownField3 = true,
                                         UnknownField3 = 6
                                     }
-                                }
+                                    }
+                                });
                             }
-                        );
-
-                        childsData.Add(new LayerChildData()
+                        }
+                        else
                         {
-                            ChildData = new LayerData()
+                            childsData.Add(
+                                new LayerChildData()
+                                {
+                                    ChildData = new LayerData()
+                                    {
+                                        Name = "City Gate1",
+                                        UnknownField5 = 1,
+                                        CurrentPopulation = 0,
+                                        MaxPopulation = 100,
+                                        UnknownField7 = 5,
+                                        UnknownField10 = 3,
+                                        UnknownField11 = 2,
+                                        UnknownField12 = 1,
+                                        UnknownField16 = 2, // Value must be 1 or 2. Seems to be a Enum of some kind
+                                        UnknownField17 = 4,
+                                        UnknownField18 = true
+                                    },
+                                    UnknownField2 = new List<UnkByteIntStruct>() {
+                                    new UnkByteIntStruct() {
+                                        UnknownField = 5,
+                                        ContainUnknownField3 = true,
+                                        UnknownField3 = 6
+                                    }
+                                    }
+                                }
+                            );
+
+                            childsData.Add(new LayerChildData()
                             {
-                                Name = "City Gate2",
-                                UnknownField5 = 2,
-                                CurrentPopulation = 0,
-                                MaxPopulation = 100,
-                                UnknownField7 = 1,
-                                UnknownField10 = 2,
-                                UnknownField11 = 3,
-                                UnknownField12 = 4,
-                                UnknownField16 = 1, // Value must be 1 or 2. Seems to be a Enum of some kind
-                                UnknownField17 = 5,
-                                UnknownField18 = true
-                            },
-                            UnknownField2 = new List<UnkByteIntStruct>() {
+                                ChildData = new LayerData()
+                                {
+                                    Name = "City Gate2",
+                                    UnknownField5 = 2,
+                                    CurrentPopulation = 0,
+                                    MaxPopulation = 100,
+                                    UnknownField7 = 1,
+                                    UnknownField10 = 2,
+                                    UnknownField11 = 3,
+                                    UnknownField12 = 4,
+                                    UnknownField16 = 1, // Value must be 1 or 2. Seems to be a Enum of some kind
+                                    UnknownField17 = 5,
+                                    UnknownField18 = true
+                                },
+                                UnknownField2 = new List<UnkByteIntStruct>() {
                                     new UnkByteIntStruct() {
                                         UnknownField = 6,
                                         ContainUnknownField3 = true,
                                         UnknownField3 = 7
                                     }
                                 }
-                        }
-                        );
+                            }
+                            );
 
-                        AfterLayerChildData = true;
+                            AfterLayerChildData = true;
+                        }
 
                         SendPacket(new AnsLayerChildListData(childsData));
                     }
@@ -907,7 +950,25 @@ namespace MHTriServer.Player
 
                 case ReqUserBinaryNotice reqUserBinaryNotice:
                     {
+                        AfterUserBinaryNotice = true;
                         SendPacket(new AnsUserBinaryNotice());
+
+                    }
+                    break;
+
+                case ReqLayerCreateHead reqLayerCreateHead:
+                    {
+                        // Notify the server that the client want to create a city
+
+                        SendPacket(new AnsLayerCreateHead(reqLayerCreateHead.CityIndex));
+                    }
+                    break;
+
+                case ReqLayerCreateFoot reqLayerCreateFoot:
+                    {
+                        // Notify the server that the client want to create a city
+
+                        SendPacket(new AnsLayerCreateFoot(reqLayerCreateFoot.CityIndex));
                     }
                     break;
 
