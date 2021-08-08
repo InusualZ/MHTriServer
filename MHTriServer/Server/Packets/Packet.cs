@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
@@ -90,6 +91,9 @@ namespace MHTriServer.Server.Packets
             RegisterWith<AnsLayerChildListData>(AnsLayerChildListData.PACKET_ID);
             RegisterWith<AnsLayerChildListFoot>(AnsLayerChildListFoot.PACKET_ID);
             RegisterWith<AnsLayerChildListHead>(AnsLayerChildListHead.PACKET_ID);
+            RegisterWith<AnsLayerCreateHead>(AnsLayerCreateHead.PACKET_ID);
+            RegisterWith<AnsLayerCreateFoot>(AnsLayerCreateFoot.PACKET_ID);
+            RegisterWith<AnsLayerDetailSearchHead>(AnsLayerDetailSearchHead.PACKET_ID);
             RegisterWith<AnsLayerDown>(AnsLayerDown.PACKET_ID);
             RegisterWith<AnsLayerEnd>(AnsLayerEnd.PACKET_ID);
             RegisterWith<AnsLayerStart>(AnsLayerStart.PACKET_ID);
@@ -139,6 +143,9 @@ namespace MHTriServer.Server.Packets
             RegisterWith<ReqLayerChildListData>(ReqLayerChildListData.PACKET_ID);
             RegisterWith<ReqLayerChildListFoot>(ReqLayerChildListFoot.PACKET_ID);
             RegisterWith<ReqLayerChildListHead>(ReqLayerChildListHead.PACKET_ID);
+            RegisterWith<ReqLayerCreateHead>(ReqLayerCreateHead.PACKET_ID);
+            RegisterWith<ReqLayerCreateFoot>(ReqLayerCreateFoot.PACKET_ID);
+            RegisterWith<ReqLayerDetailSearchHead>(ReqLayerDetailSearchHead.PACKET_ID);
             RegisterWith<ReqLayerDown>(ReqLayerDown.PACKET_ID);
             RegisterWith<ReqLayerEnd>(ReqLayerEnd.PACKET_ID);
             RegisterWith<ReqLayerStart>(ReqLayerStart.PACKET_ID);
@@ -203,7 +210,7 @@ namespace MHTriServer.Server.Packets
                     lineBuilder.Append("  ");
                 }
 
-                if (x < slice.Length - 1)
+                if (x < expectedSize - 1)
                 {
                     lineBuilder.Append(separator);
                 }
@@ -228,6 +235,52 @@ namespace MHTriServer.Server.Packets
             {
                 var endIndex = Math.Min(i + 16, bytes.Length);
                 var slice = bytes[i..endIndex];
+
+                lineBuilder.Append($"{i:X8} | ");
+
+                lineBuilder.Append(Hexstring(slice, ' ', 16));
+
+                lineBuilder.Append(" | ");
+                lineBuilder.Append(slice.Select(b => Convert2ASCII(b)).ToArray());
+
+                Console.WriteLine(lineBuilder.ToString());
+
+                lineBuilder.Clear();
+            }
+        }
+
+        public static void Hexdump(Stream stream, long? maxCount)
+        {
+            maxCount ??= stream.Length - stream.Position;
+
+            static char Convert2ASCII(byte val)
+            {
+                if (0x20 <= val && val < 0x7F)
+                {
+                    return (char)val;
+                }
+
+                return '.';
+            }
+
+            var lineBuilder = new StringBuilder();
+            var slice = new byte[16];
+            for (var i = 0; i < maxCount; i += slice.Length)
+            {
+                // var endIndex = Math.Min(i + 16, stream.Length);
+                var bytesRead = stream.Read(slice, 0, slice.Length);
+                if (bytesRead != slice.Length)
+                {
+                    if (bytesRead > 0)
+                    {
+                        // Memset if neccesarry
+                        Array.Fill<byte>(slice, 0, bytesRead, slice.Length - bytesRead);
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
 
                 lineBuilder.Append($"{i:X8} | ");
 
