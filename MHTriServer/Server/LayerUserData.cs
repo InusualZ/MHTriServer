@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Text;
+﻿using System.Diagnostics;
 
 namespace MHTriServer.Server
 {
@@ -30,6 +27,8 @@ namespace MHTriServer.Server
             }
         }
 
+        public UnkShortArrayStruct UnknownField3 { get => Get<UnkShortArrayStruct>(FIELD_3); set => Set(FIELD_3, value); }
+
         public uint UnknownField6 {
             get => Get<uint>(FIELD_6);
             set => Set(FIELD_6, value);
@@ -41,6 +40,29 @@ namespace MHTriServer.Server
                 Debug.Assert(value.Length < 0x100);
                 Set(FIELD_7, value);
             }
+        }
+
+        protected override bool TryRead(byte key, byte type, ExtendedBinaryReader reader, out object value)
+        {
+            if (key == FIELD_3)
+            {
+                // TEST type?
+                value = UnkShortArrayStruct.Deserialize(reader);
+                return true;
+            }
+            return base.TryRead(key, type, reader, out value);
+        }
+
+        protected override bool TryWrite(byte key, object value, ExtendedBinaryWriter writer)
+        {
+            if (key == FIELD_3 && value is UnkShortArrayStruct unknownData)
+            {
+                // The client write this byte, since technically is a binary payload 
+                writer.Write((byte)ElementType.Binary);
+                unknownData.Serialize(writer);
+            }
+
+            return base.TryWrite(key, value, writer);
         }
     }
 }
