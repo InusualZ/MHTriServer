@@ -945,6 +945,54 @@ namespace MHTriServer.Player
                     }
                     break;
 
+                case ReqLayerUserListHead reqLayerUserListHead:
+                    {
+                        // Request list of hunter in a city
+                        SendPacket(new AnsLayerUserListHead(reqLayerUserListHead.UnknownField3, 1));
+                    }
+                    break;
+
+                case ReqLayerUserListData reqLayerUserListData:
+                    {
+                        var childData = new List<LayerUserListData>();
+                        for (var i = 0; i < 1 /*4*/; i++)
+                        {
+                            childData.Add(new LayerUserListData() { 
+                                ChildData = new LayerUserData()
+                                {
+                                    UnknownField = "Hello",
+                                    UnknownField2 = "World",
+                                    UnknownField3 = new UnkShortArrayStruct()
+                                    {
+                                        UnknownField = 1,
+                                        UnknownField2 = 2,
+                                        UnknownField3 = new List<ushort>()
+                                        {
+                                            3, 4, 5
+                                        }
+                                    }
+                                },
+                                UnknownField2 = new List<UnkByteIntStruct>()
+                                {
+                                    new UnkByteIntStruct() {
+                                        UnknownField = 6,
+                                        ContainUnknownField3 = true,
+                                        UnknownField3 = 7
+                                    }
+                                }
+                            });
+                        }
+                        SendPacket(new AnsLayerUserListData(childData));
+                    }
+                    break;
+
+                case ReqLayerUserListFoot _:
+                    {
+                        // End hunter list request
+                        SendPacket(new AnsLayerUserListFoot());
+                    }
+                    break;
+
                 case ReqLayerEnd reqLayerEnd:
                     {
                         SendPacket(new AnsLayerEnd());

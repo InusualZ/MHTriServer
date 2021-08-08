@@ -98,6 +98,9 @@ namespace MHTriServer.Server.Packets
             RegisterWith<AnsLayerEnd>(AnsLayerEnd.PACKET_ID);
             RegisterWith<AnsLayerStart>(AnsLayerStart.PACKET_ID);
             RegisterWith<AnsLayerUserList>(AnsLayerUserList.PACKET_ID);
+            RegisterWith<AnsLayerUserListData>(AnsLayerUserListData.PACKET_ID);
+            RegisterWith<AnsLayerUserListFoot>(AnsLayerUserListFoot.PACKET_ID);
+            RegisterWith<AnsLayerUserListHead>(AnsLayerUserListHead.PACKET_ID);
             RegisterWith<AnsLineCheck>(AnsLineCheck.PACKET_ID);
             RegisterWith<AnsLoginInfo>(AnsLoginInfo.PACKET_ID);
             RegisterWith<AnsMaintenance>(AnsMaintenance.PACKET_ID);
@@ -150,6 +153,9 @@ namespace MHTriServer.Server.Packets
             RegisterWith<ReqLayerEnd>(ReqLayerEnd.PACKET_ID);
             RegisterWith<ReqLayerStart>(ReqLayerStart.PACKET_ID);
             RegisterWith<ReqLayerUserList>(ReqLayerUserList.PACKET_ID);
+            RegisterWith<ReqLayerUserListData>(ReqLayerUserListData.PACKET_ID);
+            RegisterWith<ReqLayerUserListFoot>(ReqLayerUserListFoot.PACKET_ID);
+            RegisterWith<ReqLayerUserListHead>(ReqLayerUserListHead.PACKET_ID);
             RegisterWith<ReqLineCheck>(ReqLineCheck.PACKET_ID);
             RegisterWith<ReqLmpConnect>(ReqLmpConnect.PACKET_ID);
             RegisterWith<ReqLoginInfo>(ReqLoginInfo.PACKET_ID);
