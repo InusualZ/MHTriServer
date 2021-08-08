@@ -24,6 +24,12 @@ namespace MHTriServer.Server
         private const byte FIELD_22 = 0x16;
         private const byte FIELD_23 = 0x17;
 
+        public enum StateEnum
+        {
+            Enable = 0,
+            Empty = 1,
+            Disable = 2
+        }
 
         public uint UnknownField1 { get => Get<uint>(FIELD_1); set => Set(FIELD_1, value); }
 
@@ -56,7 +62,7 @@ namespace MHTriServer.Server
 
         public ushort UnknownField13 { get => Get<ushort>(FIELD_13); set => Set(FIELD_13, value); }
 
-        public byte UnknownField16 { get => Get<byte>(FIELD_16); set => Set(FIELD_16, value); }
+        public StateEnum State { get => (StateEnum) Get<byte>(FIELD_16); set => Set(FIELD_16, (byte)value); }
 
         public uint UnknownField17 { get => Get<uint>(FIELD_17); set => Set(FIELD_17, value); }
 
