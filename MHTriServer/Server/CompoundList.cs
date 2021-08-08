@@ -7,7 +7,7 @@ namespace MHTriServer.Server
 {
     public class CompoundList
     {
-        private enum ElementType
+        protected enum ElementType
         {
             None = 0,
             UInt8 = 1,

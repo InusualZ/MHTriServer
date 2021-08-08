@@ -41,7 +41,7 @@
             if (key == FIELD_1 && value is UnkShortArrayStruct unknownData)
             {
                 // The client write this byte, since technically is a binary payload 
-                writer.Write((byte)0x06);
+                writer.Write((byte)ElementType.Binary);
                 unknownData.Serialize(writer);
             }
 
