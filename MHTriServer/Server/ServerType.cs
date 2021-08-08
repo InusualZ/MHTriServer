@@ -13,6 +13,8 @@ namespace MHTriServer.Server
         private const int SERVER_TYPE_STRUCT_SIZE = SERVER_TYPE_NAME_SIZE + SERVER_TYPE_DESC_SIZE;
         private const int SERVER_TYPE_MINMAX_STRUCT_SIZE = sizeof(ushort) + sizeof(ushort);
         private const int MAX_SERVER_TYPE = 4;
+        private const int MAX_SEEKING_DESC_LENGTH = 0x0d; // Unconfirmed, probably is wrong
+        private const int SEEKING_STRUCT_SIZE = 52;
 
         public static readonly ServerType OPEN = new ServerType("Open", "Hunters of all Ranks\ncan gather here.", 0, ushort.MaxValue);
         public static readonly ServerType ROOKIE = new ServerType("Rookie", "Only hunters HR 30\nor lower may enter", 0, 30);
@@ -44,16 +46,14 @@ namespace MHTriServer.Server
             // TODO: Move the generation of this big binary blob, elsewhere
             var asciiEncoder = Encoding.ASCII;
             var blob = new byte[BIG_BINARY_BLOB_SIZE];
-            var index = 0;
-            foreach (var serverType in serverTypes)
+            for (var index = 0; index < serverTypes.Length; ++index)
             {
-                asciiEncoder.GetBytes(serverType.Name, new Span<byte>(blob, 0 + (index * SERVER_TYPE_STRUCT_SIZE), SERVER_TYPE_NAME_SIZE));
-                asciiEncoder.GetBytes(serverType.Description, new Span<byte>(blob, 24 + (index * SERVER_TYPE_STRUCT_SIZE), SERVER_TYPE_DESC_SIZE));
+                var serverType = serverTypes[index];
+                asciiEncoder.GetBytes(serverType.Name, new Span<byte>(blob, 0 + (index * SERVER_TYPE_STRUCT_SIZE), SERVER_TYPE_NAME_SIZE - 1));
+                asciiEncoder.GetBytes(serverType.Description, new Span<byte>(blob, 24 + (index * SERVER_TYPE_STRUCT_SIZE), SERVER_TYPE_DESC_SIZE - 1));
 
                 BinaryPrimitives.WriteUInt16BigEndian(new Span<byte>(blob, 0x13AC + (index * SERVER_TYPE_MINMAX_STRUCT_SIZE), sizeof(ushort)), serverType.MinRank);
                 BinaryPrimitives.WriteUInt16BigEndian(new Span<byte>(blob, 0x13AE + (index * SERVER_TYPE_MINMAX_STRUCT_SIZE), sizeof(ushort)), serverType.MaxRank);
-
-                ++index;
             }
 
             // Confirmed! It control how long last the day/night cycle
@@ -61,8 +61,18 @@ namespace MHTriServer.Server
             // 2 uint array
             // Offset: 0x304
             // Used: @8042d91c
-            BinaryPrimitives.WriteUInt32BigEndian(new Span<byte>(blob, 0x304 + (0 * sizeof(uint)), sizeof(uint)), 100);
-            BinaryPrimitives.WriteUInt32BigEndian(new Span<byte>(blob, 0x304 + (1 * sizeof(uint)), sizeof(uint)), 100);
+            BinaryPrimitives.WriteUInt32BigEndian(new Span<byte>(blob, 0x304 + (0 * sizeof(uint)), sizeof(uint)), 0);
+            BinaryPrimitives.WriteUInt32BigEndian(new Span<byte>(blob, 0x304 + (1 * sizeof(uint)), sizeof(uint)), 0);
+
+            // Seeking City Strings
+            const ushort SEEKING_LIST_COUNT = 2; // Unknown max amount
+            for (var i = 0; i < SEEKING_LIST_COUNT; ++i)
+            {
+                asciiEncoder.GetBytes($"Everyone{i}", new Span<byte>(blob, 0x30C + (i * SEEKING_STRUCT_SIZE), MAX_SEEKING_DESC_LENGTH - 1));
+
+                blob[0x33D + (i * SEEKING_STRUCT_SIZE)] = 0x01; // Probably a boolean
+                blob[0x33E + (i * SEEKING_STRUCT_SIZE)] = 0xFF; // Probably a flag field
+            }
 
             return blob;
         }
