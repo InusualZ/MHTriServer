@@ -65,6 +65,12 @@ namespace MHTriServer.Server
 
         public static void SerializeArray(List<UnkByteIntStruct> arr, ExtendedBinaryWriter writer)
         {
+            if (arr == null)
+            {
+                writer.Write(0);
+                return;
+            }
+
             var count = Math.Min(arr.Count, MAX_ARRAY_SIZE);
 
             writer.Write((byte)count);

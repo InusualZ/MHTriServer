@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace MHTriServer.Server
+﻿namespace MHTriServer.Server
 {
     public class UserNumData : CompoundList
     {
