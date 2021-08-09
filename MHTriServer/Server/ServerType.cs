@@ -65,7 +65,7 @@ namespace MHTriServer.Server
             BinaryPrimitives.WriteUInt32BigEndian(new Span<byte>(blob, 0x304 + (1 * sizeof(uint)), sizeof(uint)), 0);
 
             // Seeking City Strings
-            const ushort SEEKING_LIST_COUNT = 2; // Unknown max amount
+            const ushort SEEKING_LIST_COUNT = 8 * 4; // Confirmed max amount
             for (var i = 0; i < SEEKING_LIST_COUNT; ++i)
             {
                 asciiEncoder.GetBytes($"Everyone{i}", new Span<byte>(blob, 0x30C + (i * SEEKING_STRUCT_SIZE), MAX_SEEKING_DESC_LENGTH - 1));
