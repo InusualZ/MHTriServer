@@ -8,7 +8,7 @@ namespace MHTriServer.Server.Packets
 
         public byte[] Format { get; private set; }
 
-        public ReqLayerUserList( byte[] format) : base(PACKET_ID) 
+        public ReqLayerUserList(byte[] format) : base(PACKET_ID) 
             => (Format) = (format);
 
         public ReqLayerUserList(uint id, ushort size, ushort counter) : base(id, size, counter) { }

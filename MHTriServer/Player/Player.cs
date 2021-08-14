@@ -1103,6 +1103,22 @@ namespace MHTriServer.Player
                     }
                     break;
 
+                case ReqLayerMediationList reqLayerMediationList:
+                    {
+                        var mediationElements = new List<MediationData>() 
+                        { 
+                            new MediationData()
+                            {
+                                UnknownField1 = "Test",
+                                UnknownField2 = 0x1,
+                                UnknownField3 = 0x2,
+                            }
+                        };
+
+                        SendPacket(new AnsLayerMediationList(reqLayerMediationList.UnknownField1, mediationElements));
+                    }
+                    break;
+
                 case ReqLayerEnd reqLayerEnd:
                     {
                         SendPacket(new AnsLayerEnd());

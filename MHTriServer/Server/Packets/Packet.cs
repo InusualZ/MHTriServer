@@ -97,6 +97,7 @@ namespace MHTriServer.Server.Packets
             RegisterWith<AnsLayerDetailSearchHead>(AnsLayerDetailSearchHead.PACKET_ID);
             RegisterWith<AnsLayerDown>(AnsLayerDown.PACKET_ID);
             RegisterWith<AnsLayerEnd>(AnsLayerEnd.PACKET_ID);
+            RegisterWith<AnsLayerMediationList>(AnsLayerMediationList.PACKET_ID);
             RegisterWith<AnsLayerStart>(AnsLayerStart.PACKET_ID);
             RegisterWith<AnsLayerUserList>(AnsLayerUserList.PACKET_ID);
             RegisterWith<AnsLayerUserListData>(AnsLayerUserListData.PACKET_ID);
@@ -153,6 +154,7 @@ namespace MHTriServer.Server.Packets
             RegisterWith<ReqLayerDetailSearchHead>(ReqLayerDetailSearchHead.PACKET_ID);
             RegisterWith<ReqLayerDown>(ReqLayerDown.PACKET_ID);
             RegisterWith<ReqLayerEnd>(ReqLayerEnd.PACKET_ID);
+            RegisterWith<ReqLayerMediationList>(ReqLayerMediationList.PACKET_ID);
             RegisterWith<ReqLayerStart>(ReqLayerStart.PACKET_ID);
             RegisterWith<ReqLayerUserList>(ReqLayerUserList.PACKET_ID);
             RegisterWith<ReqLayerUserListData>(ReqLayerUserListData.PACKET_ID);
