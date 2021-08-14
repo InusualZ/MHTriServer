@@ -1133,6 +1133,13 @@ namespace MHTriServer.Player
                     }
                     break;
 
+                case ReqCircleCreate reqCircleCreate:
+                    {
+                        // Sent by the client, when the player want to submit a quest
+                        SendPacket(new AnsCircleCreate(reqCircleCreate.UnknownField1.UnknownField9));
+                    }
+                    break;
+
                 case ReqLayerEnd reqLayerEnd:
                     {
                         SendPacket(new AnsLayerEnd());
