@@ -8,6 +8,7 @@ namespace MHTriServer.Server
         private const byte FIELD_1 = 0x01;
         private const byte FIELD_2 = 0x02;
         private const byte FIELD_3 = 0x03;
+        private const byte FIELD_4 = 0x04;
         private const byte FIELD_5 = 0x05;
         private const byte FIELD_6 = 0x06;
         private const byte FIELD_7 = 0x07;
@@ -34,6 +35,16 @@ namespace MHTriServer.Server
         }
 
         public byte UnknownField3 { get => Get<byte>(FIELD_3); set => Set(FIELD_3, value); }
+
+        public string UnknownField4
+        {
+            get => Get<string>(FIELD_4);
+            set
+            {
+                //Debug.Assert(value.Length < 0x200);
+                Set(FIELD_4, value);
+            }
+        }
 
         public byte[] UnknownField5
         {
