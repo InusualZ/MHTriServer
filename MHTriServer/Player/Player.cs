@@ -600,6 +600,66 @@ namespace MHTriServer.Player
                             // Unconfirmed expected length of 0x140c
                             binaryLength = (uint)BINARY_DATA_1.Length;
                         }
+                        else if (reqBinaryHead.BinaryType == 6)
+                        {
+                            // Received when the player enter a city
+                            // *Don't know the real max length*
+                            binaryLength = 1;
+                        }
+                        else if (reqBinaryHead.BinaryType == 7)
+                        {
+                            // Received when the player enter a city
+                            // *Don't know the real max length*
+                            binaryLength = 1;
+                        }
+                        else if (reqBinaryHead.BinaryType == 8)
+                        {
+                            // Received when the player enter a city
+                            // *Don't know the real max length*
+                            binaryLength = 1;
+                        }
+                        else if (reqBinaryHead.BinaryType == 9)
+                        {
+                            // Received when the player enter a city
+                            // *Don't know the real max length*
+                            binaryLength = 1;
+                        }
+                        else if (reqBinaryHead.BinaryType == 10)
+                        {
+                            // Received when the player enter a city
+                            // *Don't know the real max length*
+                            binaryLength = 1;
+                        }
+                        else if (reqBinaryHead.BinaryType == 11)
+                        {
+                            // Received when the player enter a city
+                            // *Don't know the real max length*
+                            binaryLength = 1;
+                        }
+                        else if (reqBinaryHead.BinaryType == 12)
+                        {
+                            // Received when the player enter a city
+                            // *Don't know the real max length*
+                            binaryLength = 1;
+                        }
+                        else if (reqBinaryHead.BinaryType == 13)
+                        {
+                            // Received when the player enter a city
+                            // *Don't know the real max length*
+                            binaryLength = 1;
+                        }
+                        else if (reqBinaryHead.BinaryType == 14)
+                        {
+                            // Received when the player enter a city
+                            // *Don't know the real max length*
+                            binaryLength = 1;
+                        }
+                        else if (reqBinaryHead.BinaryType == 15)
+                        {
+                            // Received when the player enter a city
+                            // *Don't know the real max length*
+                            binaryLength = 1;
+                        }
                         else
                         {
                             Debug.Assert(false);
@@ -642,6 +702,56 @@ namespace MHTriServer.Player
                         else if (reqBinaryData.Type == 1)
                         {
                             binaryData = BINARY_DATA_1;
+                        }
+                        else if (reqBinaryData.Type == 6)
+                        {
+                            // Received when the player enter a city
+                            binaryData = new byte[reqBinaryData.DataExpectedSize];
+                        }
+                        else if (reqBinaryData.Type == 7)
+                        {
+                            // Received when the player enter a city
+                            binaryData = new byte[reqBinaryData.DataExpectedSize];
+                        }
+                        else if (reqBinaryData.Type == 8)
+                        {
+                            // Received when the player enter a city
+                            binaryData = new byte[reqBinaryData.DataExpectedSize];
+                        }
+                        else if (reqBinaryData.Type == 9)
+                        {
+                            // Received when the player enter a city
+                            binaryData = new byte[reqBinaryData.DataExpectedSize];
+                        }
+                        else if (reqBinaryData.Type == 10)
+                        {
+                            // Received when the player enter a city
+                            binaryData = new byte[reqBinaryData.DataExpectedSize];
+                        }
+                        else if (reqBinaryData.Type == 11)
+                        {
+                            // Received when the player enter a city
+                            binaryData = new byte[reqBinaryData.DataExpectedSize];
+                        }
+                        else if (reqBinaryData.Type == 12)
+                        {
+                            // Received when the player enter a city
+                            binaryData = new byte[reqBinaryData.DataExpectedSize];
+                        }
+                        else if (reqBinaryData.Type == 13)
+                        {
+                            // Received when the player enter a city
+                            binaryData = new byte[reqBinaryData.DataExpectedSize];
+                        }
+                        else if (reqBinaryData.Type == 14)
+                        {
+                            // Received when the player enter a city
+                            binaryData = new byte[reqBinaryData.DataExpectedSize];
+                        }
+                        else if (reqBinaryData.Type == 15)
+                        {
+                            // Received when the player enter a city
+                            binaryData = new byte[reqBinaryData.DataExpectedSize];
                         }
                         else
                         {
