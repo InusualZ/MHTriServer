@@ -1126,6 +1126,13 @@ namespace MHTriServer.Player
                     }
                     break;
 
+                case ReqLayerMediationLock reqLayerMediationLock:
+                    {
+                        // Sent by the client, when player perform certain action like sit down, or arm wrestling...
+                        SendPacket(new AnsLayerMediationLock(reqLayerMediationLock.UnknownField1));
+                    }
+                    break;
+
                 case ReqLayerEnd reqLayerEnd:
                     {
                         SendPacket(new AnsLayerEnd());
