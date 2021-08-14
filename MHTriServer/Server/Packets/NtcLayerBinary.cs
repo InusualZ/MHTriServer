@@ -21,35 +21,28 @@ namespace MHTriServer.Server.Packets
 
         public override void Serialize(ExtendedBinaryWriter writer)
         {
+            // TODO: Struct is not correct
             base.Serialize(writer);
+
             writer.Write(UnknownField1);
             UnknownField2.Serialize(writer);
-            writer.Write(UnknownField3);
 
-            if (UnknownField3 > 0)
-            {
-                UnknownField4.Serialize(writer);
-            }
+            writer.Write(UnknownField3);
+            UnknownField4.Serialize(writer);
         }
 
         public override void Deserialize(ExtendedBinaryReader reader)
         {
-            // TODO: Struct is not correct
-
             Debug.Assert(ID == PACKET_ID);
-            UnknownField1 = reader.ReadString();
             UnknownField2 = CompoundList.Deserialize<NtcBinaryCompoundData>(reader);
             UnknownField3 = reader.ReadUInt16();
-            if (UnknownField3 > 0)
-            {
-                UnknownField4 = CompoundExtendedList.Deserialize<CompoundExtendedList>(reader);
-            }
+            UnknownField4 = CompoundExtendedList.Deserialize<CompoundExtendedList>(reader);
         }
 
         public override string ToString()
         {
             return base.ToString() + $"\n\tUnknownField1 {UnknownField1}\n\tUnknownField2 {UnknownField2}\n\tUnknownField3 {UnknownField3}" +
-                $"\n\tUnknownField4 {UnknownField4}";
+                $"\n\tUnknownField4\n{UnknownField4}";
         }
     }
 }

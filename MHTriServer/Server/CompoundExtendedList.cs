@@ -203,7 +203,7 @@ namespace MHTriServer.Server
             var builder = new StringBuilder();
             foreach(var (key, value) in m_Data)
             {
-                builder.Append($"\t  {{{(int)key}}}: ");
+                builder.Append($"\t  {{0x{key:X2}}}: ");
                 switch (value)
                 {
                     case byte b:
