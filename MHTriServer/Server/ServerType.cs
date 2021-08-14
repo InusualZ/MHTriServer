@@ -74,6 +74,14 @@ namespace MHTriServer.Server
                 blob[0x33E + (i * SEEKING_STRUCT_SIZE)] = 0xFF; // Probably a flag field
             }
 
+            // Timeout related short
+            // I'm not too sure if they are unsigned or signed. Do more RE
+            const int TIMEOUT_ARRAY_SIZE = 8;
+            for (var i = 0; i < TIMEOUT_ARRAY_SIZE; ++i)
+            {
+                BinaryPrimitives.WriteInt16BigEndian(new Span<byte>(blob, 0x13BC + (i * sizeof(short)), sizeof(short)), short.MaxValue);
+            }
+
             return blob;
         }
     }
