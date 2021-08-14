@@ -16,9 +16,9 @@ namespace MHTriServer.Server
             UInt64 = 4,
 
             // Probably, not confirmed
-            Int32 = 5,
-            Int64 = 6,
-            F32 = 7,
+            F32 = 5,
+            F64 = 6,
+            Int32 = 7,
             // End
 
             String = 8,
@@ -121,14 +121,14 @@ namespace MHTriServer.Server
                     break;
 
                 // Not confirmed
-                case ElementType.Int32:
-                    value = reader.ReadInt32();
-                    break;
-                case ElementType.Int64:
-                    value = reader.ReadInt64();
-                    break;
                 case ElementType.F32:
                     value = reader.ReadSingle();
+                    break;
+                case ElementType.F64:
+                    value = reader.ReadDouble();
+                    break;
+                case ElementType.Int32:
+                    value = reader.ReadInt32();
                     break;
                 // End
 
@@ -168,17 +168,17 @@ namespace MHTriServer.Server
                     break;
 
                 // Not confirmed
-                case int i:
-                    writer.Write((byte)ElementType.Int32);
-                    writer.Write(i);
-                    break;
-                case long l:
-                    writer.Write((byte)ElementType.Int64);
-                    writer.Write(l);
-                    break;
                 case float f:
                     writer.Write((byte)ElementType.F32);
                     writer.Write(f);
+                    break;
+                case double d:
+                    writer.Write((byte)ElementType.F64);
+                    writer.Write(d);
+                    break;
+                case int i:
+                    writer.Write((byte)ElementType.Int32);
+                    writer.Write(i);
                     break;
                 // End
 

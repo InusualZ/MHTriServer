@@ -67,6 +67,7 @@ namespace MHTriServer.Server.Packets
                     catch(Exception e)
                     {
                         Console.Error.WriteLine($"Failed to registry {typeof(T).Name} with id {id:X8}");
+                        throw;
                     }
                 }
             }
@@ -129,6 +130,7 @@ namespace MHTriServer.Server.Packets
             RegisterWith<LmpConnect>(LmpConnect.PACKET_ID);
             RegisterWith<NtcLayerBinary>(NtcLayerBinary.PACKET_ID);
             RegisterWith<NtcLayerUserNum>(NtcLayerUserNum.PACKET_ID);
+            RegisterWith<NtcLayerUserPosition>(NtcLayerUserPosition.PACKET_ID);
             RegisterWith<NtcLogin>(NtcLogin.PACKET_ID);
             RegisterWith<ReqAnnounce>(ReqAnnounce.PACKET_ID);
             RegisterWith<ReqAuthenticationToken>(ReqAuthenticationToken.PACKET_ID);
