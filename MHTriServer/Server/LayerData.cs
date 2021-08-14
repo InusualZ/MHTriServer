@@ -56,7 +56,7 @@ namespace MHTriServer.Server
 
         public uint UnknownField10 { get => Get<uint>(FIELD_10); set => Set(FIELD_10, value); }
 
-        public uint UnknownField11 { get => Get<uint>(FIELD_11); set => Set(FIELD_11, value); }
+        public uint InCityPopulation { get => Get<uint>(FIELD_11); set => Set(FIELD_11, value); }
 
         public uint UnknownField12 { get => Get<uint>(FIELD_12); set => Set(FIELD_12, value); }
 

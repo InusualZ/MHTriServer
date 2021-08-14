@@ -695,7 +695,7 @@ namespace MHTriServer.Player
                             UnknownField8 = 8,
                             MaxPopulation = 9,
                             UnknownField10 = 10,
-                            UnknownField11 = 11,
+                            InCityPopulation = 11,
                             UnknownField12 = 12, 
                             UnknownField13 = 13,
                             State = LayerData.StateEnum.Enable,
@@ -774,7 +774,7 @@ namespace MHTriServer.Player
                                 CurrentPopulation = 1,
                                 UnknownField7 = 100,
                                 UnknownField10 = 3,
-                                UnknownField11 = 2,
+                                InCityPopulation = 2,
                                 UnknownField12 = 1,
                                 UnknownField17 = 4,
                                 UnknownField18 = false
@@ -800,7 +800,7 @@ namespace MHTriServer.Player
                                 CurrentPopulation = 1,
                                 UnknownField7 = 100,
                                 UnknownField10 = 3,
-                                UnknownField11 = 2,
+                                InCityPopulation = 2,
                                 UnknownField12 = 1,
                                 UnknownField17 = 4,
                                 UnknownField18 = true
@@ -846,22 +846,15 @@ namespace MHTriServer.Player
                                     ChildData = new LayerData()
                                     {
                                         Name = $"City {cityIndex + 1}",
-                                        UnknownField5 = 3,
+                                        UnknownField5 = 1,
                                         CurrentPopulation = 0,
                                         MaxPopulation = 4,
-                                        UnknownField7 = 5,
-                                        UnknownField10 = 3,
-                                        UnknownField11 = 1,
-                                        UnknownField12 = 1,
-                                        State = LayerData.StateEnum.Enable,
-                                        UnknownField17 = 4,
-                                    },
-                                    UnknownField2 = new List<UnkByteIntStruct>() {
-                                        new UnkByteIntStruct() {
-                                            UnknownField = 5,
-                                            ContainUnknownField3 = true,
-                                            UnknownField3 = 6
-                                        }
+                                        UnknownField7 = 0,
+                                        UnknownField10 = 0,
+                                        InCityPopulation = 0,
+                                        UnknownField12 = 0,
+                                        State = LayerData.StateEnum.Empty,
+                                        UnknownField17 = 0,
                                     }
                                 });
                             }
@@ -880,7 +873,7 @@ namespace MHTriServer.Player
                                         MaxPopulation = 100,
                                         UnknownField7 = 5,
                                         UnknownField10 = 3,
-                                        UnknownField11 = 2,
+                                        InCityPopulation = 0,
                                         UnknownField12 = 1,
                                         State = LayerData.StateEnum.Enable,
                                         UnknownField17 = 4,
