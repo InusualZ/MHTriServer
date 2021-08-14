@@ -67,7 +67,7 @@ namespace MHTriServer.Server
         {
             if (arr == null)
             {
-                writer.Write(0);
+                writer.Write((byte)0);
                 return;
             }
 
