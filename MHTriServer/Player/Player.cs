@@ -1148,6 +1148,35 @@ namespace MHTriServer.Player
                     }
                     break;
 
+                case ReqCircleInfo reqCircleInfo:
+                    {
+                        var circleData = new CircleData()
+                        {
+                            UnknownField1 = reqCircleInfo.UnknownField1,
+                            UnknownField2 = "JoeA",
+                            UnknownField3 = 1,
+                            UnknownField5 = new byte[10],
+                            UnknownField6 = "JoeB",
+                            UnknownField7 = 2,
+                            UnknownField8 = 3,
+                            UnknownField9 = 4,
+                            UnknownField10 = 5,
+                            UnknownField11 = 6,
+                            UnknownField12 = 7,
+                            UnknownField13 = "JoeC",
+                            UnknownField15 = 0x01
+                        };
+
+                        var unknownData = new UnkByteIntStruct() { 
+                            UnknownField = 14,
+                            ContainUnknownField3 = true,
+                            UnknownField3 = 15
+                        };
+
+                        SendPacket(new AnsCircleInfo(reqCircleInfo.UnknownField1, circleData, unknownData));
+                    }
+                    break;
+
                 case ReqLayerEnd reqLayerEnd:
                     {
                         SendPacket(new AnsLayerEnd());

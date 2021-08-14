@@ -4,7 +4,6 @@ namespace MHTriServer.Server
 {
     public class Unk2ByteArray
     {
-
         public byte UnknownField1 { get; set; }
 
         public byte UnknownField2 { get; set; }
