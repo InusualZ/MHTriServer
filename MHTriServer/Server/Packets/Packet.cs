@@ -93,6 +93,7 @@ namespace MHTriServer.Server.Packets
             RegisterWith<AnsLayerChildListHead>(AnsLayerChildListHead.PACKET_ID);
             RegisterWith<AnsLayerCreateHead>(AnsLayerCreateHead.PACKET_ID);
             RegisterWith<AnsLayerCreateFoot>(AnsLayerCreateFoot.PACKET_ID);
+            RegisterWith<AnsLayerCreateSet>(AnsLayerCreateSet.PACKET_ID);
             RegisterWith<AnsLayerDetailSearchHead>(AnsLayerDetailSearchHead.PACKET_ID);
             RegisterWith<AnsLayerDown>(AnsLayerDown.PACKET_ID);
             RegisterWith<AnsLayerEnd>(AnsLayerEnd.PACKET_ID);
@@ -148,6 +149,7 @@ namespace MHTriServer.Server.Packets
             RegisterWith<ReqLayerChildListHead>(ReqLayerChildListHead.PACKET_ID);
             RegisterWith<ReqLayerCreateHead>(ReqLayerCreateHead.PACKET_ID);
             RegisterWith<ReqLayerCreateFoot>(ReqLayerCreateFoot.PACKET_ID);
+            RegisterWith<ReqLayerCreateSet>(ReqLayerCreateSet.PACKET_ID);
             RegisterWith<ReqLayerDetailSearchHead>(ReqLayerDetailSearchHead.PACKET_ID);
             RegisterWith<ReqLayerDown>(ReqLayerDown.PACKET_ID);
             RegisterWith<ReqLayerEnd>(ReqLayerEnd.PACKET_ID);

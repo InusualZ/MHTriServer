@@ -986,6 +986,13 @@ namespace MHTriServer.Player
                     }
                     break;
 
+                case ReqLayerCreateSet reqLayerCreateSet:
+                    {
+                        // Mark city as created
+                        SendPacket(new AnsLayerCreateSet(reqLayerCreateSet.CityIndex));
+                    }
+                    break;
+
                 case ReqLayerEnd reqLayerEnd:
                     {
                         SendPacket(new AnsLayerEnd());
