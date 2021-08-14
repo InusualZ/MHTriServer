@@ -1140,6 +1140,14 @@ namespace MHTriServer.Player
                     }
                     break;
 
+                case ReqCircleMatchOptionSet reqCircleMatchOptionSet:
+                    {
+                        // Sent by the client when the player succesfully submit a quest. 
+                        // This is to propagate the quest options
+                        SendPacket(new AnsCircleMatchOptionSet());
+                    }
+                    break;
+
                 case ReqLayerEnd reqLayerEnd:
                     {
                         SendPacket(new AnsLayerEnd());
