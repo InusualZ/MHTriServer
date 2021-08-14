@@ -79,6 +79,7 @@ namespace MHTriServer.Server.Packets
             RegisterWith<AnsBinaryVersion>(AnsBinaryVersion.PACKET_ID);
             RegisterWith<AnsBlackList>(AnsBlackList.PACKET_ID);
             RegisterWith<AnsCircleInfoNoticeSet>(AnsCircleInfoNoticeSet.PACKET_ID);
+            RegisterWith<AnsCircleListLayer>(AnsCircleListLayer.PACKET_ID);
             RegisterWith<AnsCommonKey>(AnsCommonKey.PACKET_ID);
             RegisterWith<AnsConnection>(AnsConnection.PACKET_ID);
             RegisterWith<AnsFmpInfo>(AnsFmpInfo.PACKET_ID, AnsFmpInfo.PACKET_ID_FMP);
@@ -136,6 +137,7 @@ namespace MHTriServer.Server.Packets
             RegisterWith<ReqBinaryVersion>(ReqBinaryVersion.PACKET_ID);
             RegisterWith<ReqBlackList>(ReqBlackList.PACKET_ID);
             RegisterWith<ReqCircleInfoNoticeSet>(ReqCircleInfoNoticeSet.PACKET_ID);
+            RegisterWith<ReqCircleListLayer>(ReqCircleListLayer.PACKET_ID);
             RegisterWith<ReqCommonKey>(ReqCommonKey.PACKET_ID);
             RegisterWith<ReqConnection>(ReqConnection.PACKET_ID);
             RegisterWith<ReqFmpInfo>(ReqFmpInfo.PACKET_ID, ReqFmpInfo.PACKET_ID_FMP);

@@ -1119,6 +1119,13 @@ namespace MHTriServer.Player
                     }
                     break;
 
+                case ReqCircleListLayer reqCircleListLayer:
+                    {
+                        var circleElements = new List<CircleListData>();
+                        SendPacket(new AnsCircleListLayer(circleElements));
+                    }
+                    break;
+
                 case ReqLayerEnd reqLayerEnd:
                     {
                         SendPacket(new AnsLayerEnd());
