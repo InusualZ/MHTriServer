@@ -5,7 +5,6 @@ using System.Buffers.Binary;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -198,13 +197,7 @@ namespace MHTriServer.Player
 
         private void Handle(Packet packet)
         {
-            if (packet is ServerTimeout)
-            {
-                m_NetworkStream.Dispose();
-                m_Socket.Dispose();
-                return;
-            }
-            else if (packet is ReqShut)
+            if (packet is ReqShut)
             {
                 SendPacket(new AnsShut(0));
                 return;
