@@ -1129,7 +1129,7 @@ namespace MHTriServer.Player
                 case ReqCircleCreate reqCircleCreate:
                     {
                         // Sent by the client, when the player want to submit a quest
-                        SendPacket(new AnsCircleCreate(reqCircleCreate.UnknownField1.UnknownField9));
+                        SendPacket(new AnsCircleCreate(1));
                     }
                     break;
 
@@ -1146,27 +1146,28 @@ namespace MHTriServer.Player
                         var circleData = new CircleData()
                         {
                             UnknownField1 = reqCircleInfo.UnknownField1,
-                            UnknownField2 = "JoeA",
-                            UnknownField3 = 1,
-                            UnknownField5 = new byte[10],
-                            UnknownField6 = "JoeB",
-                            UnknownField7 = 2,
-                            UnknownField8 = 3,
-                            UnknownField9 = 4,
-                            UnknownField10 = 5,
-                            UnknownField11 = 6,
-                            UnknownField12 = 7,
-                            UnknownField13 = "JoeC",
-                            UnknownField15 = 0x01
+                            UnknownField2 = "JoeA", // *Used* 0x424
+                            UnknownField7 = 1, // *Used* 0x528
+                            UnknownField8 = 0, // *Used* 0x530
+                            UnknownField9 = 4, // *Used* 0x524
+                            UnknownField10 = 1, // *Used* 0x52c
+                            UnknownField11 = 1, // *Used* 0x420
                         };
 
                         var unknownData = new UnkByteIntStruct() { 
-                            UnknownField = 14,
+                            UnknownField = 0,
                             ContainUnknownField3 = true,
-                            UnknownField3 = 15
+                            UnknownField3 = 0
                         };
 
                         SendPacket(new AnsCircleInfo(reqCircleInfo.UnknownField1, circleData, unknownData));
+                    }
+                    break;
+
+                case ReqCircleLeave reqCircleLeave:
+                    {
+                        // Received when the player quit a quest group
+                        SendPacket(new AnsCircleLeave(reqCircleLeave.UnknownField1));
                     }
                     break;
 
