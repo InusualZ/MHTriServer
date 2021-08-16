@@ -86,6 +86,7 @@ namespace MHTriServer.Server.Packets
             RegisterWith<AnsCircleLeave>(AnsCircleLeave.PACKET_ID);
             RegisterWith<AnsCircleListLayer>(AnsCircleListLayer.PACKET_ID);
             RegisterWith<AnsCircleMatchOptionSet>(AnsCircleMatchOptionSet.PACKET_ID);
+            RegisterWith<AnsCircleMatchStart>(AnsCircleMatchStart.PACKET_ID);
             RegisterWith<AnsCommonKey>(AnsCommonKey.PACKET_ID);
             RegisterWith<AnsConnection>(AnsConnection.PACKET_ID);
             RegisterWith<AnsFmpInfo>(AnsFmpInfo.PACKET_ID, AnsFmpInfo.PACKET_ID_FMP);
@@ -151,6 +152,7 @@ namespace MHTriServer.Server.Packets
             RegisterWith<ReqCircleLeave>(ReqCircleLeave.PACKET_ID);
             RegisterWith<ReqCircleListLayer>(ReqCircleListLayer.PACKET_ID);
             RegisterWith<ReqCircleMatchOptionSet>(ReqCircleMatchOptionSet.PACKET_ID);
+            RegisterWith<ReqCircleMatchStart>(ReqCircleMatchStart.PACKET_ID);
             RegisterWith<ReqCommonKey>(ReqCommonKey.PACKET_ID);
             RegisterWith<ReqConnection>(ReqConnection.PACKET_ID);
             RegisterWith<ReqFmpInfo>(ReqFmpInfo.PACKET_ID, ReqFmpInfo.PACKET_ID_FMP);

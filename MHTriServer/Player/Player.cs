@@ -1198,6 +1198,12 @@ namespace MHTriServer.Player
                     }
                     break;
 
+                case ReqCircleMatchStart _:
+                    {
+                        SendPacket(new AnsCircleMatchStart());
+                    }
+                    break;
+
                 case ReqLayerEnd reqLayerEnd:
                     {
                         SendPacket(new AnsLayerEnd());
