@@ -34,7 +34,7 @@ namespace MHTriServer.Server
             }
         }
 
-        public byte UnknownField3 { get => Get<byte>(FIELD_3); set => Set(FIELD_3, value); }
+        public byte HasPassword { get => Get<byte>(FIELD_3); set => Set(FIELD_3, value); }
 
         public string UnknownField4
         {
@@ -46,7 +46,7 @@ namespace MHTriServer.Server
             }
         }
 
-        public byte[] UnknownField5
+        public byte[] Password
         {
             get => Get<byte[]>(FIELD_5); set
             {
@@ -55,7 +55,7 @@ namespace MHTriServer.Server
             }
         }
 
-        public string UnknownField6
+        public string Remarks
         {
             get => Get<string>(FIELD_6);
             set

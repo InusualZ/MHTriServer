@@ -1114,7 +1114,27 @@ namespace MHTriServer.Player
 
                 case ReqCircleListLayer reqCircleListLayer:
                     {
-                        var circleElements = new List<CircleListData>();
+                        // *unconfirmed* The client is requesting the quest slots
+                        // Only a few fields are needed. Need more RE
+                        var circleElements = new List<CircleListData>()
+                        {
+                            new CircleListData()
+                            {
+                                ChildData = new CircleData()
+                                {
+                                    UnknownField1 = 1,
+                                    UnknownField2 = "JoeA",
+                                    UnknownField7 = 2,
+                                    UnknownField8 = 3,
+                                    UnknownField9 = 8,
+                                    UnknownField10 = 5,
+                                    UnknownField11 = 6,
+                                    UnknownField12 = 7,
+                                    UnknownField13 = "JoeC",
+                                    UnknownField15 = 0x01
+                                }
+                            }
+                        };
                         SendPacket(new AnsCircleListLayer(circleElements));
                     }
                     break;
