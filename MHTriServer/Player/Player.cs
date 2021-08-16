@@ -1166,7 +1166,7 @@ namespace MHTriServer.Player
                         var circleData = new CircleData()
                         {
                             UnknownField1 = reqCircleInfo.UnknownField1,
-                            UnknownField2 = "JoeA", // *Used* 0x424
+                            UnknownField2 = "192.168.1.2", // *Used* 0x424
                             UnknownField7 = 1, // *Used* 0x528
                             UnknownField8 = 0, // *Used* 0x530
                             UnknownField9 = 4, // *Used* 0x524
@@ -1188,6 +1188,13 @@ namespace MHTriServer.Player
                     {
                         // Received when the player quit a quest group
                         SendPacket(new AnsCircleLeave(reqCircleLeave.UnknownField1));
+                    }
+                    break;
+
+                case ReqCircleInfoSet reqCircleInfoSet:
+                    {
+                        // Received when the player start a quest
+                        SendPacket(new AnsCircleInfoSet(reqCircleInfoSet.CircleIndex));
                     }
                     break;
 
