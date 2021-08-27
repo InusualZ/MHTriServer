@@ -48,6 +48,10 @@ namespace MHTriServer
 
         public override ulong ReadUInt64() => ReadUInt64(m_Endianness);
 
+        public override float ReadSingle() => ReadSingle(m_Endianness);
+
+        public override double ReadDouble() => ReadDouble(m_Endianness);
+
         public short ReadInt16(Endianness endianness) => endianness == Endianness.Little
             ? BinaryPrimitives.ReadInt16LittleEndian(ReadBytes(sizeof(Int16)))
             : BinaryPrimitives.ReadInt16BigEndian(ReadBytes(sizeof(Int16)));
@@ -71,6 +75,28 @@ namespace MHTriServer
         public ulong ReadUInt64(Endianness endianness) => endianness == Endianness.Little
             ? BinaryPrimitives.ReadUInt64LittleEndian(ReadBytes(sizeof(UInt64)))
             : BinaryPrimitives.ReadUInt64BigEndian(ReadBytes(sizeof(UInt64)));
+
+        public float ReadSingle(Endianness endianness)                              
+        {
+            var bytes = ReadBytes(sizeof(float));
+            if (endianness == Endianness.Big)
+            {
+                Array.Reverse(bytes);
+            }
+
+            return BitConverter.ToSingle(bytes);
+        }
+
+        public double ReadDouble(Endianness endianness)
+        {
+            var bytes = ReadBytes(sizeof(double));
+            if (endianness == Endianness.Big)
+            {
+                Array.Reverse(bytes);
+            }
+
+            return BitConverter.ToDouble(bytes);
+        }
 
         public override string ReadString()
         {
@@ -101,7 +127,7 @@ namespace MHTriServer
     public class ExtendedBinaryWriter : BinaryWriter
     {
         private readonly Endianness m_Endianness = Endianness.Little;
-        private readonly byte[] m_buffer = new byte[8];
+        private readonly byte[] m_buffer = new byte[sizeof(ulong)];
         private readonly Encoding m_Encoding;
 
         public long Position { get => BaseStream.Position; set => BaseStream.Position = value; }
@@ -132,6 +158,8 @@ namespace MHTriServer
         public override void Write(short value) => WriteInt16(m_Endianness, value);
         public override void Write(int value) => WriteInt32(m_Endianness, value);
         public override void Write(long value) => WriteInt64(m_Endianness, value);
+        public override void Write(float value) => WriteSingle(m_Endianness, value);
+        public override void Write(double value) => WriteDouble(m_Endianness, value);
 
         //
         public void WriteUInt16(Endianness endianness, ushort value)
@@ -216,6 +244,28 @@ namespace MHTriServer
             }
 
             base.Write(m_buffer, 0, sizeof(long));
+        }
+
+        public void WriteSingle(Endianness endianness, float value)
+        {
+            var bytes = BitConverter.GetBytes(value);
+            if (endianness == Endianness.Big)
+            {
+                Array.Reverse(bytes);
+            }
+
+            base.Write(bytes, 0, bytes.Length);
+        }
+
+        public void WriteDouble(Endianness endianness, double value)
+        {
+            var bytes = BitConverter.GetBytes(value);
+            if (endianness == Endianness.Big)
+            {
+                Array.Reverse(bytes);
+            }
+
+            base.Write(bytes, 0, bytes.Length);
         }
 
         // TODO: Better name
