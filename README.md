@@ -54,6 +54,8 @@ In order to use custom servers on Monster Hunter Tri you first need to patch the
 Your host file should include:
 ```
 127.0.0.1 mh.capcom.co.jp
+127.0.0.1 mmh-t1-opn02.mmh-service.capcom.co.jp
+127.0.0.1 mmh-t1-opn03.mmh-service.capcom.co.jp
 ``` 
 If you are using a local Nintendo Wifi Connection Server and patched the game with the wimmfi patcher also include:
 ```
