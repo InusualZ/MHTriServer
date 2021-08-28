@@ -793,12 +793,12 @@ namespace MHTriServer.Player
                             },
                             Name = "Joe",
                             UnknownField5 = (ushort)"Joe".Length,
-                            CurrentPopulation = 6,
+                            CurrentPopulation = 1,
                             UnknownField7 = 7,
                             UnknownField8 = 8,
-                            MaxPopulation = 9,
+                            MaxPopulation = 4,
                             UnknownField10 = 10,
-                            InCityPopulation = 11,
+                            InCityPopulation = 0,
                             UnknownField12 = 12, 
                             UnknownField13 = 13,
                             State = LayerData.StateEnum.Enable,
@@ -874,10 +874,10 @@ namespace MHTriServer.Player
                             {
                                 Name = "Joe",
                                 UnknownField5 = 2,
-                                CurrentPopulation = 1,
+                                CurrentPopulation = 0,
                                 UnknownField7 = 100,
                                 UnknownField10 = 3,
-                                InCityPopulation = 2,
+                                InCityPopulation = 0,
                                 UnknownField12 = 1,
                                 UnknownField17 = 4,
                                 UnknownField18 = false
@@ -1124,13 +1124,13 @@ namespace MHTriServer.Player
                                 {
                                     UnknownField1 = 1,
                                     UnknownField2 = "JoeA",
-                                    UnknownField7 = 2,
+                                    UnknownField7 = 2, // ???, , Used when the player submit quest
                                     UnknownField8 = 3,
-                                    UnknownField9 = 8,
+                                    UnknownField9 = 8, // ???, Used when the player submit quest
                                     UnknownField10 = 5,
                                     UnknownField11 = 6,
-                                    UnknownField12 = 7,
-                                    UnknownField13 = "JoeC",
+                                    UnknownField12 = 1, // Quest Slot Index??, Used when the player submit quest
+                                    UnknownField13 = "JoeC", // NetworkUniqueId related
                                     UnknownField15 = 0x01
                                 }
                             }
@@ -1158,6 +1158,7 @@ namespace MHTriServer.Player
                         // Sent by the client when the player succesfully submit a quest. 
                         // This is to propagate the quest options
                         SendPacket(new AnsCircleMatchOptionSet());
+                        SendPacket(new NtcCircleMatchOptionSet(reqCircleMatchOptionSet.MatchOptions));
                     }
                     break;
 
@@ -1172,6 +1173,7 @@ namespace MHTriServer.Player
                             UnknownField9 = 4, // *Used* 0x524
                             UnknownField10 = 1, // *Used* 0x52c
                             UnknownField11 = 1, // *Used* 0x420
+                            UnknownField12 = 1,
                         };
 
                         var unknownData = new UnkByteIntStruct() { 
@@ -1195,12 +1197,25 @@ namespace MHTriServer.Player
                     {
                         // Received when the player start a quest
                         SendPacket(new AnsCircleInfoSet(reqCircleInfoSet.CircleIndex));
+                        SendPacket(new NtcCircleInfoSet(reqCircleInfoSet.CircleIndex, reqCircleInfoSet.UnknownField1, reqCircleInfoSet.UnknownField2));
                     }
                     break;
 
                 case ReqCircleMatchStart _:
                     {
                         SendPacket(new AnsCircleMatchStart());
+
+                        var hunters = new List<NtcCircleMatchStart.HunterData>()
+                        {
+                            new NtcCircleMatchStart.HunterData()
+                            {
+                                UnknownField1 = 1,
+                                UnknownField2 = DEFAULT_USER_ID,
+                                UnknownField3 = 0xff,
+                                UnknownField4 = 2
+                            }
+                        };
+                        SendPacket(new NtcCircleMatchStart(hunters, 3));
                     }
                     break;
 

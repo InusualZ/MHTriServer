@@ -134,6 +134,9 @@ namespace MHTriServer.Server.Packets
             RegisterWith<AnsVulgarityInfoLow>(AnsVulgarityInfoLow.PACKET_ID);
             RegisterWith<AnsVulgarityLow>(AnsVulgarityLow.PACKET_ID);
             RegisterWith<LmpConnect>(LmpConnect.PACKET_ID);
+            RegisterWith<NtcCircleInfoSet>(NtcCircleInfoSet.PACKET_ID);
+            RegisterWith<NtcCircleMatchOptionSet>(NtcCircleMatchOptionSet.PACKET_ID);
+            RegisterWith<NtcCircleMatchStart>(NtcCircleMatchStart.PACKET_ID);
             RegisterWith<NtcLayerBinary>(NtcLayerBinary.PACKET_ID);
             RegisterWith<NtcLayerUserNum>(NtcLayerUserNum.PACKET_ID);
             RegisterWith<NtcLayerUserPosition>(NtcLayerUserPosition.PACKET_ID);
