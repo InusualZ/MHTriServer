@@ -1122,16 +1122,67 @@ namespace MHTriServer.Player
                             {
                                 ChildData = new CircleData()
                                 {
-                                    UnknownField1 = 1,
-                                    UnknownField2 = "JoeA",
-                                    UnknownField7 = 2, // ???, , Used when the player submit quest
-                                    UnknownField8 = 3,
-                                    UnknownField9 = 8, // ???, Used when the player submit quest
-                                    UnknownField10 = 5,
-                                    UnknownField11 = 6,
-                                    UnknownField12 = 1, // Quest Slot Index??, Used when the player submit quest
-                                    UnknownField13 = "JoeC", // NetworkUniqueId related
-                                    UnknownField15 = 0x01
+                                    UnknownField1 = 1, // Used
+                                    UnknownField2 = "JoeA", // Used
+                                    // HasPassword = false, // Used
+                                    UnknownField5 = new byte[] { 7, 8, 9, 10, 11, 12 }, // Used
+                                    UnknownField7 = 2, // Used
+                                    UnknownField8 = 3, // Used
+                                    UnknownField9 = 8, // Used
+                                    UnknownField10 = 5, // Used
+                                    UnknownField12 = 1, // Used Quest Slot Index??
+                                    LeaderID = DEFAULT_USER_ID, // Used NetworkUniqueId related
+                                    UnknownField15 = 0x01 // Used, flag
+                                },
+                                UnknownField2 = new List<UnkByteIntStruct>() {
+                                    new UnkByteIntStruct()
+                                    {
+                                        UnknownField = 1, // Element Index??
+                                        ContainUnknownField3 = true,
+                                        UnknownField3 = 4 // Max Population in Circle
+                                    },
+                                    new UnkByteIntStruct()
+                                    {
+                                        UnknownField = 2,
+                                        ContainUnknownField3 = true,
+                                        UnknownField3 = 1, // If this value is zero the, quest would not appear in the dashboard
+                                    },
+                                    new UnkByteIntStruct()
+                                    {
+                                        UnknownField = 3,
+                                        ContainUnknownField3 = true,
+                                        UnknownField3 = 4,
+                                    },
+                                    new UnkByteIntStruct()
+                                    {
+                                        UnknownField = 4,
+                                        ContainUnknownField3 = true,
+                                        UnknownField3 = 5,
+                                    },
+                                    new UnkByteIntStruct()
+                                    {
+                                        UnknownField = 5,
+                                        ContainUnknownField3 = true,
+                                        UnknownField3 = 6,
+                                    },
+                                    new UnkByteIntStruct()
+                                    {
+                                        UnknownField = 6,
+                                        ContainUnknownField3 = true,
+                                        UnknownField3 = 7,
+                                    },
+                                    new UnkByteIntStruct()
+                                    {
+                                        UnknownField = 7,
+                                        ContainUnknownField3 = true,
+                                        UnknownField3 = 8,
+                                    },
+                                    new UnkByteIntStruct()
+                                    {
+                                        UnknownField = 8,
+                                        ContainUnknownField3 = true,
+                                        UnknownField3 = 9,
+                                    }
                                 }
                             }
                         };
@@ -1158,7 +1209,7 @@ namespace MHTriServer.Player
                         // Sent by the client when the player succesfully submit a quest. 
                         // This is to propagate the quest options
                         SendPacket(new AnsCircleMatchOptionSet());
-                        SendPacket(new NtcCircleMatchOptionSet(reqCircleMatchOptionSet.MatchOptions));
+                        // SendPacket(new NtcCircleMatchOptionSet(reqCircleMatchOptionSet.MatchOptions));
                     }
                     break;
 
@@ -1166,20 +1217,20 @@ namespace MHTriServer.Player
                     {
                         var circleData = new CircleData()
                         {
-                            UnknownField1 = reqCircleInfo.UnknownField1,
-                            UnknownField2 = "192.168.1.2", // *Used* 0x424
-                            UnknownField7 = 1, // *Used* 0x528
-                            UnknownField8 = 0, // *Used* 0x530
-                            UnknownField9 = 4, // *Used* 0x524
-                            UnknownField10 = 1, // *Used* 0x52c
+                            UnknownField1 = 1,
+                            UnknownField2 = "JoeA", // *Used* 0x424
+                            UnknownField7 = 4, // *Used* 0x528
+                            UnknownField8 = 3, // *Used* 0x530
+                            UnknownField9 = 1, // *Used* 0x524
+                            UnknownField10 = 5, // *Used* 0x52c
                             UnknownField11 = 1, // *Used* 0x420
                             UnknownField12 = 1,
                         };
 
                         var unknownData = new UnkByteIntStruct() { 
-                            UnknownField = 0,
+                            UnknownField = 2,
                             ContainUnknownField3 = true,
-                            UnknownField3 = 0
+                            UnknownField3 = 1
                         };
 
                         SendPacket(new AnsCircleInfo(reqCircleInfo.UnknownField1, circleData, unknownData));
@@ -1197,7 +1248,7 @@ namespace MHTriServer.Player
                     {
                         // Received when the player start a quest
                         SendPacket(new AnsCircleInfoSet(reqCircleInfoSet.CircleIndex));
-                        SendPacket(new NtcCircleInfoSet(reqCircleInfoSet.CircleIndex, reqCircleInfoSet.UnknownField1, reqCircleInfoSet.UnknownField2));
+                        // SendPacket(new NtcCircleInfoSet(reqCircleInfoSet.CircleIndex, reqCircleInfoSet.UnknownField1, reqCircleInfoSet.UnknownField2));
                     }
                     break;
 
@@ -1215,7 +1266,7 @@ namespace MHTriServer.Player
                                 UnknownField4 = 2
                             }
                         };
-                        SendPacket(new NtcCircleMatchStart(hunters, 3));
+                        // SendPacket(new NtcCircleMatchStart(hunters, 3));
                     }
                     break;
 
