@@ -1122,7 +1122,7 @@ namespace MHTriServer.Player
                             {
                                 ChildData = new CircleData()
                                 {
-                                    UnknownField1 = 1, // Used
+                                    UnknownField1 = 0, // Used
                                     UnknownField2 = "JoeA", // Used
                                     // HasPassword = false, // Used
                                     UnknownField5 = new byte[] { 7, 8, 9, 10, 11, 12 }, // Used
@@ -1130,7 +1130,7 @@ namespace MHTriServer.Player
                                     UnknownField8 = 3, // Used
                                     UnknownField9 = 8, // Used
                                     UnknownField10 = 5, // Used
-                                    UnknownField12 = 1, // Used Quest Slot Index??
+                                    UnknownField12 = 0, // Used Quest Slot Index??
                                     LeaderID = DEFAULT_USER_ID, // Used NetworkUniqueId related
                                     UnknownField15 = 0x01 // Used, flag
                                 },
@@ -1145,11 +1145,11 @@ namespace MHTriServer.Player
                                     {
                                         UnknownField = 2,
                                         ContainUnknownField3 = true,
-                                        UnknownField3 = 1, // If this value is zero the, quest would not appear in the dashboard
+                                        UnknownField3 = 10000, // Quest ID
                                     },
                                     new UnkByteIntStruct()
                                     {
-                                        UnknownField = 3,
+                                        UnknownField = 3, // Element Index??
                                         ContainUnknownField3 = true,
                                         UnknownField3 = 4,
                                     },
@@ -1227,10 +1227,12 @@ namespace MHTriServer.Player
                             UnknownField12 = 1,
                         };
 
-                        var unknownData = new UnkByteIntStruct() { 
-                            UnknownField = 2,
-                            ContainUnknownField3 = true,
-                            UnknownField3 = 1
+                        var unknownData = new List<UnkByteIntStruct>() { 
+                            new UnkByteIntStruct() {
+                                UnknownField = 1,
+                                ContainUnknownField3 = true,
+                                UnknownField3 = 4
+                            }
                         };
 
                         SendPacket(new AnsCircleInfo(reqCircleInfo.UnknownField1, circleData, unknownData));
