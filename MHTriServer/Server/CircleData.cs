@@ -34,9 +34,9 @@ namespace MHTriServer.Server
             }
         }
 
-        public byte HasPassword { get => Get<byte>(FIELD_3); set => Set(FIELD_3, value); }
+        public bool HasPassword { get => Get<byte>(FIELD_3) == 0x01; set => Set(FIELD_3, (byte)(value ? 0x01 : 0x00)); }
 
-        public string UnknownField4
+        public string Password
         {
             get => Get<string>(FIELD_4);
             set
@@ -46,11 +46,12 @@ namespace MHTriServer.Server
             }
         }
 
-        public byte[] Password
+        public byte[] UnknownField5
         {
-            get => Get<byte[]>(FIELD_5); set
+            get => Get<byte[]>(FIELD_5); 
+            set
             {
-                Debug.Assert(value.Length < 0x100);
+                Debug.Assert(value.Length <= 0x100);
                 Set(FIELD_5, value);
             }
         }
@@ -77,7 +78,7 @@ namespace MHTriServer.Server
 
         public uint UnknownField12 { get => Get<uint>(FIELD_12); set => Set(FIELD_12, value); }
 
-        public string UnknownField13
+        public string LeaderID
         {
             get => Get<string>(FIELD_13);
             set
