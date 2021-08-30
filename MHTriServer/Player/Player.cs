@@ -1114,78 +1114,9 @@ namespace MHTriServer.Player
 
                 case ReqCircleListLayer reqCircleListLayer:
                     {
-                        // *unconfirmed* The client is requesting the quest slots
+                        // This packet sent the list of created circle
                         // Only a few fields are needed. Need more RE
-                        var circleElements = new List<CircleListData>()
-                        {
-                            new CircleListData()
-                            {
-                                ChildData = new CircleData()
-                                {
-                                    UnknownField1 = 0, // Used
-                                    UnknownField2 = "JoeA", // Used
-                                    // HasPassword = false, // Used
-                                    UnknownField5 = new byte[] { 7, 8, 9, 10, 11, 12 }, // Used
-                                    UnknownField7 = 2, // Used
-                                    UnknownField8 = 3, // Used
-                                    UnknownField9 = 8, // Used
-                                    UnknownField10 = 5, // Used
-                                    UnknownField12 = 0, // Used Quest Slot Index??
-                                    LeaderID = DEFAULT_USER_ID, // Used NetworkUniqueId related
-                                    UnknownField15 = 0x01 // Used, flag
-                                },
-                                UnknownField2 = new List<UnkByteIntStruct>() {
-                                    new UnkByteIntStruct()
-                                    {
-                                        UnknownField = 1, // Element Index??
-                                        ContainUnknownField3 = true,
-                                        UnknownField3 = 4 // Max Population in Circle
-                                    },
-                                    new UnkByteIntStruct()
-                                    {
-                                        UnknownField = 2,
-                                        ContainUnknownField3 = true,
-                                        UnknownField3 = 10000, // Quest ID
-                                    },
-                                    new UnkByteIntStruct()
-                                    {
-                                        UnknownField = 3, // Element Index??
-                                        ContainUnknownField3 = true,
-                                        UnknownField3 = 4,
-                                    },
-                                    new UnkByteIntStruct()
-                                    {
-                                        UnknownField = 4,
-                                        ContainUnknownField3 = true,
-                                        UnknownField3 = 5,
-                                    },
-                                    new UnkByteIntStruct()
-                                    {
-                                        UnknownField = 5,
-                                        ContainUnknownField3 = true,
-                                        UnknownField3 = 6,
-                                    },
-                                    new UnkByteIntStruct()
-                                    {
-                                        UnknownField = 6,
-                                        ContainUnknownField3 = true,
-                                        UnknownField3 = 7,
-                                    },
-                                    new UnkByteIntStruct()
-                                    {
-                                        UnknownField = 7,
-                                        ContainUnknownField3 = true,
-                                        UnknownField3 = 8,
-                                    },
-                                    new UnkByteIntStruct()
-                                    {
-                                        UnknownField = 8,
-                                        ContainUnknownField3 = true,
-                                        UnknownField3 = 9,
-                                    }
-                                }
-                            }
-                        };
+                        var circleElements = new List<CircleListData>();
                         SendPacket(new AnsCircleListLayer(circleElements));
                     }
                     break;
@@ -1199,8 +1130,24 @@ namespace MHTriServer.Player
 
                 case ReqCircleCreate reqCircleCreate:
                     {
+                        // TODO: We should not always send NtcCircleListLayer,
+                        //  in some situations we want to use NtcCircleListLayerChange
+                        reqCircleCreate.UnknownField1.UnknownField1 = 1; // *Required* Used
+                        reqCircleCreate.UnknownField1.UnknownField2 = "JoeA"; // Used
+                        reqCircleCreate.UnknownField1.UnknownField7 = 2; // Used ???
+                        reqCircleCreate.UnknownField1.UnknownField8 = 3; // Used ???
+                        reqCircleCreate.UnknownField1.UnknownField9 = 8; // Used ???
+                        reqCircleCreate.UnknownField1.UnknownField10 = 5; // Used ???
+                        reqCircleCreate.UnknownField1.UnknownField12 = 1; // *Required* Used Quest Slot Index??
+                        reqCircleCreate.UnknownField1.LeaderID = DEFAULT_USER_ID;
+                        reqCircleCreate.UnknownField1.UnknownField15 = 0x01; // Used, flag ???
+
+                        // We need to create the quest in the list, because of this packet the quest is shown in the quest board
+                        SendPacket(new NtcCircleListLayerCreate(1, reqCircleCreate.UnknownField1, reqCircleCreate.UnknownField2));
+
                         // Sent by the client, when the player want to submit a quest
                         SendPacket(new AnsCircleCreate(1));
+
                     }
                     break;
 
