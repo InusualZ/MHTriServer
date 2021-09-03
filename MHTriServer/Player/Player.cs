@@ -789,7 +789,10 @@ namespace MHTriServer.Player
                             {
                                 UnknownField = 2,
                                 UnknownField2 = 3,
-                                UnknownField3 = new List<ushort>() { 4, 5 }
+                                UnknownField3 = new List<ushort>()
+                                {
+                                    4, 5, 6
+                                }
                             },
                             Name = "Joe",
                             UnknownField5 = (ushort)"Joe".Length,
@@ -798,12 +801,12 @@ namespace MHTriServer.Player
                             UnknownField8 = 8,
                             MaxPopulation = 4,
                             UnknownField10 = 10,
-                            InCityPopulation = 0,
+                            InCityPopulation = 11,
                             UnknownField12 = 12, 
                             UnknownField13 = 13,
                             State = LayerData.StateEnum.Enable,
                             UnknownField17 = 14,
-                            UnknownField18 = false
+                            UnknownField18 = 1
                         };
                         SendPacket(new AnsLayerStart(data));
                     }
@@ -855,8 +858,8 @@ namespace MHTriServer.Player
                                         UnknownField = 0,
                                         UnknownField2 = 1,
                                         UnknownField3 = new List<ushort>() {
-                                        2, 3, 4
-                                    },
+                                            2, 3, 4
+                                        },
                                     },
                                     UnknownField2 = 2,
                                     UnknownField3 = 3,
@@ -878,9 +881,9 @@ namespace MHTriServer.Player
                                 UnknownField7 = 100,
                                 UnknownField10 = 3,
                                 InCityPopulation = 0,
-                                UnknownField12 = 1,
+                                UnknownField12 = 2,
                                 UnknownField17 = 4,
-                                UnknownField18 = false
+                                UnknownField18 = 1
                             };
 
                             var unkData = new List<UnkByteIntStruct>() {
@@ -904,9 +907,9 @@ namespace MHTriServer.Player
                                 UnknownField7 = 100,
                                 UnknownField10 = 3,
                                 InCityPopulation = 2,
-                                UnknownField12 = 1,
+                                UnknownField12 = 2,
                                 UnknownField17 = 4,
-                                UnknownField18 = true
+                                UnknownField18 = 1
                             };
 
                             var unkData = new List<UnkByteIntStruct>() {
@@ -980,7 +983,7 @@ namespace MHTriServer.Player
                                         UnknownField12 = 1,
                                         State = LayerData.StateEnum.Enable,
                                         UnknownField17 = 4,
-                                        UnknownField18 = true
+                                        UnknownField18 = 1
                                     },
                                     UnknownField2 = new List<UnkByteIntStruct>() {
                                         new UnkByteIntStruct() {
@@ -1130,7 +1133,7 @@ namespace MHTriServer.Player
 
                 case ReqCircleCreate reqCircleCreate:
                     {
-                        // TODO: We should not always send NtcCircleListLayer,
+                        // TODO: We should not always send NtcCircleListLayerCreate,
                         //  in some situations we want to use NtcCircleListLayerChange
                         reqCircleCreate.UnknownField1.UnknownField1 = 1; // *Required* Used
                         reqCircleCreate.UnknownField1.UnknownField2 = "JoeA"; // Used
@@ -1148,6 +1151,17 @@ namespace MHTriServer.Player
                         // Sent by the client, when the player want to submit a quest
                         SendPacket(new AnsCircleCreate(1));
 
+                    }
+                    break;
+
+                case ReqLayerUserList reqLayerUserList:
+                    {
+                        var currentUsers = new List<LayerUserData>();
+                        currentUsers.Add(new LayerUserData() { 
+                            UnknownField = DEFAULT_USER_ID,
+                            
+                        });
+                        SendPacket(new AnsLayerUserList(currentUsers));
                     }
                     break;
 
@@ -1215,7 +1229,7 @@ namespace MHTriServer.Player
                                 UnknownField4 = 2
                             }
                         };
-                        // SendPacket(new NtcCircleMatchStart(hunters, 3));
+                        SendPacket(new NtcCircleMatchStart(hunters, 3));
                     }
                     break;
 
