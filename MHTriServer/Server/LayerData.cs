@@ -66,7 +66,7 @@ namespace MHTriServer.Server
 
         public uint UnknownField17 { get => Get<uint>(FIELD_17); set => Set(FIELD_17, value); }
 
-        public bool UnknownField18 { get => Get<byte>(FIELD_18) == 0x01; set => Set(FIELD_18, value ? 0x01 : 0x00); }
+        public byte UnknownField18 { get => Get<byte>(FIELD_18); set => Set(FIELD_18, value); }
 
         // Any value that you put here, when the client receive it. It would substract one
         public byte UnknownField21 { get => Get<byte>(FIELD_21); set => Set(FIELD_21, value); }
@@ -111,6 +111,7 @@ namespace MHTriServer.Server
                 // The client write this byte, since technically is a binary payload 
                 writer.Write((byte)0x06);
                 unknownData.Serialize(writer);
+                return true;
             }
 
             return base.TryWrite(key, value, writer);

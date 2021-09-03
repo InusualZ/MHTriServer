@@ -60,6 +60,7 @@ namespace MHTriServer.Server
                 // The client write this byte, since technically is a binary payload 
                 writer.Write((byte)ElementType.Binary);
                 unknownData.Serialize(writer);
+                return true;
             }
 
             return base.TryWrite(key, value, writer);
