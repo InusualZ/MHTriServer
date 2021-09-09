@@ -1180,7 +1180,7 @@ namespace MHTriServer.Player
                         {
                             UnknownField1 = 1,
                             UnknownField2 = "JoeA", // *Used* 0x424
-                            UnknownField7 = 4, // *Used* 0x528
+                            UnknownField7 = 1, // *Used* 0x528
                             UnknownField8 = 3, // *Used* 0x530
                             UnknownField9 = 1, // *Used* 0x524
                             UnknownField10 = 5, // *Used* 0x52c
