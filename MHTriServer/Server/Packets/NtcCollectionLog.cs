@@ -2,7 +2,7 @@
 
 namespace MHTriServer.Server.Packets
 {
-    public class ServerTimeout : Packet
+    public class NtcCollectionLog : Packet
     {
         public const uint PACKET_ID = 0x60501000;
 
@@ -10,9 +10,9 @@ namespace MHTriServer.Server.Packets
 
         public TimeoutData Data { get; set; }
 
-        public ServerTimeout(TimeoutData data) : base(PACKET_ID) => Data = data;
+        public NtcCollectionLog(TimeoutData data) : base(PACKET_ID) => Data = data;
 
-        public ServerTimeout(uint id, ushort size, ushort counter) : base(id, size, counter) { }
+        public NtcCollectionLog(uint id, ushort size, ushort counter) : base(id, size, counter) { }
 
         public override void Serialize(ExtendedBinaryWriter writer)
         {
