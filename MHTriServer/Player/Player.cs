@@ -314,7 +314,7 @@ namespace MHTriServer.Player
 
                 case ReqLmpConnect _:
                     {
-                        SendPacket(new LmpConnect("127.0.0.1", LmpServer.DefaultPort));
+                        SendPacket(new AnsLmpConnect("127.0.0.1", LmpServer.DefaultPort));
                     }
                     break;
             }

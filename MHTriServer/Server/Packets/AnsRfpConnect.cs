@@ -2,17 +2,17 @@
 
 namespace MHTriServer.Server.Packets
 {
-    public class LmpConnect : Packet
+    public class AnsRfpConnect : Packet
     {
-        public const uint PACKET_ID = 0x62010200;
+        public const uint PACKET_ID = 0x61400200;
 
         public string Address { get; set; }
 
         public ushort Port { get; set; }
 
-        public LmpConnect(string address, ushort port) : base(PACKET_ID) => (Address, Port) = (address, port);
+        public AnsRfpConnect(string address, ushort port) : base(PACKET_ID) => (Address, Port) = (address, port);
 
-        public LmpConnect(uint id, ushort size, ushort counter) : base(id, size, counter) { }
+        public AnsRfpConnect(uint id, ushort size, ushort counter) : base(id, size, counter) { }
 
         public override void Serialize(ExtendedBinaryWriter writer)
         {

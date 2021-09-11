@@ -113,10 +113,12 @@ namespace MHTriServer.Server.Packets
             RegisterWith<AnsLayerUserListFoot>(AnsLayerUserListFoot.PACKET_ID);
             RegisterWith<AnsLayerUserListHead>(AnsLayerUserListHead.PACKET_ID);
             RegisterWith<AnsLineCheck>(AnsLineCheck.PACKET_ID);
+            RegisterWith<AnsLmpConnect>(AnsLmpConnect.PACKET_ID);
             RegisterWith<AnsLoginInfo>(AnsLoginInfo.PACKET_ID);
             RegisterWith<AnsMaintenance>(AnsMaintenance.PACKET_ID);
             RegisterWith<AnsMediaVersionInfo>(AnsMediaVersionInfo.PACKET_ID);
             RegisterWith<AnsNoCharge>(AnsNoCharge.PACKET_ID);
+            RegisterWith<AnsRfpConnect>(AnsRfpConnect.PACKET_ID);
             RegisterWith<AnsServerTime>(AnsServerTime.PACKET_ID);
             RegisterWith<AnsShut>(AnsShut.PACKET_ID);
             RegisterWith<AnsTerms>(AnsTerms.PACKET_ID);
@@ -133,10 +135,10 @@ namespace MHTriServer.Server.Packets
             RegisterWith<AnsUserStatusSet>(AnsUserStatusSet.PACKET_ID);
             RegisterWith<AnsVulgarityInfoLow>(AnsVulgarityInfoLow.PACKET_ID);
             RegisterWith<AnsVulgarityLow>(AnsVulgarityLow.PACKET_ID);
-            RegisterWith<LmpConnect>(LmpConnect.PACKET_ID);
             RegisterWith<NtcCircleInfoSet>(NtcCircleInfoSet.PACKET_ID);
             RegisterWith<NtcCircleMatchOptionSet>(NtcCircleMatchOptionSet.PACKET_ID);
             RegisterWith<NtcCircleMatchStart>(NtcCircleMatchStart.PACKET_ID);
+            RegisterWith<NtcCollectionLog>(NtcCollectionLog.PACKET_ID);
             RegisterWith<NtcLayerBinary>(NtcLayerBinary.PACKET_ID);
             RegisterWith<NtcLayerUserNum>(NtcLayerUserNum.PACKET_ID);
             RegisterWith<NtcLayerUserPosition>(NtcLayerUserPosition.PACKET_ID);
@@ -204,8 +206,7 @@ namespace MHTriServer.Server.Packets
             RegisterWith<ReqUserStatusSet>(ReqUserStatusSet.PACKET_ID);
             RegisterWith<ReqVulgarityInfoLow>(ReqVulgarityInfoLow.PACKET_ID);
             RegisterWith<ReqVulgarityLow>(ReqVulgarityLow.PACKET_ID);
-            RegisterWith<RfpConnect>(RfpConnect.PACKET_ID);
-            RegisterWith<ServerTimeout>(ServerTimeout.PACKET_ID);
+
 
         }
 
