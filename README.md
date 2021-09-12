@@ -4,7 +4,7 @@ Monster Hunter Tri Custom Server Implementation
 
 Current Status
 --------------
-![Progress](https://i.imgur.com/t4Xpfnt.gif)
+![Progress](https://i.imgur.com/ITGqHah.png)
 
 Todo:
 - [x] Bypass Nintendo Servers
@@ -17,14 +17,14 @@ Todo:
 - [X] Gate:
   - [X] Gate Selection
   - [X] Spawn At Gate
-- [ ] City 
-  - [ ] Create a city
-  - [ ] Join a city
+- [X] City 
+  - [X] Create a city
+  - [X] Join a city
   - [ ] Search a city
-- [ ] Quest
-  - [ ] Submit a quest
+- [X] Quest
+  - [X] Submit a quest
   - [ ] Join a quest
-  - [ ] Start a quest
+  - [X] Start a quest
   - [ ] Event Quest
   - [ ] Arena Quest
 - [ ] Chat
