@@ -136,6 +136,7 @@ namespace MHTriServer.Server.Packets
             RegisterWith<AnsUserStatusSet>(AnsUserStatusSet.PACKET_ID);
             RegisterWith<AnsVulgarityInfoLow>(AnsVulgarityInfoLow.PACKET_ID);
             RegisterWith<AnsVulgarityLow>(AnsVulgarityLow.PACKET_ID);
+            RegisterWith<NtcCircleBinary>(NtcCircleBinary.PACKET_ID);
             RegisterWith<NtcCircleInfoSet>(NtcCircleInfoSet.PACKET_ID);
             RegisterWith<NtcCircleMatchOptionSet>(NtcCircleMatchOptionSet.PACKET_ID);
             RegisterWith<NtcCircleMatchStart>(NtcCircleMatchStart.PACKET_ID);
