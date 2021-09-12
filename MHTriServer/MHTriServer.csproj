@@ -13,4 +13,14 @@
     <EmbeddedResource Include="Resources\ServerCertificate.p12" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="log4net" Version="2.0.12" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="log4net.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>
