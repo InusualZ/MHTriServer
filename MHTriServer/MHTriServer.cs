@@ -4,7 +4,7 @@ using System;
 
 namespace MHTriServer
 {
-    class Program
+    public class MHTriServer
     {
 
         public static int Main(string[] args)
