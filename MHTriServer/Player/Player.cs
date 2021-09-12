@@ -1233,6 +1233,14 @@ namespace MHTriServer.Player
                     }
                     break;
 
+                case ReqCircleMatchEnd _:
+                    {
+                        // Sent when the player finish/abandon a quest
+
+                        SendPacket(new AnsCircleMatchEnd());
+                    }
+                    break;
+
                 case ReqLayerEnd reqLayerEnd:
                     {
                         SendPacket(new AnsLayerEnd());
