@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using MHTriServer.Utils;
 
 namespace MHTriServer.Server.Packets
 {
@@ -17,7 +18,7 @@ namespace MHTriServer.Server.Packets
 
         public AnsUserObject(uint id, ushort size, ushort counter) : base(id, size, counter) { }
 
-        public override void Serialize(ExtendedBinaryWriter writer)
+        public override void Serialize(BEBinaryWriter writer)
         {
             base.Serialize(writer);
             writer.Write(LoginInfoByte);
@@ -26,7 +27,7 @@ namespace MHTriServer.Server.Packets
             UserObject.Serialize(writer);
         }
 
-        public override void Deserialize(ExtendedBinaryReader reader)
+        public override void Deserialize(BEBinaryReader reader)
         {
             Debug.Assert(ID == PACKET_ID);
             LoginInfoByte = reader.ReadByte();

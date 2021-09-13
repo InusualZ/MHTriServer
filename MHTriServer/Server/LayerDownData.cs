@@ -1,7 +1,4 @@
-﻿
-using System.Diagnostics;
-
-namespace MHTriServer.Server
+﻿namespace MHTriServer.Server
 {
     public class LayerDownData : CompoundList
     {

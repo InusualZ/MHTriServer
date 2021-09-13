@@ -1,5 +1,5 @@
-﻿
-using System.Diagnostics;
+﻿using System.Diagnostics;
+using MHTriServer.Utils;
 
 namespace MHTriServer.Server
 {
@@ -88,7 +88,7 @@ namespace MHTriServer.Server
         }
 
 
-        protected override bool TryRead(byte key, byte type, ExtendedBinaryReader reader, out object value)
+        protected override bool TryRead(byte key, byte type, BEBinaryReader reader, out object value)
         {
             if (key == FIELD_2)
             {
@@ -99,7 +99,7 @@ namespace MHTriServer.Server
             return base.TryRead(key, type, reader, out value);
         }
 
-        protected override bool TryWrite(byte key, object value, ExtendedBinaryWriter writer)
+        protected override bool TryWrite(byte key, object value, BEBinaryWriter writer)
         {
             if (!(value is UnkShortArrayStruct unknownData))
             {

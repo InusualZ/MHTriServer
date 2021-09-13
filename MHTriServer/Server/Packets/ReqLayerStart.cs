@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using MHTriServer.Utils;
 
 namespace MHTriServer.Server.Packets
 {
@@ -14,14 +15,14 @@ namespace MHTriServer.Server.Packets
 
         public ReqLayerStart(uint id, ushort size, ushort counter) : base(id, size, counter) { }
 
-        public override void Serialize(ExtendedBinaryWriter writer)
+        public override void Serialize(BEBinaryWriter writer)
         {
             base.Serialize(writer);
             writer.WriteByteBytes(Format);
             writer.WriteByteBytes(Format2);
         }
 
-        public override void Deserialize(ExtendedBinaryReader reader)
+        public override void Deserialize(BEBinaryReader reader)
         {
             Debug.Assert(ID == PACKET_ID);
             Format = reader.ReadByteBytes();

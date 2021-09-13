@@ -1,5 +1,7 @@
 ﻿using System.Diagnostics;
 
+using MHTriServer.Utils;
+
 namespace MHTriServer.Server.Packets
 {
     public class ReqBinaryData : Packet
@@ -19,7 +21,7 @@ namespace MHTriServer.Server.Packets
 
         public ReqBinaryData(uint id, ushort size, ushort counter) : base(id, size, counter) { }
 
-        public override void Serialize(ExtendedBinaryWriter writer)
+        public override void Serialize(BEBinaryWriter writer)
         {
             base.Serialize(writer);
             writer.Write(Type);
@@ -28,7 +30,7 @@ namespace MHTriServer.Server.Packets
             writer.Write(DataExpectedSize);
         }
 
-        public override void Deserialize(ExtendedBinaryReader reader)
+        public override void Deserialize(BEBinaryReader reader)
         {
             Debug.Assert(ID == PACKET_ID);
             Debug.Assert(Size == 13);

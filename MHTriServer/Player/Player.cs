@@ -1,5 +1,6 @@
 ﻿using MHTriServer.Server;
 using MHTriServer.Server.Packets;
+using MHTriServer.Utils;
 using System;
 using System.Buffers.Binary;
 using System.Collections.Generic;
@@ -27,7 +28,7 @@ namespace MHTriServer.Player
         private int m_ReadingPosition = 0;
 
         private readonly Stopwatch m_LastSent;
-        private ExtendedBinaryWriter m_SendStream = new ExtendedBinaryWriter(new MemoryStream(0x4000), Endianness.Big);
+        private BEBinaryWriter m_SendStream = new BEBinaryWriter(new MemoryStream(0x4000));
 
         private bool AfterFirstConnection = false;
         private ushort m_PacketCounter = 0;
@@ -116,7 +117,7 @@ namespace MHTriServer.Player
                 return;
             }
 
-            var reader = new ExtendedBinaryReader(packetStream, Endianness.Big);
+            var reader = new BEBinaryReader(packetStream);
             var packetStartPosition = packetStream.Position;
             while (packetStream.Position < packetStream.Length)
             {

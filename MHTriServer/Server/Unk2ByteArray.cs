@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using MHTriServer.Utils;
 
 namespace MHTriServer.Server
 {
@@ -8,7 +9,7 @@ namespace MHTriServer.Server
 
         public byte UnknownField2 { get; set; }
 
-        public static Unk2ByteArray Deserialize(ExtendedBinaryReader reader)
+        public static Unk2ByteArray Deserialize(BEBinaryReader reader)
         {
             return new Unk2ByteArray()
             {
@@ -17,13 +18,13 @@ namespace MHTriServer.Server
             };
         }
 
-        public void Serialize(ExtendedBinaryWriter writer)
+        public void Serialize(BEBinaryWriter writer)
         {
             writer.Write(UnknownField1);
             writer.Write(UnknownField2);
         }
 
-        public static List<Unk2ByteArray> DeserializeArray(ExtendedBinaryReader reader)
+        public static List<Unk2ByteArray> DeserializeArray(BEBinaryReader reader)
         {
             var result = new List<Unk2ByteArray>();
 
@@ -35,7 +36,7 @@ namespace MHTriServer.Server
             return result;
         }
 
-        public static void SerializeArray(List<Unk2ByteArray> arr, ExtendedBinaryWriter writer)
+        public static void SerializeArray(List<Unk2ByteArray> arr, BEBinaryWriter writer)
         {
             if (arr == null)
             {

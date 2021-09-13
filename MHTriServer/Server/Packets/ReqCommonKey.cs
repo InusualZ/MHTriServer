@@ -1,5 +1,7 @@
 ﻿using System.Diagnostics;
 
+using MHTriServer.Utils;
+
 namespace MHTriServer.Server.Packets
 {
     public class ReqCommonKey : Packet
@@ -10,12 +12,12 @@ namespace MHTriServer.Server.Packets
 
         public ReqCommonKey(uint id, ushort size, ushort counter) : base(id, size, counter) { }
 
-        public override void Serialize(ExtendedBinaryWriter writer)
+        public override void Serialize(BEBinaryWriter writer)
         {
             base.Serialize(writer);
         }
 
-        public override void Deserialize(ExtendedBinaryReader reader)
+        public override void Deserialize(BEBinaryReader reader)
         {
             Debug.Assert(ID == PACKET_ID);
             Debug.Assert(Size == 0);

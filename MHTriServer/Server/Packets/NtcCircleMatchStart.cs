@@ -3,6 +3,8 @@ using System.Diagnostics;
 using System.Text;
 using System.Linq;
 
+using MHTriServer.Utils;
+
 namespace MHTriServer.Server.Packets
 {
     public class NtcCircleMatchStart : Packet
@@ -65,7 +67,7 @@ namespace MHTriServer.Server.Packets
 
         public NtcCircleMatchStart(uint id, ushort size, ushort counter) : base(id, size, counter) { }
 
-        public override void Serialize(ExtendedBinaryWriter writer)
+        public override void Serialize(BEBinaryWriter writer)
         {
             base.Serialize(writer);
 
@@ -108,7 +110,7 @@ namespace MHTriServer.Server.Packets
             writer.Write(PatInterface0XD630);
         }
 
-        public override void Deserialize(ExtendedBinaryReader reader)
+        public override void Deserialize(BEBinaryReader reader)
         {
             Debug.Assert(ID == PACKET_ID);
             Debug.Assert(Size == 0);

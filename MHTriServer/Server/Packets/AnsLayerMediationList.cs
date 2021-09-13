@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
+using MHTriServer.Utils;
 
 namespace MHTriServer.Server.Packets
 {
@@ -17,7 +18,7 @@ namespace MHTriServer.Server.Packets
 
         public AnsLayerMediationList(uint id, ushort size, ushort counter) : base(id, size, counter) { }
 
-        public override void Serialize(ExtendedBinaryWriter writer)
+        public override void Serialize(BEBinaryWriter writer)
         {
             Debug.Assert(m_elements.Count < 0x20);
 
@@ -32,7 +33,7 @@ namespace MHTriServer.Server.Packets
             }
         }
 
-        public override void Deserialize(ExtendedBinaryReader reader)
+        public override void Deserialize(BEBinaryReader reader)
         {
             Debug.Assert(ID == PACKET_ID);
 

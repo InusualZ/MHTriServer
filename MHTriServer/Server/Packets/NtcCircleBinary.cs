@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using MHTriServer.Utils;
 
 namespace MHTriServer.Server.Packets
 {
@@ -22,7 +23,7 @@ namespace MHTriServer.Server.Packets
 
         public NtcCircleBinary(uint id, ushort size, ushort counter) : base(id, size, counter) { }
 
-        public override void Serialize(ExtendedBinaryWriter writer)
+        public override void Serialize(BEBinaryWriter writer)
         {
             Debug.Assert(!string.IsNullOrWhiteSpace(HunterID));
 
@@ -34,7 +35,7 @@ namespace MHTriServer.Server.Packets
             UnknownField4.Serialize(writer);
         }
 
-        public override void Deserialize(ExtendedBinaryReader reader)
+        public override void Deserialize(BEBinaryReader reader)
         {
             Debug.Assert(ID == PACKET_ID);
             CircleIndex = reader.ReadUInt32();

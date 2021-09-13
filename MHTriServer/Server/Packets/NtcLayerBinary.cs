@@ -1,5 +1,7 @@
 ﻿using System.Diagnostics;
 
+using MHTriServer.Utils;
+
 namespace MHTriServer.Server.Packets
 {
     public class NtcLayerBinary : Packet
@@ -19,7 +21,7 @@ namespace MHTriServer.Server.Packets
 
         public NtcLayerBinary(uint id, ushort size, ushort counter) : base(id, size, counter) { }
 
-        public override void Serialize(ExtendedBinaryWriter writer)
+        public override void Serialize(BEBinaryWriter writer)
         {
             // TODO: Struct is not correct
             base.Serialize(writer);
@@ -31,7 +33,7 @@ namespace MHTriServer.Server.Packets
             UnknownField4.Serialize(writer);
         }
 
-        public override void Deserialize(ExtendedBinaryReader reader)
+        public override void Deserialize(BEBinaryReader reader)
         {
             Debug.Assert(ID == PACKET_ID);
             UnknownField2 = CompoundList.Deserialize<NtcBinaryCompoundData>(reader);

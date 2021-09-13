@@ -1,9 +1,7 @@
 ﻿using MHTriServer.Player;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net.Sockets;
-using System.Text;
 
 namespace MHTriServer.Server
 {
@@ -68,7 +66,7 @@ namespace MHTriServer.Server
             {
                 player.ReadPacketFromStream();
             }
-            catch (Exception e) { }
+            catch (Exception) { }
 
 
             // Handle player closing his own socket.

@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using MHTriServer.Utils;
 
 namespace MHTriServer.Server.Packets
 {
@@ -12,13 +13,13 @@ namespace MHTriServer.Server.Packets
 
         public AnsLayerStart(uint id, ushort size, ushort counter) : base(id, size, counter) { }
 
-        public override void Serialize(ExtendedBinaryWriter writer)
+        public override void Serialize(BEBinaryWriter writer)
         {
             base.Serialize(writer);
             Data.Serialize(writer);
         }
 
-        public override void Deserialize(ExtendedBinaryReader reader)
+        public override void Deserialize(BEBinaryReader reader)
         {
             Debug.Assert(ID == PACKET_ID);
             CompoundList.Deserialize<LayerData>(reader);

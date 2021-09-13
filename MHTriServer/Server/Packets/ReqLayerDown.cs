@@ -1,6 +1,5 @@
-﻿
-using System.Collections.Generic;
-using System.Diagnostics;
+﻿using System.Diagnostics;
+using MHTriServer.Utils;
 
 namespace MHTriServer.Server.Packets
 {
@@ -16,14 +15,14 @@ namespace MHTriServer.Server.Packets
 
         public ReqLayerDown(uint id, ushort size, ushort counter) : base(id, size, counter) { }
 
-        public override void Serialize(ExtendedBinaryWriter writer)
+        public override void Serialize(BEBinaryWriter writer)
         {
             base.Serialize(writer);
             writer.Write(UnknownField);
             Slot.Serialize(writer);
         }
 
-        public override void Deserialize(ExtendedBinaryReader reader)
+        public override void Deserialize(BEBinaryReader reader)
         {
             Debug.Assert(ID == PACKET_ID);
             UnknownField = reader.ReadUInt16();

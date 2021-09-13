@@ -1,4 +1,5 @@
 ﻿using MHTriServer.Server.Packets;
+using MHTriServer.Utils;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
@@ -78,7 +79,7 @@ namespace MHTriServer.Server
         }
 
 
-        public void Serialize(ExtendedBinaryWriter writer)
+        public void Serialize(BEBinaryWriter writer)
         {
             writer.Write((byte)m_Data.Count);
             foreach (var (id, value) in m_Data)
@@ -89,7 +90,7 @@ namespace MHTriServer.Server
             }
         }
 
-        public void Deserialize(ExtendedBinaryReader reader)
+        public void Deserialize(BEBinaryReader reader)
         {
             var listSize = (int)reader.ReadByte();
             for (var i  = 0; i < listSize; ++i)
@@ -102,7 +103,7 @@ namespace MHTriServer.Server
             }
         }
 
-        protected virtual bool TryRead(byte key, byte type, ExtendedBinaryReader reader, out object value)
+        protected virtual bool TryRead(byte key, byte type, BEBinaryReader reader, out object value)
         {
             value = default;
             switch ((ElementType)type)
@@ -146,7 +147,7 @@ namespace MHTriServer.Server
             return true;
         }
 
-        protected virtual bool TryWrite(byte key, object value, ExtendedBinaryWriter writer)
+        protected virtual bool TryWrite(byte key, object value, BEBinaryWriter writer)
         {
             switch (value)
             {
@@ -246,7 +247,7 @@ namespace MHTriServer.Server
             return builder.ToString();
         }
 
-        public static T Deserialize<T>(ExtendedBinaryReader reader) where T : CompoundExtendedList, new()
+        public static T Deserialize<T>(BEBinaryReader reader) where T : CompoundExtendedList, new()
         {
             var compoindList = new T();
             compoindList.Deserialize(reader);

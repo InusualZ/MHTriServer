@@ -1,5 +1,7 @@
 ﻿using System.Diagnostics;
 
+using MHTriServer.Utils;
+
 namespace MHTriServer.Server.Packets
 {
     public class ReqFmpInfo : Packet
@@ -20,14 +22,14 @@ namespace MHTriServer.Server.Packets
 
         public ReqFmpInfo(uint id, ushort size, ushort counter) : base(id, size, counter) { }
 
-        public override void Serialize(ExtendedBinaryWriter writer)
+        public override void Serialize(BEBinaryWriter writer)
         {
             base.Serialize(writer);
             writer.Write(SelectedFmpIndex);
             writer.WriteByteBytes(Format);
         }
 
-        public override void Deserialize(ExtendedBinaryReader reader)
+        public override void Deserialize(BEBinaryReader reader)
         {
             Debug.Assert(ID == PACKET_ID || ID == PACKET_ID_FMP);
             SelectedFmpIndex = reader.ReadUInt32();

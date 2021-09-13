@@ -1,4 +1,6 @@
-﻿namespace MHTriServer.Server
+﻿using MHTriServer.Utils;
+
+namespace MHTriServer.Server
 {
     public class UserNumData : CompoundList
     {
@@ -25,7 +27,7 @@
         public uint UnknownField7 { get => Get<uint>(FIELD_7); set => Set(FIELD_7, value); }
 
 
-        protected override bool TryRead(byte key, byte type, ExtendedBinaryReader reader, out object value)
+        protected override bool TryRead(byte key, byte type, BEBinaryReader reader, out object value)
         {
             if (key == FIELD_1)
             {
@@ -36,7 +38,7 @@
             return base.TryRead(key, type, reader, out value);
         }
 
-        protected override bool TryWrite(byte key, object value, ExtendedBinaryWriter writer)
+        protected override bool TryWrite(byte key, object value, BEBinaryWriter writer)
         {
             if (key == FIELD_1 && value is UnkShortArrayStruct unknownData)
             {

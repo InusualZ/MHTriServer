@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
+using MHTriServer.Utils;
 
 namespace MHTriServer.Server
 {
@@ -14,7 +14,7 @@ namespace MHTriServer.Server
 
         public uint UnknownField3 { get; set; }
 
-        public static UnkByteIntStruct Deserialize(ExtendedBinaryReader reader)
+        public static UnkByteIntStruct Deserialize(BEBinaryReader reader)
         {
             var unknownField = reader.ReadByte();
             var containUnkField3 = reader.ReadByte() == 1;
@@ -32,7 +32,7 @@ namespace MHTriServer.Server
             };
         }
 
-        public void Serialize(ExtendedBinaryWriter writer)
+        public void Serialize(BEBinaryWriter writer)
         {
             writer.Write(UnknownField);
             writer.Write(ContainUnknownField3);
@@ -42,7 +42,7 @@ namespace MHTriServer.Server
             }
         }
 
-        public static List<UnkByteIntStruct> DeserializeArray(ExtendedBinaryReader reader)
+        public static List<UnkByteIntStruct> DeserializeArray(BEBinaryReader reader)
         {
             var result = new List<UnkByteIntStruct>();
 
@@ -63,7 +63,7 @@ namespace MHTriServer.Server
             return result;
         }
 
-        public static void SerializeArray(List<UnkByteIntStruct> arr, ExtendedBinaryWriter writer)
+        public static void SerializeArray(List<UnkByteIntStruct> arr, BEBinaryWriter writer)
         {
             if (arr == null)
             {

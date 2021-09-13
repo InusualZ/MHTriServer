@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using System.Reflection;
 
-namespace MHTriServer
+namespace MHTriServer.Utils
 {
     public static class ResourceUtils
     {

@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
 
+using MHTriServer.Utils;
+
 namespace MHTriServer.Server.Packets
 {
     public class ReqCircleInfoSet : Packet
@@ -18,7 +20,7 @@ namespace MHTriServer.Server.Packets
 
         public ReqCircleInfoSet(uint id, ushort size, ushort counter) : base(id, size, counter) { }
 
-        public override void Serialize(ExtendedBinaryWriter writer)
+        public override void Serialize(BEBinaryWriter writer)
         {
             base.Serialize(writer);
             writer.Write(CircleIndex);
@@ -26,7 +28,7 @@ namespace MHTriServer.Server.Packets
             UnkByteIntStruct.SerializeArray(UnknownField2, writer);
         }
 
-        public override void Deserialize(ExtendedBinaryReader reader)
+        public override void Deserialize(BEBinaryReader reader)
         {
             Debug.Assert(ID == PACKET_ID);
             CircleIndex = reader.ReadUInt32();

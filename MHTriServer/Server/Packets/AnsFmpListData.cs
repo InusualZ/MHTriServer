@@ -1,6 +1,7 @@
 ﻿
 using System.Collections.Generic;
 using System.Diagnostics;
+using MHTriServer.Utils;
 
 namespace MHTriServer.Server.Packets
 {
@@ -19,7 +20,7 @@ namespace MHTriServer.Server.Packets
 
         public AnsFmpListData(uint id, ushort size, ushort counter) : base(id, size, counter) { }
 
-        public override void Serialize(ExtendedBinaryWriter writer)
+        public override void Serialize(BEBinaryWriter writer)
         {
             base.Serialize(writer);
             writer.Write((uint)0); // This field is read, but not used.
@@ -31,7 +32,7 @@ namespace MHTriServer.Server.Packets
             }
         }
 
-        public override void Deserialize(ExtendedBinaryReader reader)
+        public override void Deserialize(BEBinaryReader reader)
         {
             Debug.Assert(ID == PACKET_ID);
 

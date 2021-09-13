@@ -1,5 +1,7 @@
 ﻿using System.Diagnostics;
 
+using MHTriServer.Utils;
+
 namespace MHTriServer.Server.Packets
 {
     public class NtcCircleMatchOptionSet : Packet
@@ -12,13 +14,13 @@ namespace MHTriServer.Server.Packets
 
         public NtcCircleMatchOptionSet(uint id, ushort size, ushort counter) : base(id, size, counter) { }
 
-        public override void Serialize(ExtendedBinaryWriter writer)
+        public override void Serialize(BEBinaryWriter writer)
         {
             base.Serialize(writer);
             MatchOptions.Serialize(writer);
         }
 
-        public override void Deserialize(ExtendedBinaryReader reader)
+        public override void Deserialize(BEBinaryReader reader)
         {
             Debug.Assert(ID == PACKET_ID);
             MatchOptions = CompoundList.Deserialize<CompoundList>(reader);

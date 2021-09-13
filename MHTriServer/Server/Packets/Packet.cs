@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
+using MHTriServer.Utils;
 
 namespace MHTriServer.Server.Packets
 {
@@ -24,14 +25,14 @@ namespace MHTriServer.Server.Packets
 
         protected Packet(uint id, ushort size, ushort counter) => (ID, Counter, Size) = (id, counter, size);
 
-        public virtual void Serialize(ExtendedBinaryWriter writer)
+        public virtual void Serialize(BEBinaryWriter writer)
         {
             writer.Write(Size);
             writer.Write(Counter);
             writer.Write(ID);
         }
 
-        public virtual void Deserialize(ExtendedBinaryReader reader)
+        public virtual void Deserialize(BEBinaryReader reader)
         {
             // Packet Specific
         }
@@ -64,7 +65,7 @@ namespace MHTriServer.Server.Packets
                     {
                         m_PacketFactoryMap.Add(id, func);
                     }
-                    catch(Exception e)
+                    catch(Exception _)
                     {
                         Console.Error.WriteLine($"Failed to registry {typeof(T).Name} with id {id:X8}");
                         throw;
