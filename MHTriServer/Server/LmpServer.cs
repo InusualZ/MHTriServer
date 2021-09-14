@@ -1,4 +1,5 @@
-﻿using MHTriServer.Player;
+﻿using log4net;
+using MHTriServer.Player;
 using System;
 using System.Diagnostics;
 using System.Net.Sockets;
@@ -7,19 +8,17 @@ namespace MHTriServer.Server
 {
     public class LmpServer : BaseServer
     {
-        public const int DefaultPort = 8210;
+        private static readonly ILog Log = LogManager.GetLogger(nameof(LmpServer));
 
-        private Player.Player m_PendingPlayer = null;
+        private Player.Player m_PendingPlayer = null; 
 
         private readonly PlayerManager m_PlayerManager = null;
-
-        public LmpServer(PlayerManager playerManager) : this(playerManager, "0.0.0.0", DefaultPort) { }
-
-        public LmpServer(PlayerManager playerManager, string address) : this(playerManager, address, DefaultPort) { }
 
         public LmpServer(PlayerManager playerManager, string address, int port) : base(address, port)
         {
             Debug.Assert(playerManager != null);
+            Debug.Assert(!string.IsNullOrEmpty(address));
+
             m_PlayerManager = playerManager;
         }
 
@@ -27,7 +26,7 @@ namespace MHTriServer.Server
         {
             base.Start();
 
-            Console.WriteLine($"LmpServer: {Address}:{Port}");
+            Log.InfoFormat("Running on {0}:{1}", Address, Port);
         }
 
         public override bool AcceptNewConnection(TcpClient client)
@@ -37,17 +36,17 @@ namespace MHTriServer.Server
                 if (m_PendingPlayer == null)
                 {
                     var player = m_PlayerManager.AddPlayer(ConnectionType.LMP, client.Client, client.GetStream());
-                    Console.WriteLine($"LmpServer: New player connected {client.Client.RemoteEndPoint}");
+                    Log.InfoFormat("New player connected {0}", client.Client.RemoteEndPoint);
                 }
                 else
                 {
                     m_PendingPlayer.SetConnection(ConnectionType.LMP, client.Client, client.GetStream());
-                    Console.WriteLine($"LmpServer: Player reconnected {client.Client.RemoteEndPoint}");
+                    Log.InfoFormat("Player reconnected {0}", client.Client.RemoteEndPoint);
                 }
             }
             catch (Exception e)
             {
-                Console.WriteLine($"LmpServer: Unable to accept new player. {e.Message}");
+                Log.Fatal("Unable to accept new player", e);
                 return false;
             }
 
@@ -59,15 +58,17 @@ namespace MHTriServer.Server
             var endpoint = socket.RemoteEndPoint;
             if (!m_PlayerManager.TryGetPlayer(endpoint, out var player))
             {
-                Console.Error.WriteLine($"LmpServer: Unable to find player {endpoint}");
+                Log.FatalFormat("Unable to find player {0}", endpoint);
+                RemoveClient(socket);
                 return;
             }
 
             if (socket.Available == 0)
             {
-                Console.WriteLine($"LmpServer: Connection {endpoint} was closed gracefully");
+                Log.InfoFormat("Connection {0} was closed gracefully", endpoint);
 
                 RemoveClient(socket);
+
                 // At this point we have to handle the later reconnection of this player. To the same server!!!
 
                 if (m_PendingPlayer == null)
@@ -99,7 +100,8 @@ namespace MHTriServer.Server
             var endpoint = socket.RemoteEndPoint;
             if (!m_PlayerManager.TryGetPlayer(endpoint, out var player))
             {
-                Console.Error.WriteLine($"LmpServer: Unable to find player {endpoint}");
+                Log.FatalFormat("Unable to find player {0}", endpoint);
+                RemoveClient(socket);
                 return;
             }
 

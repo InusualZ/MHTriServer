@@ -38,7 +38,7 @@ namespace MHTriServer
             }
 
             var opnServer = new OpnServer(playerManager, Config.OpnServer.Address, Config.OpnServer.Port, opnServerCertificate);
-            var lmpServer = new LmpServer(playerManager);
+            var lmpServer = new LmpServer(playerManager, Config.LmpServer.Address, Config.LmpServer.Port);
             var fmpServer = new FmpServer(playerManager);
 
             opnServer.Start();
