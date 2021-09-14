@@ -15,27 +15,29 @@ namespace MHTriServer
 {
     public class MHTriServer
     {
-        public static readonly ILog Log = LogManager.GetLogger(nameof(MHTriServer));
+        private static readonly ILog Log = LogManager.GetLogger(nameof(MHTriServer));
+
+        public static IConfig Config;
 
         public static int Main(string[] args)
         {
             InitializeLogger();
-            var config = InitializeConfig();
+            Config = InitializeConfig();
 
             var playerManager = new PlayerManager();
 
             X509Certificate2 opnServerCertificate;
             try
             {
-                opnServerCertificate = new X509Certificate2(config.OpnServer.CertificatePath, config.OpnServer.CertificatePassphrase);
+                opnServerCertificate = new X509Certificate2(Config.OpnServer.CertificatePath, Config.OpnServer.CertificatePassphrase);
             }
             catch (CryptographicException e)
             {
-                Log.FatalFormat("Unable to parse `{0}` certificate. {1}", config.OpnServer.CertificatePath, e.Message);
+                Log.FatalFormat("Unable to parse `{0}` certificate. {1}", Config.OpnServer.CertificatePath, e.Message);
                 return 1;
             }
 
-            var opnServer = new OpnServer(playerManager, config.OpnServer.Address, config.OpnServer.Port, opnServerCertificate);
+            var opnServer = new OpnServer(playerManager, Config.OpnServer.Address, Config.OpnServer.Port, opnServerCertificate);
             var lmpServer = new LmpServer(playerManager);
             var fmpServer = new FmpServer(playerManager);
 
