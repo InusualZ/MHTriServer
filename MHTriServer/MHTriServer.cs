@@ -17,37 +17,6 @@ namespace MHTriServer
     {
         public static readonly ILog Log = LogManager.GetLogger(nameof(MHTriServer));
 
-        public static void InitializeLogger()
-        {
-            var executingAssembly = Assembly.GetExecutingAssembly();
-            var filepath = Path.Join(Path.GetDirectoryName(executingAssembly.Location), "log4net.xml");
-            if (!File.Exists(filepath))
-            {
-                throw new ApplicationException("Unable to initialize the logging service\nPlease verify that `log4net.xml` exist at the root folder of the program binary");
-            }
-
-            var repo = LogManager.GetRepository(executingAssembly);
-            XmlConfigurator.Configure(repo, new FileInfo(filepath));
-
-            // Setup Thread Name
-            Thread.CurrentThread.Name = nameof(MHTriServer);
-        }
-
-        public static IConfig InitializeConfig()
-        {
-            const string CONFIG_NAME = "MHTriServer.ini";
-            var executingAssembly = Assembly.GetExecutingAssembly();
-            var configPath = Path.Join(Path.GetDirectoryName(executingAssembly.Location), CONFIG_NAME);
-            if (!File.Exists(configPath))
-            {
-                var defaultConfigBytes = ResourceUtils.GetResourceBytes(CONFIG_NAME);
-                File.WriteAllBytes(configPath, defaultConfigBytes);
-                Log.Warn("Default config has been written");
-            }
-
-            return new ConfigurationBuilder<IConfig>().UseIniFile(configPath).Build();
-        }
-
         public static int Main(string[] args)
         {
             InitializeLogger();
@@ -88,6 +57,37 @@ namespace MHTriServer
             opnServer.Stop();
 
             return 0;
+        }
+
+        public static void InitializeLogger()
+        {
+            var executingAssembly = Assembly.GetExecutingAssembly();
+            var filepath = Path.Join(Path.GetDirectoryName(executingAssembly.Location), "log4net.xml");
+            if (!File.Exists(filepath))
+            {
+                throw new ApplicationException("Unable to initialize the logging service\nPlease verify that `log4net.xml` exist at the root folder of the program binary");
+            }
+
+            var repo = LogManager.GetRepository(executingAssembly);
+            XmlConfigurator.Configure(repo, new FileInfo(filepath));
+
+            // Setup Thread Name
+            Thread.CurrentThread.Name = nameof(MHTriServer);
+        }
+
+        public static IConfig InitializeConfig()
+        {
+            const string CONFIG_NAME = "MHTriServer.ini";
+            var executingAssembly = Assembly.GetExecutingAssembly();
+            var configPath = Path.Join(Path.GetDirectoryName(executingAssembly.Location), CONFIG_NAME);
+            if (!File.Exists(configPath))
+            {
+                var defaultConfigBytes = ResourceUtils.GetResourceBytes(CONFIG_NAME);
+                File.WriteAllBytes(configPath, defaultConfigBytes);
+                Log.Warn("Default config has been written");
+            }
+
+            return new ConfigurationBuilder<IConfig>().UseIniFile(configPath).Build();
         }
     }
 }
