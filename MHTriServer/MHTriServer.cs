@@ -1,7 +1,9 @@
-﻿using log4net;
+﻿using Config.Net;
+using log4net;
 using log4net.Config;
 using MHTriServer.Player;
 using MHTriServer.Server;
+using MHTriServer.Utils;
 using System;
 using System.IO;
 using System.Reflection;
@@ -25,13 +27,30 @@ namespace MHTriServer
             var repo = LogManager.GetRepository(executingAssembly);
             XmlConfigurator.Configure(repo, new FileInfo(filepath));
 
+
             // Setup Thread Name
             Thread.CurrentThread.Name = nameof(MHTriServer);
+        }
+
+        public static IConfig InitializeConfig()
+        {
+            const string CONFIG_NAME = "MHTriServer.ini";
+            var executingAssembly = Assembly.GetExecutingAssembly();
+            var configPath = Path.Join(Path.GetDirectoryName(executingAssembly.Location), CONFIG_NAME);
+            if (!File.Exists(configPath))
+            {
+                var defaultConfigBytes = ResourceUtils.GetResourceBytes(CONFIG_NAME);
+                File.WriteAllBytes(configPath, defaultConfigBytes);
+                Log.Warn("Default config has been written");
+            }
+
+            return new ConfigurationBuilder<IConfig>().UseIniFile(configPath).Build();
         }
 
         public static int Main(string[] args)
         {
             InitializeLogger();
+            var config = InitializeConfig();
 
             var playerManager = new PlayerManager();
 

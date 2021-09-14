@@ -6,14 +6,20 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Resources\MHTriServer.ini" />
     <None Remove="Resources\ServerCertificate.p12" />
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Resources\MHTriServer.ini">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  <TargetPath>MHTriServer.ini</TargetPath>
+    </EmbeddedResource>
     <EmbeddedResource Include="Resources\ServerCertificate.p12" />
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Config.Net" Version="4.15.0" />
     <PackageReference Include="log4net" Version="2.0.12" />
   </ItemGroup>
 
