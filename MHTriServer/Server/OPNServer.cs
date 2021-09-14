@@ -1,5 +1,5 @@
-﻿using MHTriServer.Player;
-using MHTriServer.Utils;
+﻿using log4net;
+using MHTriServer.Player;
 using System;
 using System.Diagnostics;
 using System.Net.Security;
@@ -8,29 +8,28 @@ using System.Security.Cryptography.X509Certificates;
 
 namespace MHTriServer.Server
 {
-    public class OPNServer : BaseServer
+    public class OpnServer : BaseServer
     {
-        public const int DefaultPort = 8200;
-
-        private readonly X509Certificate m_ServerCertificate = null;
+        private static readonly ILog Log = LogManager.GetLogger(nameof(OpnServer));
 
         private readonly PlayerManager m_PlayerManager = null;
+        private readonly X509Certificate m_ServerCertificate = null;
 
-        public OPNServer(PlayerManager playerManager) : this(playerManager, "0.0.0.0", DefaultPort) { }
-
-        public OPNServer(PlayerManager playerManager, string address) : this(playerManager, address, DefaultPort) { }
-
-        public OPNServer(PlayerManager playerManager, string address, int port) : base(address, port) {
+        public OpnServer(PlayerManager playerManager, string address, int port, X509Certificate certificate) : base(address, port) 
+        {
             Debug.Assert(playerManager != null);
-            m_ServerCertificate = new X509Certificate2(ResourceUtils.GetResourceBytes("ServerCertificate.p12"), "1234");
+            Debug.Assert(!string.IsNullOrEmpty(address));
+            Debug.Assert(certificate!= null);
+
             m_PlayerManager = playerManager;
+            m_ServerCertificate = certificate;
         }
 
         public override void Start()
         {
             base.Start();
 
-            Console.WriteLine($"OPNServer: {Address}:{Port}");
+            Log.InfoFormat("Running on {0}:{1}", Address, Port);
         }
 
         public override bool AcceptNewConnection(TcpClient client)
@@ -39,14 +38,14 @@ namespace MHTriServer.Server
 
             try
             {
-                sslStream.AuthenticateAsServer(m_ServerCertificate, false, false); // TODO: In the future check certificates
+                sslStream.AuthenticateAsServer(m_ServerCertificate);
 
                 var player = m_PlayerManager.AddPlayer(ConnectionType.OPN, client.Client, sslStream);
-                Console.WriteLine($"OPNServer: New player connected {client.Client.RemoteEndPoint}");
+                Log.InfoFormat("New player connected {0}", client.Client.RemoteEndPoint);
             }
             catch(Exception e)
             {
-                Console.WriteLine($"OPNServer: Unable to authenticate client. {e.Message}");
+                Log.ErrorFormat("OPNServer: Unable to authenticate client. {0}", e.Message);
                 sslStream.Close();
                 return false;
             }
@@ -59,13 +58,14 @@ namespace MHTriServer.Server
             var endpoint = socket.RemoteEndPoint;
             if (!m_PlayerManager.TryGetPlayer(endpoint, out var player))
             {
-                Console.Error.WriteLine($"OPNServer: Unable to find player {endpoint}");
+                Log.FatalFormat("Unable to find player session for {0}", endpoint);
+                RemoveClient(socket);
                 return;
             }
 
             if (socket.Available == 0)
             {
-                Console.WriteLine($"OPNServer: Connection {endpoint} was closed gracefully");
+                Log.InfoFormat("Connection {0} was closed gracefully", endpoint);
                 RemoveClient(socket);
                 m_PlayerManager.RemovePlayer(player);
             }
@@ -86,7 +86,8 @@ namespace MHTriServer.Server
             var endpoint = socket.RemoteEndPoint;
             if (!m_PlayerManager.TryGetPlayer(endpoint, out var player))
             {
-                Console.Error.WriteLine($"LMPServer: Unable to find player {endpoint}");
+                Log.FatalFormat("Unable to find player {0}", endpoint);
+                RemoveClient(socket);
                 return;
             }
 

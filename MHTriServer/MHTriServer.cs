@@ -7,6 +7,8 @@ using MHTriServer.Utils;
 using System;
 using System.IO;
 using System.Reflection;
+using System.Security.Cryptography;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 
 namespace MHTriServer
@@ -26,7 +28,6 @@ namespace MHTriServer
 
             var repo = LogManager.GetRepository(executingAssembly);
             XmlConfigurator.Configure(repo, new FileInfo(filepath));
-
 
             // Setup Thread Name
             Thread.CurrentThread.Name = nameof(MHTriServer);
@@ -54,7 +55,18 @@ namespace MHTriServer
 
             var playerManager = new PlayerManager();
 
-            var opnServer = new OPNServer(playerManager);
+            X509Certificate2 opnServerCertificate;
+            try
+            {
+                opnServerCertificate = new X509Certificate2(config.OpnServer.CertificatePath, config.OpnServer.CertificatePassphrase);
+            }
+            catch (CryptographicException e)
+            {
+                Log.FatalFormat("Unable to parse `{0}` certificate. {1}", config.OpnServer.CertificatePath, e.Message);
+                return 1;
+            }
+
+            var opnServer = new OpnServer(playerManager, config.OpnServer.Address, config.OpnServer.Port, opnServerCertificate);
             var lmpServer = new LmpServer(playerManager);
             var fmpServer = new FmpServer(playerManager);
 

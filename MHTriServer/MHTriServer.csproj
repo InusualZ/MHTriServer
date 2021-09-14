@@ -15,7 +15,11 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  <TargetPath>MHTriServer.ini</TargetPath>
     </EmbeddedResource>
-    <EmbeddedResource Include="Resources\ServerCertificate.p12" />
+    <EmbeddedResource Include="Resources\ServerCertificate.p12">
+	  <!-- In the future, this default certificate would be removed -->
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  <TargetPath>ServerCertificate.p12</TargetPath>
+    </EmbeddedResource>
   </ItemGroup>
 
   <ItemGroup>
