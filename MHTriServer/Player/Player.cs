@@ -349,8 +349,8 @@ namespace MHTriServer.Player
                     {
                         var chargeInfo = new ChargeInfo()
                         {
-                            UnknownField1 = 1,
-                            UnknownField2 = 2,
+                            TicketValidity1 = 1,
+                            TicketValidity2 = 2,
                             UnknownField5 = new byte[] { 0x48, 0x65, 0x6c, 0x6c, 0x6f, 0x20, 0x57, 0x6f, 0x72, 0x6c, 0x64, 0x31 }, // "Hello World1"
                             OnlineSupportCode = "NoSupport"
                         };
