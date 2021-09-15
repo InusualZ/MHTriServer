@@ -14,7 +14,7 @@
     {
         public string Address { get; }
 
-        public short Port { get; }
+        public ushort Port { get; }
     }
 
     public interface IOpnServerConfig : IServerConfig

@@ -315,7 +315,7 @@ namespace MHTriServer.Player
 
                 case ReqLmpConnect _:
                     {
-                        SendPacket(new AnsLmpConnect("127.0.0.1", (ushort)MHTriServer.Config.LmpServer.Port));
+                        SendPacket(new AnsLmpConnect(MHTriServer.Config.LmpServer.Address, MHTriServer.Config.LmpServer.Port));
                     }
                     break;
             }
@@ -438,7 +438,7 @@ namespace MHTriServer.Player
 
                 case ReqFmpInfo reqFmpInfo:
                     {
-                        SendPacket(new AnsFmpInfo(FmpData.Address("127.0.0.1", (ushort)MHTriServer.Config.FmpServer.Port)));
+                        SendPacket(new AnsFmpInfo(FmpData.Address(MHTriServer.Config.FmpServer.Address, MHTriServer.Config.FmpServer.Port)));
                     }
                     break;
 
@@ -549,7 +549,7 @@ namespace MHTriServer.Player
                 case ReqFmpInfo reqFmpInfo:
                     {
                         // Make it connect to the same server, I don't know what is the purpose of this
-                        SendPacket(new AnsFmpInfo(FmpData.Address("127.0.0.1", (ushort)MHTriServer.Config.FmpServer.Port)));
+                        SendPacket(new AnsFmpInfo(FmpData.Address(MHTriServer.Config.FmpServer.Address, MHTriServer.Config.FmpServer.Port)));
                     }
                     break;
 
