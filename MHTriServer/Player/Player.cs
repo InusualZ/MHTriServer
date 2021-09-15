@@ -549,7 +549,7 @@ namespace MHTriServer.Player
                 case ReqFmpInfo reqFmpInfo:
                     {
                         // Make it connect to the same server, I don't know what is the purpose of this
-                        SendPacket(new AnsFmpInfo(FmpData.Address("127.0.0.1", FmpServer.DefaultPort)));
+                        SendPacket(new AnsFmpInfo(FmpData.Address("127.0.0.1", (ushort)MHTriServer.Config.FmpServer.Port)));
                     }
                     break;
 

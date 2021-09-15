@@ -1,4 +1,5 @@
-﻿using MHTriServer.Player;
+﻿using log4net;
+using MHTriServer.Player;
 using System;
 using System.Diagnostics;
 using System.Net.Sockets;
@@ -7,17 +8,15 @@ namespace MHTriServer.Server
 {
     public class FmpServer : BaseServer
     {
-        public const int DefaultPort = 8220;
+        private static readonly ILog Log = LogManager.GetLogger(nameof(FmpServer));
 
         private readonly PlayerManager m_PlayerManager = null;
-
-        public FmpServer(PlayerManager playerManager) : this(playerManager, "0.0.0.0", DefaultPort) { }
-
-        public FmpServer(PlayerManager playerManager, string address) : this(playerManager, address, DefaultPort) { }
 
         public FmpServer(PlayerManager playerManager, string address, int port) : base(address, port)
         {
             Debug.Assert(playerManager != null);
+            Debug.Assert(!string.IsNullOrEmpty(address));
+
             m_PlayerManager = playerManager;
         }
 
@@ -25,7 +24,7 @@ namespace MHTriServer.Server
         {
             base.Start();
 
-            Console.WriteLine($"FmpServer: {Address}:{Port}");
+            Log.InfoFormat("Running on {0}:{1}", Address, Port);
         }
 
         public override bool AcceptNewConnection(TcpClient client)
@@ -33,11 +32,11 @@ namespace MHTriServer.Server
             try
             {
                 var player = m_PlayerManager.AddPlayer(ConnectionType.FMP, client.Client, client.GetStream());
-                Console.WriteLine($"FmpServer: New player connected {client.Client.RemoteEndPoint}");
+                Log.InfoFormat("New player connected {0}", client.Client.RemoteEndPoint);
             }
             catch (Exception e)
             {
-                Console.WriteLine($"FmpServer: Unable to accept new player. {e.Message}");
+                Log.Fatal("Unable to accept new player", e);
                 return false;
             }
 
@@ -49,25 +48,20 @@ namespace MHTriServer.Server
             var endpoint = socket.RemoteEndPoint;
             if (!m_PlayerManager.TryGetPlayer(endpoint, out var player))
             {
-                Console.Error.WriteLine($"FmpServer: Unable to find player {endpoint}");
+                Log.FatalFormat("Unable to find player {0}", endpoint);
                 return;
             }
 
             if (socket.Available == 0)
             {
-                Console.WriteLine($"FmpServer: Connection {endpoint} was closed gracefully");
+                Log.InfoFormat("Connection {0} was closed gracefully", endpoint);
 
                 RemoveClient(socket);
                 m_PlayerManager.RemovePlayer(player);
                 return;
             }
 
-            try
-            {
-                player.ReadPacketFromStream();
-            }
-            catch (Exception) { }
-
+            player.ReadPacketFromStream();
 
             // Handle player closing his own socket.
             // Refactor asap
@@ -83,7 +77,8 @@ namespace MHTriServer.Server
             var endpoint = socket.RemoteEndPoint;
             if (!m_PlayerManager.TryGetPlayer(endpoint, out var player))
             {
-                Console.Error.WriteLine($"FmpServer: Unable to find player {endpoint}");
+                Log.FatalFormat("Unable to find player {0}", endpoint);
+                RemoveClient(socket);
                 return;
             }
 
