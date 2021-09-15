@@ -29,19 +29,19 @@ namespace MHTriServer.Server
             Log.InfoFormat("Running on {0}:{1}", Address, Port);
         }
 
-        public override bool AcceptNewConnection(TcpClient client)
+        public override bool AcceptNewConnection(Socket newSocket)
         {
             try
             {
                 if (m_PendingPlayer == null)
                 {
-                    var player = m_PlayerManager.AddPlayer(ConnectionType.LMP, client.Client, client.GetStream());
-                    Log.InfoFormat("New player connected {0}", client.Client.RemoteEndPoint);
+                    var player = m_PlayerManager.AddPlayer(ConnectionType.LMP, newSocket, new NetworkStream(newSocket));
+                    Log.InfoFormat("New player connected {0}", newSocket.RemoteEndPoint);
                 }
                 else
                 {
-                    m_PendingPlayer.SetConnection(ConnectionType.LMP, client.Client, client.GetStream());
-                    Log.InfoFormat("Player reconnected {0}", client.Client.RemoteEndPoint);
+                    m_PendingPlayer.SetConnection(ConnectionType.LMP, newSocket, new NetworkStream(newSocket));
+                    Log.InfoFormat("Player reconnected {0}", newSocket.RemoteEndPoint);
                 }
             }
             catch (Exception e)
@@ -114,12 +114,6 @@ namespace MHTriServer.Server
                 RemoveClient(socket);
                 m_PlayerManager.RemovePlayer(player);
             }
-        }
-
-        public override void HandleSocketError(Socket socket)
-        {
-            RemoveClient(socket);
-            m_PlayerManager.RemovePlayer(socket.RemoteEndPoint);
         }
     }
 }

@@ -32,16 +32,16 @@ namespace MHTriServer.Server
             Log.InfoFormat("Running on {0}:{1}", Address, Port);
         }
 
-        public override bool AcceptNewConnection(TcpClient client)
+        public override bool AcceptNewConnection(Socket newSocket)
         {
-            var sslStream = new SslStream(client.GetStream(), false);
+            var sslStream = new SslStream(new NetworkStream(newSocket), false);
 
             try
             {
                 sslStream.AuthenticateAsServer(m_ServerCertificate);
 
-                var player = m_PlayerManager.AddPlayer(ConnectionType.OPN, client.Client, sslStream);
-                Log.InfoFormat("New player connected {0}", client.Client.RemoteEndPoint);
+                var player = m_PlayerManager.AddPlayer(ConnectionType.OPN, newSocket, sslStream);
+                Log.InfoFormat("New player connected {0}", newSocket.RemoteEndPoint);
             }
             catch(Exception e)
             {
@@ -66,8 +66,11 @@ namespace MHTriServer.Server
             if (socket.Available == 0)
             {
                 Log.InfoFormat("Connection {0} was closed gracefully", endpoint);
+
                 RemoveClient(socket);
                 m_PlayerManager.RemovePlayer(player);
+
+                return;
             }
 
             player.ReadPacketFromStream();
@@ -100,12 +103,6 @@ namespace MHTriServer.Server
                 RemoveClient(socket);
                 m_PlayerManager.RemovePlayer(player);
             }
-        }
-
-        public override void HandleSocketError(Socket socket)
-        {
-            RemoveClient(socket);
-            m_PlayerManager.RemovePlayer(socket.RemoteEndPoint);
         }
     }
 }

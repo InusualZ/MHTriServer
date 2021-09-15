@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading.Tasks;
@@ -11,23 +10,23 @@ namespace MHTriServer.Server
     {
         private Task m_ServerTask = null;
 
-        public string Address { get; private set; }
-
-        public int Port { get; private set; }
-
         protected TcpListener m_TcpListener = null;
 
-        protected List<TcpClient> m_Clients = null;
+        protected List<Socket> m_Clients = null;
 
-        public bool Running { get; set; } = false;
+        public string Address { get; }
+
+        public int Port { get; }
+
+        public bool Running { get; private set; } = false;
 
         public BaseServer(string address, int port) => (Address, Port) = (address, port);
 
         public void Listen()
         {
             m_TcpListener = new TcpListener(IPAddress.Parse(Address), Port);
-            m_TcpListener.Start(); // TODO: Backlog configurable
-            m_Clients = new List<TcpClient>();
+            m_TcpListener.Start();
+            m_Clients = new List<Socket>();
         }
 
         public virtual void Start()
@@ -42,30 +41,25 @@ namespace MHTriServer.Server
 
         public void Run()
         {
-            List<Socket> GetSockets()
-            {
-                return m_Clients.Select(c => c.Client).Append(m_TcpListener.Server).ToList();
-            }
+            const int WAIT_INDEFINITELY = -1;
 
-            List<Socket> GetSocketsClient()
-            {
-                return m_Clients.Select(c => c.Client).ToList();
-            }
-
+            var selectReadList = new List<Socket>();
+            var selectWriteList = new List<Socket>();
             while (Running)
             {
-                var socketRead = GetSockets();
-                var socketWrite = GetSocketsClient();
-                var socketError = GetSocketsClient();
+                selectReadList.Add(m_TcpListener.Server);
+                selectReadList.AddRange(m_Clients);
+
+                selectWriteList.AddRange(m_Clients);
 
                 // Blocking 
-                Socket.Select(socketRead, socketWrite, socketError, -1);
+                Socket.Select(selectReadList, selectWriteList, null, WAIT_INDEFINITELY);
 
-                foreach(var socket in socketRead)
+                foreach(var socket in selectReadList)
                 {
                     if (socket == m_TcpListener.Server)
                     {
-                        var newClient = m_TcpListener.AcceptTcpClient();
+                        var newClient = m_TcpListener.AcceptSocket();
                         if (AcceptNewConnection(newClient))
                         {
                             m_Clients.Add(newClient);
@@ -76,8 +70,12 @@ namespace MHTriServer.Server
                     HandleSocketRead(socket);
                 }
 
-                foreach (var socket in socketWrite)
+                foreach (var socket in selectWriteList)
                 {
+                    // We detect that the client has gracefully closed the connection when
+                    // we try to read from the socket, and we receive 0 bytes back. That means,
+                    // that the socket has have passed through the previous foreach loop
+                    // which means that the socket has been closed already
                     if (!socket.Connected)
                     {
                         continue;
@@ -86,46 +84,38 @@ namespace MHTriServer.Server
                     HandleSocketWrite(socket);
                 }
 
-                foreach (var socket in socketError)
-                {
-                    HandleSocketError(socket);
-                }
+                selectReadList.Clear();
+                selectWriteList.Clear();
             }
+
+            foreach (var socket in m_Clients)
+            {
+                socket.Close();
+            }
+
+            m_Clients.Clear();
         }
 
-        public abstract bool AcceptNewConnection(TcpClient client);
+        public abstract bool AcceptNewConnection(Socket newSocket);
 
         public abstract void HandleSocketRead(Socket socket);
 
         public abstract void HandleSocketWrite(Socket socket);
 
-        public abstract void HandleSocketError(Socket socket);
-
-        public bool RemoveClient(TcpClient clientToRemove)
-        {
-            if (m_Clients.Remove(clientToRemove))
-            {
-                clientToRemove.Close();
-                clientToRemove.Dispose();
-
-                return true;
-            }
-
-            return false;
-        }
-
         public bool RemoveClient(Socket socket)
         {
             for (var i = 0; i < m_Clients.Count; ++i) 
             {
-                var client = m_Clients[i];
-                if (client.Client == socket)
+                var entry = m_Clients[i];
+                if (entry != socket)
                 {
-                    m_Clients.RemoveAt(i);
-                    client.Close();
-                    client.Dispose();
-                    return true;
+                    continue;
                 }
+
+                m_Clients.RemoveAt(i);
+                entry.Close();
+                entry.Dispose();
+                return true;
             }
 
             return false;
@@ -133,11 +123,17 @@ namespace MHTriServer.Server
 
         public virtual void Stop()
         {
-            if (Running)
+            if (!Running)
             {
-                Running = false;
-                m_ServerTask.Wait();
+                return;
             }
+
+            Running = false;
+            m_ServerTask.Wait();
+            m_ServerTask = null;
+
+            m_TcpListener.Stop();
+            m_TcpListener = null;
         }
     }
 }
