@@ -16,6 +16,9 @@ namespace MHTriServer.Server.Packets
             base.Serialize(writer);
         }
 
+        public override void Handle(PacketHandler handler, NetworkSession networkSession) =>
+            handler.HandleReqLayerEnd(networkSession, this);
+
         public override void Deserialize(BEBinaryReader reader)
         {
             Debug.Assert(ID == PACKET_ID);

@@ -29,6 +29,9 @@ namespace MHTriServer.Server.Packets
             UnknownField2 = reader.ReadShortBytes();
         }
 
+        public override void Handle(PacketHandler handler, NetworkSession networkSession) =>
+            handler.HandleReqUserBinarySet(networkSession, this);
+
         public override string ToString()
         {
             return base.ToString() + $"\n\tUnknownField {UnknownField}\n\tUnknownField2 '{Packet.Hexstring(UnknownField2, ' ')}'";

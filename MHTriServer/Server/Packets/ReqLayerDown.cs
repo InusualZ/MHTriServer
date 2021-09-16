@@ -29,6 +29,9 @@ namespace MHTriServer.Server.Packets
             Slot = CompoundList.Deserialize<LayerDownData>(reader);
         }
 
+        public override void Handle(PacketHandler handler, NetworkSession networkSession) =>
+            handler.HandleReqLayerDown(networkSession, this);
+
         public override string ToString()
         {
             return base.ToString() + $":\n\tUnknownField {UnknownField}\n\tSlot\n{Slot}";

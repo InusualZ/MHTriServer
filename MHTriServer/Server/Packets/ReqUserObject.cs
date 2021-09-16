@@ -34,6 +34,9 @@ namespace MHTriServer.Server.Packets
             Slot = CompoundList.Deserialize<UserSlot>(reader);
         }
 
+        public override void Handle(PacketHandler handler, NetworkSession networkSession) =>
+            handler.HandleReqUserObject(networkSession, this);
+
         public override string ToString()
         {
             return base.ToString() + $":\n\tSlotIsEmpty {SlotIsEmpty}\n\tSlotIndex {SlotIndex}\n\tSlot\n{Slot}";

@@ -26,6 +26,9 @@ namespace MHTriServer.Server.Packets
             UnknownField = UnkByteIntStruct.DeserializeArray(reader);
         }
 
+        public override void Handle(PacketHandler handler, NetworkSession networkSession) =>
+            handler.HandleReqUserSearchSet(networkSession, this);
+
         public override string ToString()
         {
             var str = $":\n\tUnknownField({UnknownField.Count})";

@@ -25,6 +25,9 @@ namespace MHTriServer.Server.Packets
             Data = CompoundList.Deserialize<CompoundList>(reader);
         }
 
+        public override void Handle(PacketHandler handler, NetworkSession networkSession) =>
+            handler.HandleReqLoginInfo(networkSession, this);
+
         public override string ToString()
         {
             return base.ToString() + $":\n\tData\n{Data}";

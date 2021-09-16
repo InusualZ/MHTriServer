@@ -34,6 +34,9 @@ namespace MHTriServer.Server.Packets
             Format = reader.ReadByteBytes();
         }
 
+        public override void Handle(PacketHandler handler, NetworkSession networkSession) =>
+            handler.HandleReqLayerMediationList(networkSession, this);
+
         public override string ToString()
         {
             return base.ToString() + $":\n\tUnknownField1 {UnknownField1:02X}\n\tUnknownField2 {UnknownField2:02X}\n\tFormat '{Packet.Hexstring(Format, ' ')}'";

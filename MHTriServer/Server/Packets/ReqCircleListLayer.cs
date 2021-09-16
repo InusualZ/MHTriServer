@@ -31,6 +31,9 @@ namespace MHTriServer.Server.Packets
             UnknownField2 = Unk2ByteArray.DeserializeArray(reader);
         }
 
+        public override void Handle(PacketHandler handler, NetworkSession networkSession) =>
+            handler.HandleReqCircleListLayer(networkSession, this);
+
         public override string ToString()
         {
             var str = $":\n\tFormat '{Packet.Hexstring(Format, ' ')}'\n\tUnknownField2({UnknownField2.Count})";

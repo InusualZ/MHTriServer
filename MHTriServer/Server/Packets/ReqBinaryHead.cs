@@ -28,6 +28,9 @@ namespace MHTriServer.Server.Packets
             BinaryType = reader.ReadByte();
         }
 
+        public override void Handle(PacketHandler handler, NetworkSession networkSession) =>
+            handler.HandleReqBinaryHead(networkSession, this);
+
         public override string ToString()
         {
             return base.ToString() + $":\n\tBinaryType {BinaryType}";

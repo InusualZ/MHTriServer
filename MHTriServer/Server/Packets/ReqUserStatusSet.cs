@@ -25,6 +25,9 @@ namespace MHTriServer.Server.Packets
             UserStatus = CompoundList.Deserialize<CompoundList>(reader);
         }
 
+        public override void Handle(PacketHandler handler, NetworkSession networkSession) =>
+            handler.HandleReqUserStatusSet(networkSession, this);
+
         public override string ToString()
         {
             return base.ToString() + $":\n\tUserStatus\n{UserStatus}";

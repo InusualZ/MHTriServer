@@ -33,6 +33,9 @@ namespace MHTriServer.Server.Packets
             Format = reader.ReadByteBytes();
         }
 
+        public override void Handle(PacketHandler handler, NetworkSession networkSession) =>
+            handler.HandleReqFriendList(networkSession, this);
+
         public override string ToString()
         {
             return base.ToString() + $":\n\tUnknownField {UnknownField}" +

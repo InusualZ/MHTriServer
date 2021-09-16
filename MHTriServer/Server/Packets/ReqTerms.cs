@@ -34,6 +34,9 @@ namespace MHTriServer.Server.Packets
             TermsExpectedLength = reader.ReadUInt32();
         }
 
+        public override void Handle(PacketHandler handler, NetworkSession networkSession) =>
+            handler.HandleReqTerms(networkSession, this);
+
         public override string ToString()
         {
             return base.ToString() + $":\n\tTermsVersion {TermsVersion}\n\tTermsCurrentLength {TermsCurrentLength}\n\tTermsExpectedLength {TermsExpectedLength}";

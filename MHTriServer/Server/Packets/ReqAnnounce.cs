@@ -21,5 +21,8 @@ namespace MHTriServer.Server.Packets
             Debug.Assert(ID == PACKET_ID);
             Debug.Assert(Size == 0);
         }
+
+        public override void Handle(PacketHandler handler, NetworkSession networkSession) =>
+            handler.HandleReqAnnounce(networkSession, this);
     }
 }

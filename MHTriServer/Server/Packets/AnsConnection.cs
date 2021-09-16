@@ -12,10 +12,19 @@ namespace MHTriServer.Server.Packets
 
         public AnsConnection(uint id, ushort size, ushort counter) : base(id, size, counter) { }
 
+        public override void Serialize(BEBinaryWriter writer)
+        {
+            base.Serialize(writer);
+            Data.Serialize(writer);
+        }
+
         public override void Deserialize(BEBinaryReader reader)
         {
             Data = CompoundList.Deserialize<ConnectionData>(reader);
         }
+
+        public override void Handle(PacketHandler handler, NetworkSession networkSession) =>
+            handler.HandleAnsConnection(networkSession, this);
 
         public override string ToString()
         {

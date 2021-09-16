@@ -39,6 +39,9 @@ namespace MHTriServer.Server.Packets
             UnknownField4 = reader.ReadUInt32();
         }
 
+        public override void Handle(PacketHandler handler, NetworkSession networkSession) =>
+            handler.HandleReqUserBinaryNotice(networkSession, this);
+
         public override string ToString()
         {
             return base.ToString() + $"\n\tUnknownField1 {UnknownField1}\n\tUnknownField2 \"{UnknownField2}\"\n\tUnknownField3 {UnknownField3}" +

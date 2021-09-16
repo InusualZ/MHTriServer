@@ -27,6 +27,9 @@ namespace MHTriServer.Server.Packets
             Token = reader.ReadString();
         }
 
+        public override void Handle(PacketHandler handler, NetworkSession networkSession) =>
+            handler.HandleReqAuthenticationToken(networkSession, this);
+
         public override string ToString()
         {
             return base.ToString() + $"\n\tToken {Token}";

@@ -1,9 +1,7 @@
 ﻿using log4net;
 using MHTriServer.Player;
-using System;
+using MHTriServer.Server.Packets;
 using System.Diagnostics;
-using System.Net.Security;
-using System.Net.Sockets;
 using System.Security.Cryptography.X509Certificates;
 
 namespace MHTriServer.Server
@@ -13,16 +11,14 @@ namespace MHTriServer.Server
         private static readonly ILog Log = LogManager.GetLogger(nameof(OpnServer));
 
         private readonly PlayerManager m_PlayerManager = null;
-        private readonly X509Certificate m_ServerCertificate = null;
 
-        public OpnServer(PlayerManager playerManager, string address, int port, X509Certificate certificate) : base(address, port) 
+        public OpnServer(PlayerManager playerManager, string address, int port, X509Certificate certificate) : base(address, port, certificate) 
         {
             Debug.Assert(playerManager != null);
             Debug.Assert(!string.IsNullOrEmpty(address));
             Debug.Assert(certificate!= null);
 
             m_PlayerManager = playerManager;
-            m_ServerCertificate = certificate;
         }
 
         public override void Start()
@@ -32,77 +28,82 @@ namespace MHTriServer.Server
             Log.InfoFormat("Running on {0}:{1}", Address, Port);
         }
 
-        public override bool AcceptNewConnection(Socket newSocket)
+        public override void HandleAnsConnection(NetworkSession session, AnsConnection ansConnection)
         {
-            var sslStream = new SslStream(new NetworkStream(newSocket), false);
-
-            try
-            {
-                sslStream.AuthenticateAsServer(m_ServerCertificate);
-
-                var player = m_PlayerManager.AddPlayer(ConnectionType.OPN, newSocket, sslStream);
-                Log.InfoFormat("New player connected {0}", newSocket.RemoteEndPoint);
-            }
-            catch(Exception e)
-            {
-                Log.ErrorFormat("OPNServer: Unable to authenticate client. {0}", e.Message);
-                sslStream.Close();
-                return false;
-            }
-
-            return true;
+            session.SendPacket(new NtcLogin(ServerLoginType.OPN_SERVER_ANOUNCE));
         }
 
-        public override void HandleSocketRead(Socket socket)
+        public override void HandleReqAuthenticationToken(NetworkSession session, ReqAuthenticationToken reqAuthenticationToken)
         {
-            var endpoint = socket.RemoteEndPoint;
-            if (!m_PlayerManager.TryGetPlayer(endpoint, out var player))
-            {
-                Log.FatalFormat("Unable to find player session for {0}", endpoint);
-                RemoveClient(socket);
-                return;
-            }
-
-            if (socket.Available == 0)
-            {
-                Log.InfoFormat("Connection {0} was closed gracefully", endpoint);
-
-                RemoveClient(socket);
-                m_PlayerManager.RemovePlayer(player);
-
-                return;
-            }
-
-            player.ReadPacketFromStream();
-
-            // Handle player closing his own socket.
-            // Refactor asap
-            if (!socket.Connected)
-            {
-                RemoveClient(socket);
-                m_PlayerManager.RemovePlayer(player);
-            }
+            // TODO: Should probably store the token
+            Player.Player.PlayerToken = reqAuthenticationToken.Token;
+            session.SendPacket(new AnsAuthenticationToken());
         }
 
-        public override void HandleSocketWrite(Socket socket)
+        public override void HandleReqMaintenance(NetworkSession session, ReqMaintenance reqMaintenance)
         {
-            var endpoint = socket.RemoteEndPoint;
-            if (!m_PlayerManager.TryGetPlayer(endpoint, out var player))
-            {
-                Log.FatalFormat("Unable to find player {0}", endpoint);
-                RemoveClient(socket);
-                return;
-            }
+            session.SendPacket(new AnsMaintenance(Constants.MAINTENANCE_MESSAGE));
+        }
 
-            player.HandleWrite();
+        public override void HandleReqTermsVersion(NetworkSession session, ReqTermsVersion reqTermsVersion)
+        {
+            session.SendPacket(new AnsTermsVersion(Constants.TERMS_AND_CONDITIONS_VERSION, (uint)Constants.TERMS_AND_CONDITIONS.Length));
+        }
 
-            // Handle player closing his own socket.
-            // Refactor asap
-            if (!socket.Connected)
-            {
-                RemoveClient(socket);
-                m_PlayerManager.RemovePlayer(player);
-            }
+        public override void HandleReqTerms(NetworkSession session, ReqTerms reqTerms)
+        {
+            session.SendPacket(new AnsTerms(reqTerms.TermsCurrentLength, (uint)Constants.TERMS_AND_CONDITIONS.Length, Constants.TERMS_AND_CONDITIONS));
+        }
+
+        public override void HandleReqMediaVersionInfo(NetworkSession session, ReqMediaVersionInfo reqMediaVersionInfo)
+        {
+            // It seems that there is a bug or something in their network loop.
+            // I can bypass a lot of thing by sending LmpConnect next
+
+            // SendPacket(new LmpConnect("127.0.0.1", LmpServer.DefaultPort));
+
+            session.SendPacket(new AnsMediaVersionInfo("V1.0.0", "Alpha", "Hello World1"));
+        }
+
+        public override void HandleReqAnnounce(NetworkSession session, ReqAnnounce reqAnnounce)
+        {
+            session.SendPacket(new AnsAnnounce(Constants.ANNOUNCEMENT_MESSAGE));
+        }
+
+        public override void HandleReqNoCharge(NetworkSession session, ReqNoCharge reqNoCharge)
+        {
+            session.SendPacket(new AnsNoCharge("hello Wordl2"));
+        }
+
+        public override void HandleReqVulgarityInfoLow(NetworkSession session, ReqVulgarityInfoLow reqVulgarityInfoLow)
+        {
+            const string message = "HelloWorld3";
+            session.SendPacket(new AnsVulgarityInfoLow(1, reqVulgarityInfoLow.UnknownField, (uint)message.Length));
+        }
+
+        public override void HandleReqVulgarityLow(NetworkSession session, ReqVulgarityLow reqVulgarityLow)
+        {
+            const string message = "HelloWorld3";
+            session.SendPacket(new AnsVulgarityLow(reqVulgarityLow.InfoType, reqVulgarityLow.CurrentLength, (uint)message.Length, message));
+        }
+
+        public override void HandleReqCommonKey(NetworkSession session, ReqCommonKey reqCommonKey)
+        {
+            // This probably have to do with encryption
+            // TODO: Extract the encryption/decryption method that way, we can send the packet.
+            // SendPacket(new AnsCommonKey(""));
+            session.SendPacket(new AnsAuthenticationToken());
+        }
+
+        public override void HandleReqLmpConnect(NetworkSession session, ReqLmpConnect reqLmpConnect)
+        {
+            session.SendPacket(new AnsLmpConnect(MHTriServer.Config.LmpServer.Address, MHTriServer.Config.LmpServer.Port));
+        }
+
+        public override void HandleReqShut(NetworkSession session, ReqShut reqShut)
+        {
+            session.SendPacket(new AnsShut(0), true);
+            RemoveSession(session);
         }
     }
 }

@@ -29,6 +29,9 @@ namespace MHTriServer.Server.Packets
             UnknownField1 = reader.ReadUInt32();
         }
 
+        public override void Handle(PacketHandler handler, NetworkSession networkSession) =>
+            handler.HandleReqCircleLeave(networkSession, this);
+
         public override string ToString()
         {
             return base.ToString() + $":\n\tUnknownField1 {UnknownField1}";

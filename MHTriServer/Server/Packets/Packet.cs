@@ -37,6 +37,11 @@ namespace MHTriServer.Server.Packets
             // Packet Specific
         }
 
+        public virtual void Handle(PacketHandler handler, NetworkSession networkSession)
+        {
+            throw new NotImplementedException();
+        }
+
         public override string ToString()
         {
             return $"{GetType().Name}({ID:X8}; {Size} bytes)";
@@ -48,6 +53,8 @@ namespace MHTriServer.Server.Packets
             Func<uint, ushort, ushort, T> CreateFunc<T>() where T : Packet
             {
                 var ctr = typeof(T).GetConstructor(constructorTypes);
+                Debug.Assert(ctr != null);
+
                 var idParameter = Expression.Parameter(typeof(uint));
                 var sizeParameter = Expression.Parameter(typeof(ushort));
                 var counterParameter = Expression.Parameter(typeof(ushort));

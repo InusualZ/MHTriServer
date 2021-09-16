@@ -34,6 +34,9 @@ namespace MHTriServer.Server.Packets
             --CityIndex;
         }
 
+        public override void Handle(PacketHandler handler, NetworkSession networkSession) =>
+            handler.HandleReqLayerCreateFoot(networkSession, this);
+
         public override string ToString()
         {
             return base.ToString() + $":\n\tCityIndex {CityIndex}\n\tUnknownField2 {UnknownField2}";

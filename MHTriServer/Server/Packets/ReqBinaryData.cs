@@ -40,6 +40,9 @@ namespace MHTriServer.Server.Packets
             DataExpectedSize = reader.ReadUInt32();
         }
 
+        public override void Handle(PacketHandler handler, NetworkSession networkSession) =>
+            handler.HandleReqBinaryData(networkSession, this);
+
         public override string ToString()
         {
             return base.ToString() + $"\n\tType {Type}\n\tVersion {Version}\n\tOffset {Offset}" +

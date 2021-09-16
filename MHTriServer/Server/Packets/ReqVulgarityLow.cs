@@ -39,6 +39,9 @@ namespace MHTriServer.Server.Packets
             ExpectedLength = reader.ReadUInt32();
         }
 
+        public override void Handle(PacketHandler handler, NetworkSession networkSession) =>
+            handler.HandleReqVulgarityLow(networkSession, this);
+
         public override string ToString()
         {
             return base.ToString() + $":\n\tInfoType {InfoType}\n\tVersion {Version}\n\tCurrentLength {CurrentLength}\n\tExpectedLength {ExpectedLength}";

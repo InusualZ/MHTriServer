@@ -4,8 +4,6 @@
     {
         LMP,
         FMP,
-        OPN,
-        RFP,
-        Unknown
+        OPN
     }
 }

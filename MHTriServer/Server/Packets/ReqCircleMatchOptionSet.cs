@@ -26,6 +26,9 @@ namespace MHTriServer.Server.Packets
             MatchOptions = CompoundList.Deserialize<CompoundList>(reader);
         }
 
+        public override void Handle(PacketHandler handler, NetworkSession networkSession) =>
+            handler.HandleReqCircleMatchOptionSet(networkSession, this);
+
         public override string ToString()
         {
             return base.ToString() + $":\n\tMatchOptions\n{MatchOptions}";

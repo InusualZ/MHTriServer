@@ -29,6 +29,9 @@ namespace MHTriServer.Server.Packets
             Format2 = reader.ReadByteBytes();
         }
 
+        public override void Handle(PacketHandler handler, NetworkSession networkSession) =>
+            handler.HandleReqLayerStart(networkSession, this);
+
         public override string ToString()
         {
             return base.ToString() + $":\n\tFormat {Packet.Hexstring(Format, ' ')}\n\tFormat2 {Packet.Hexstring(Format2, ' ')}";

@@ -1,8 +1,10 @@
 ﻿using log4net;
 using MHTriServer.Player;
-using System;
+using MHTriServer.Server.Packets;
+using System.Collections.Generic;
 using System.Diagnostics;
-using System.Net.Sockets;
+using System.Net;
+using System.Text;
 
 namespace MHTriServer.Server
 {
@@ -10,9 +12,10 @@ namespace MHTriServer.Server
     {
         private static readonly ILog Log = LogManager.GetLogger(nameof(LmpServer));
 
-        private Player.Player m_PendingPlayer = null; 
-
         private readonly PlayerManager m_PlayerManager = null;
+
+        // TEMP
+        private readonly Dictionary<string, int> m_CodeCounter;
 
         public LmpServer(PlayerManager playerManager, string address, int port) : base(address, port)
         {
@@ -20,6 +23,7 @@ namespace MHTriServer.Server
             Debug.Assert(!string.IsNullOrEmpty(address));
 
             m_PlayerManager = playerManager;
+            m_CodeCounter = new Dictionary<string, int>();
         }
 
         public override void Start()
@@ -29,91 +33,156 @@ namespace MHTriServer.Server
             Log.InfoFormat("Running on {0}:{1}", Address, Port);
         }
 
-        public override bool AcceptNewConnection(Socket newSocket)
+        public override void HandleAnsConnection(NetworkSession session, AnsConnection ansConnection)
         {
-            try
+            // Very naive implmentation of how this should be implemented
+            var onlineCode = "NoSupport"; // ansConnection.Data.OnlineSupportCode;
+            if (!m_CodeCounter.TryGetValue(onlineCode, out var currentCounter))
             {
-                if (m_PendingPlayer == null)
-                {
-                    var player = m_PlayerManager.AddPlayer(ConnectionType.LMP, newSocket, new NetworkStream(newSocket));
-                    Log.InfoFormat("New player connected {0}", newSocket.RemoteEndPoint);
-                }
-                else
-                {
-                    m_PendingPlayer.SetConnection(ConnectionType.LMP, newSocket, new NetworkStream(newSocket));
-                    Log.InfoFormat("Player reconnected {0}", newSocket.RemoteEndPoint);
-                }
+                currentCounter = 1;
+                m_CodeCounter.Add(onlineCode, currentCounter);
             }
-            catch (Exception e)
+            else
             {
-                Log.Fatal("Unable to accept new player", e);
-                return false;
+                m_CodeCounter[onlineCode] = ++currentCounter;
             }
+            var afterFirstConnection = (currentCounter % 2) == 0;
 
-            return true;
+            session.SendPacket(new NtcLogin(!afterFirstConnection ? ServerLoginType.LMP_NORMAL_FIRST : ServerLoginType.LMP_NORMAL_SECOND));
+        }
+        // TODO: Do something with the data
+        public override void HandleReqLoginInfo(NetworkSession session, ReqLoginInfo reqLoginInfo)
+        {
+            var chargeInfo = new ChargeInfo()
+            {
+                TicketValidity1 = 1,
+                TicketValidity2 = 2,
+                UnknownField5 = new byte[] { 0x48, 0x65, 0x6c, 0x6c, 0x6f, 0x20, 0x57, 0x6f, 0x72, 0x6c, 0x64, 0x31 }, // "Hello World1"
+                OnlineSupportCode = "NoSupport"
+            };
+
+            // TODO: Figure out what login info byte 1 means?
+            // Depending on the state of this argument. The client would go different paths
+            // during the login process
+            const byte loginInfoByte = 0x01;
+
+            session.SendPacket(new AnsLoginInfo(loginInfoByte, "Hello World3", chargeInfo));
         }
 
-        public override void HandleSocketRead(Socket socket)
+        public override void HandleReqTicketClient(NetworkSession session, ReqTicketClient reqTicketClient)
         {
-            var endpoint = socket.RemoteEndPoint;
-            if (!m_PlayerManager.TryGetPlayer(endpoint, out var player))
-            {
-                Log.FatalFormat("Unable to find player {0}", endpoint);
-                RemoveClient(socket);
-                return;
-            }
-
-            if (socket.Available == 0)
-            {
-                Log.InfoFormat("Connection {0} was closed gracefully", endpoint);
-
-                RemoveClient(socket);
-
-                // At this point we have to handle the later reconnection of this player. To the same server!!!
-
-                if (m_PendingPlayer == null)
-                {
-                    m_PendingPlayer = player;
-                }
-                else
-                {
-                    m_PlayerManager.RemovePlayer(player);
-                    m_PendingPlayer = null;
-                }
-
-                return;
-            }
-
-            player.ReadPacketFromStream();
-
-            // Handle player closing his own socket.
-            // Refactor asap
-            if (!socket.Connected)
-            {
-                RemoveClient(socket);
-                m_PlayerManager.RemovePlayer(player);
-            }
+            // I doubt this is correct? Need more RE
+            session.SendPacket(new AnsTicketClient(Player.Player.PlayerToken));
+        }
+        // TODO: Do something with the data
+        public override void HandleReqUserListHead(NetworkSession session, ReqUserListHead reqUserListHead)
+        {
+            session.SendPacket(new AnsUserListHead(0, 6));
         }
 
-        public override void HandleSocketWrite(Socket socket)
+        public override void HandleReqUserListData(NetworkSession session, ReqUserListData reqUserListData)
         {
-            var endpoint = socket.RemoteEndPoint;
-            if (!m_PlayerManager.TryGetPlayer(endpoint, out var player))
+            // TODO: Load from database,
+            var slots = new List<UserSlot>();
+            for (var i = 0; i < reqUserListData.SlotCount; ++i)
             {
-                Log.FatalFormat("Unable to find player {0}", endpoint);
-                RemoveClient(socket);
-                return;
+                slots.Add(UserSlot.NoData((uint)i));
             }
-
-            player.HandleWrite();
-
-            // Handle player closing his own socket.
-            // Refactor asap
-            if (!socket.Connected)
-            {
-                RemoveClient(socket);
-                m_PlayerManager.RemovePlayer(player);
-            }
+            session.SendPacket(new AnsUserListData(slots));
         }
+
+        public override void HandleReqServerTime(NetworkSession session, ReqServerTime reqServerTime)
+        {
+            session.SendPacket(new AnsServerTime(1500, 0));
+        }
+
+        public override void HandleReqUserListFoot(NetworkSession session, ReqUserListFoot reqUserListFoot)
+        {
+            session.SendPacket(new AnsUserListFoot());
+        }
+
+        public override void HandleReqUserObject(NetworkSession session, ReqUserObject reqUserObject)
+        {
+            reqUserObject.Slot.SlotIndex = 1;
+            reqUserObject.Slot.SaveID = Player.Player.DEFAULT_USER_ID; // Guid.NewGuid().ToString().Substring(0, 7); // TODO: Replace this token
+            session.SendPacket(new AnsUserObject(1, string.Empty, reqUserObject.Slot));
+        }
+
+        public override void HandleReqFmpListVersion(NetworkSession session, ReqFmpListVersion reqFmpListVersion)
+        {
+            session.SendPacket(new AnsFmpListVersion(1));
+        }
+
+        public override void HandleReqFmpListHead(NetworkSession session, ReqFmpListHead reqFmpListHead)
+        {
+            session.SendPacket(new AnsFmpListHead(0, 1));
+        }
+
+        public override void HandleReqFmpListData(NetworkSession session, ReqFmpListData reqFmpListData)
+        {
+            var servers = new List<FmpData>() 
+            {
+                FmpData.Server(1, 2, 3, 2, "Valor333333", 1),
+            };
+            session.SendPacket(new AnsFmpListData(servers));
+        }
+
+        public override void HandleReqFmpListFoot(NetworkSession session, ReqFmpListFoot reqFmpListFoot)
+        {
+            session.SendPacket(new AnsFmpListFoot());
+        }
+
+        public override void HandleReqFmpInfo(NetworkSession session, ReqFmpInfo reqFmpInfo)
+        {
+            session.SendPacket(new AnsFmpInfo(FmpData.Address(MHTriServer.Config.FmpServer.Address, MHTriServer.Config.FmpServer.Port)));
+        }
+
+        public override void HandleReqBinaryHead(NetworkSession session, ReqBinaryHead reqBinaryHead)
+        {
+            uint binaryLength = 0;
+            if (reqBinaryHead.BinaryType == 5)
+            {
+                // Arbitrary Length
+                binaryLength = (uint)(Player.Player.BINARY_DATA_5_TEST.Length);
+            }
+            else
+            {
+                Log.DebugFormat("ReqBinaryRead Type {0}", reqBinaryHead);
+            }
+
+            session.SendPacket(new AnsBinaryHead(reqBinaryHead.BinaryType, binaryLength));
+        }
+
+        public override void HandleReqBinaryData(NetworkSession session, ReqBinaryData reqBinaryData)
+        {
+            uint offset = 0;
+            byte[] binaryData = null;
+            if (reqBinaryData.Type == 5)
+            {
+                // Unknown request, max size is 0x1ff
+                binaryData = Encoding.ASCII.GetBytes(Player.Player.BINARY_DATA_5_TEST);
+            }
+
+            session.SendPacket(new AnsBinaryData(reqBinaryData.Type, offset, binaryData));
+        }
+
+        public override void HandleReqUserSearchInfoMine(NetworkSession session, ReqUserSearchInfoMine reqUserSearchInfoMine)
+        {
+            // The client won't even read the data that we would send, so why bother.
+            session.SendPacket(new AnsUserSearchInfoMine(new CompoundList()));
+        }
+
+        public override void HandleReqBinaryFoot(NetworkSession session, ReqBinaryFoot reqBinaryFoot)
+        {
+            session.SendPacket(new AnsBinaryFoot());
+        }
+
+        public override void HandleReqShut(NetworkSession session, ReqShut reqShut)
+        {
+            session.SendPacket(new AnsShut(0), true);
+            RemoveSession(session);
+        }
+
+        public override void OnSessionRemoved(NetworkSession session) { }
     }
 }

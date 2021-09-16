@@ -36,6 +36,9 @@ namespace MHTriServer.Server.Packets
             Format = reader.ReadByteBytes();
         }
 
+        public override void Handle(PacketHandler handler, NetworkSession networkSession) =>
+            handler.HandleReqFmpInfo(networkSession, this);
+
         public override string ToString()
         {
             return base.ToString() + $":\n\tSelectedFmpIndex {SelectedFmpIndex}\n\tFormat '{Packet.Hexstring(Format, ' ')}'";

@@ -43,6 +43,9 @@ namespace MHTriServer.Server.Packets
             Format1 = reader.ReadByteBytes();
         }
 
+        public override void Handle(PacketHandler handler, NetworkSession networkSession) =>
+            handler.HandleReqLayerUserListHead(networkSession, this);
+
         public override string ToString()
         {
             var str = $":\n\tUnknownField1 {UnknownField1}\n\tUnknownField2\n\t  UnknownField1 {UnknownField2.UnknownField}\n\t  UnknownField2 {UnknownField2.UnknownField2}\n\t  UnknownField3{UnknownField2.UnknownField3.Count}";

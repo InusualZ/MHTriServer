@@ -1,32 +1,46 @@
-﻿using System.Collections.Generic;
+﻿using log4net;
+using MHTriServer.Server.Packets;
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Net;
+using System.Net.Security;
 using System.Net.Sockets;
+using System.Security.Cryptography.X509Certificates;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace MHTriServer.Server
 {
-    public abstract class BaseServer
+    public abstract class BaseServer : PacketHandler
     {
+        private static readonly ILog Log = LogManager.GetLogger(nameof(BaseServer));
+
         private Task m_ServerTask = null;
 
         protected TcpListener m_TcpListener = null;
 
-        protected List<Socket> m_Clients = null;
+        protected List<NetworkSession> m_Sessions = null;
 
         public string Address { get; }
 
         public int Port { get; }
 
+        public X509Certificate Certificate { get; } = null;
+
         public bool Running { get; private set; } = false;
 
         public BaseServer(string address, int port) => (Address, Port) = (address, port);
 
-        public void Listen()
+        public BaseServer(string address, int port, X509Certificate certificate) =>
+            (Address, Port, Certificate) = (address, port, certificate);
+
+        private void Listen()
         {
             m_TcpListener = new TcpListener(IPAddress.Parse(Address), Port);
             m_TcpListener.Start();
-            m_Clients = new List<Socket>();
+            m_Sessions = new List<NetworkSession>();
         }
 
         public virtual void Start()
@@ -43,27 +57,60 @@ namespace MHTriServer.Server
         {
             const int WAIT_INDEFINITELY = -1;
 
+            Thread.CurrentThread.Name = this.GetType().Name;
+
             var selectReadList = new List<Socket>();
             var selectWriteList = new List<Socket>();
             while (Running)
             {
                 selectReadList.Add(m_TcpListener.Server);
-                selectReadList.AddRange(m_Clients);
 
-                selectWriteList.AddRange(m_Clients);
+                foreach (var session in m_Sessions)
+                {
+                    selectReadList.Add(session.Socket);
+                }
+
+                foreach (var session in m_Sessions)
+                {
+                    selectWriteList.Add(session.Socket);
+                }
 
                 // Blocking 
                 Socket.Select(selectReadList, selectWriteList, null, WAIT_INDEFINITELY);
 
-                foreach(var socket in selectReadList)
+                foreach (var socket in selectReadList)
                 {
                     if (socket == m_TcpListener.Server)
                     {
-                        var newClient = m_TcpListener.AcceptSocket();
-                        if (AcceptNewConnection(newClient))
+                        var newSocket = m_TcpListener.AcceptSocket();
+
+                        Stream networkStream = new NetworkStream(newSocket);
+
+                        if (Certificate != null)
                         {
-                            m_Clients.Add(newClient);
+                            var sslStream = new SslStream(networkStream, false);
+
+                            try
+                            {
+                                sslStream.AuthenticateAsServer(Certificate);
+                            }
+                            catch (Exception ex)
+                            {
+                                Log.Error($"Unable to authenticate as server {newSocket.RemoteEndPoint}", ex);
+                                newSocket.Dispose();
+                                continue;
+                            }
+
+                            networkStream = sslStream;
                         }
+
+                        var newSession = new NetworkSession(newSocket, networkStream);
+                        m_Sessions.Add(newSession);
+
+                        Log.InfoFormat("New session {0}", newSession.RemoteEndPoint);
+
+                        newSession.SendHandshake();
+
                         continue;
                     }
 
@@ -88,33 +135,96 @@ namespace MHTriServer.Server
                 selectWriteList.Clear();
             }
 
-            foreach (var socket in m_Clients)
+            foreach (var socket in m_Sessions)
             {
                 socket.Close();
             }
 
-            m_Clients.Clear();
+            m_Sessions.Clear();
         }
 
-        public abstract bool AcceptNewConnection(Socket newSocket);
-
-        public abstract void HandleSocketRead(Socket socket);
-
-        public abstract void HandleSocketWrite(Socket socket);
-
-        public bool RemoveClient(Socket socket)
+        private void HandleSocketRead(Socket socket)
         {
-            for (var i = 0; i < m_Clients.Count; ++i) 
+            var session = GetNetworkSession(socket);
+            Debug.Assert(session != null);
+
+            if (session.Socket.Available < 1)
             {
-                var entry = m_Clients[i];
-                if (entry != socket)
+                Log.InfoFormat("Session `{0}` was closed gracefully", session.RemoteEndPoint);
+                RemoveSession(session);
+                return;
+            }
+
+            var packets = session.ReadPackets();
+            Debug.Assert(packets.Count > 0);
+
+            foreach (var packet in packets)
+            {
+                session.NextResponseCounter = packet.Counter;
+
+                try
                 {
-                    continue;
+                    packet.Handle(this, session);
+                }
+                catch (NotImplementedException _)
+                {
+                    Log.Error($"Packet `{packet.GetType().Name}` left unhandled by server");
+                }
+                catch (Exception e)
+                {
+                    Log.Fatal($"Error ocurred while handling packet {packet.GetType().Name}", e);
+                }
+            }
+        }
+
+        private void HandleSocketWrite(Socket socket)
+        {
+            var session = GetNetworkSession(socket);
+            Debug.Assert(session != null);
+
+            if (session.CouldWrite())
+            {
+                try
+                {
+                    session.FlushWriteBuffer();
+                }
+                catch (Exception e)
+                {
+                    Log.Fatal($"Error ocurred while writing to `{session.RemoteEndPoint}`", e);
+                    RemoveSession(session);
+                }
+            }
+        }
+
+        private NetworkSession GetNetworkSession(Socket socket)
+        {
+            foreach (var session in m_Sessions)
+            {
+                if (session.Socket == socket)
+                {
+                    return session;
+                }
+            }
+
+            // TEST: Under current condition this should be imposible
+            Debug.Assert(false);
+            return null;
+        }
+
+        public virtual void OnSessionRemoved(NetworkSession session) { }
+
+        public bool RemoveSession(NetworkSession session)
+        {
+            if (m_Sessions.Remove(session))
+            {
+                OnSessionRemoved(session);
+
+                if (session.Socket.Connected)
+                {
+                    Log.InfoFormat("Closed {0} connection", session.RemoteEndPoint);
                 }
 
-                m_Clients.RemoveAt(i);
-                entry.Close();
-                entry.Dispose();
+                session.Dispose();
                 return true;
             }
 

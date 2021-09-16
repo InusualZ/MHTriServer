@@ -30,6 +30,9 @@ namespace MHTriServer.Server.Packets
             UnknownField2 = reader.ReadUInt32();
         }
 
+        public override void Handle(PacketHandler handler, NetworkSession networkSession) =>
+            handler.HandleReqLayerUserListData(networkSession, this);
+
         public override string ToString()
         {
             return base.ToString() + $":\n\tUnknownField1 {UnknownField1}" +

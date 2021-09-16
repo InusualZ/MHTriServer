@@ -39,6 +39,9 @@ namespace MHTriServer.Server.Packets
             UnknownField3 = UnkByteIntStruct.DeserializeArray(reader);
         }
 
+        public override void Handle(PacketHandler handler, NetworkSession networkSession) =>
+            handler.HandleReqLayerCreateSet(networkSession, this);
+
         public override string ToString()
         {
             var str = $":\n\tCityIndex {CityIndex}\n\tUnknownField2 {UnknownField2}\n\tUnknownField3({UnknownField3.Count})";

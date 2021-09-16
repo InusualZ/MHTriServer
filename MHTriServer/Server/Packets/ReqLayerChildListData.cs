@@ -31,6 +31,9 @@ namespace MHTriServer.Server.Packets
             ExpectedDataCount = reader.ReadUInt32();
         }
 
+        public override void Handle(PacketHandler handler, NetworkSession networkSession) =>
+            handler.HandleReqLayerChildListData(networkSession, this);
+
         public override string ToString()
         {
             return base.ToString() + $":\n\tUnknownField {UnknownField}\n\tExpectedDataCount {ExpectedDataCount}";

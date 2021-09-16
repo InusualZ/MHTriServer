@@ -41,6 +41,9 @@ namespace MHTriServer.Server.Packets
             Format = reader.ReadByteBytes();
         }
 
+        public override void Handle(PacketHandler handler, NetworkSession networkSession) =>
+            handler.HandleReqFmpListHead(networkSession, this);
+
         public override string ToString()
         {
             return base.ToString() + $":\n\tFmpListVersion {FmpListVersion}\n\tUnknownField {UnknownField}" +

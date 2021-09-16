@@ -3,11 +3,6 @@
 
 namespace MHTriServer.Server.Packets
 {
-    /*
-     * This packet is sent by the client. Don't know his purpose.
-     * TODO: Find more meaningful name, this name was given because of the context in which the
-     * packet get sent.
-     */
     public class ReqShut : Packet
     {
         public const uint PACKET_ID = 0x60100100;
@@ -31,6 +26,9 @@ namespace MHTriServer.Server.Packets
             Debug.Assert(Size == 1);
             UnknownField = reader.ReadByte();
         }
+
+        public override void Handle(PacketHandler handler, NetworkSession networkSession) =>
+            handler.HandleReqShut(networkSession, this);
 
         public override string ToString()
         {

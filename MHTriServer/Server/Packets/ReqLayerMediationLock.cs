@@ -30,5 +30,13 @@ namespace MHTriServer.Server.Packets
             UnknownField1 = reader.ReadByte();
             LockData = CompoundList.Deserialize<MediationData>(reader);
         }
+
+        public override void Handle(PacketHandler handler, NetworkSession networkSession) =>
+            handler.HandleReqLayerMediationLock(networkSession, this);
+
+        public override string ToString()
+        {
+            return base.ToString() + $":\n\tUnknownField1 {UnknownField1}\n\tLockData\n{LockData}";
+        }
     }
 }

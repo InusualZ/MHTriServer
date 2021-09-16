@@ -25,6 +25,9 @@ namespace MHTriServer.Server.Packets
             UnknownField = CompoundList.Deserialize<FmpData>(reader);
         }
 
+        public override void Handle(PacketHandler handler, NetworkSession networkSession) =>
+            handler.HandleReqUserSearchInfoMine(networkSession, this);
+
         public override string ToString()
         {
             return base.ToString() + $":\n\tUnknownField {UnknownField}";

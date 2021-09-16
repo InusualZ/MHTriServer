@@ -38,6 +38,9 @@ namespace MHTriServer.Server.Packets
             UnknownField2 = reader.ReadUInt32();
         }
 
+        public override void Handle(PacketHandler handler, NetworkSession networkSession) =>
+            handler.HandleReqFmpListData(networkSession, this);
+
         public override string ToString()
         {
             return base.ToString() + $":\n\tUnknownField {UnknownField}\n\tUnknownField2 {UnknownField2}";

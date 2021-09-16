@@ -1,13 +1,9 @@
 ﻿using System.Diagnostics;
-using MHTriServer.Utils;
+using MHTriServer.Utils;
 
 namespace MHTriServer.Server.Packets
 {
-    /*
-     * TODO: Find more meaningful name, this name was given because of the context in which the
-     * packet get sent.
-     */
-    class ReqTicketClient : Packet
+    public class ReqTicketClient : Packet
     {
         public const uint PACKET_ID = 0x60300100;
 
@@ -19,6 +15,9 @@ namespace MHTriServer.Server.Packets
         {
             base.Serialize(writer);
         }
+
+        public override void Handle(PacketHandler handler, NetworkSession networkSession) =>
+            handler.HandleReqTicketClient(networkSession, this);
 
         public override void Deserialize(BEBinaryReader reader)
         {
