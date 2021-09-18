@@ -1,6 +1,7 @@
 ﻿
 using System.Collections.Generic;
 using System.Diagnostics;
+using MHTriServer.Server.Packets.Properties;
 using MHTriServer.Utils;
 
 namespace MHTriServer.Server.Packets

@@ -1,5 +1,5 @@
 ﻿
-namespace MHTriServer.Server
+namespace MHTriServer.Server.Packets.Properties
 {
     public class NtcBinaryCompoundData : CompoundList
     {

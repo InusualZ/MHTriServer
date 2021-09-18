@@ -1,7 +1,6 @@
-﻿
-using System.Diagnostics;
+﻿using System.Diagnostics;
 
-namespace MHTriServer.Server
+namespace MHTriServer.Server.Packets.Properties
 {
     public class CircleData : CompoundList
     {
@@ -48,7 +47,7 @@ namespace MHTriServer.Server
 
         public byte[] UnknownField5
         {
-            get => Get<byte[]>(FIELD_5); 
+            get => Get<byte[]>(FIELD_5);
             set
             {
                 Debug.Assert(value.Length <= 0x100);

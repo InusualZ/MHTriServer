@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using MHTriServer.Utils;
 
-namespace MHTriServer.Server
+namespace MHTriServer.Server.Packets.Properties
 {
     public class UnkShortArrayStruct
     {
@@ -21,7 +21,7 @@ namespace MHTriServer.Server
 
             var ushortCount = Math.Min((byteCount - (2 * sizeof(uint))) / sizeof(ushort), 3);
             var unknownField3 = new List<ushort>(ushortCount);
-            for(var i = 0; i < ushortCount; ++i)
+            for (var i = 0; i < ushortCount; ++i)
             {
                 unknownField3.Add(reader.ReadUInt16());
             }

@@ -1,6 +1,6 @@
 ﻿using MHTriServer.Utils;
 
-namespace MHTriServer.Server
+namespace MHTriServer.Server.Packets.Properties
 {
     public class UserNumData : CompoundList
     {

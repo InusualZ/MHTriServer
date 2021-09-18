@@ -1,7 +1,7 @@
 ﻿
 using System.Diagnostics;
 
-namespace MHTriServer.Server
+namespace MHTriServer.Server.Packets.Properties
 {
     public class ConnectionData : CompoundList
     {

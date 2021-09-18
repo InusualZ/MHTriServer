@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using MHTriServer.Utils;
 
-namespace MHTriServer.Server
+namespace MHTriServer.Server.Packets.Properties
 {
     public class Unk3Byte1Int
     {

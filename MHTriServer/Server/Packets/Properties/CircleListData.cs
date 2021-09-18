@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace MHTriServer.Server
+namespace MHTriServer.Server.Packets.Properties
 {
     public class CircleListData
     {

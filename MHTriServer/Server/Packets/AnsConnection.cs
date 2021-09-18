@@ -1,4 +1,5 @@
-﻿using MHTriServer.Utils;
+﻿using MHTriServer.Server.Packets.Properties;
+using MHTriServer.Utils;
 
 namespace MHTriServer.Server.Packets
 {

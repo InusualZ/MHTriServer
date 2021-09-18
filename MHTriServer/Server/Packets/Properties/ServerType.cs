@@ -3,7 +3,7 @@ using System.Buffers.Binary;
 using System.Diagnostics;
 using System.Text;
 
-namespace MHTriServer.Server
+namespace MHTriServer.Server.Packets.Properties
 {
     public struct ServerType
     {

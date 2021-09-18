@@ -1,4 +1,5 @@
 ﻿using MHTriServer.Server;
+using MHTriServer.Server.Packets.Properties;
 
 namespace MHTriServer.Player
 {

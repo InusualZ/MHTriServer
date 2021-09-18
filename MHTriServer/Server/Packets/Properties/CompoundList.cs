@@ -1,36 +1,28 @@
-﻿using MHTriServer.Server.Packets;
-using MHTriServer.Utils;
+﻿using MHTriServer.Utils;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
-namespace MHTriServer.Server
+namespace MHTriServer.Server.Packets.Properties
 {
-    public class CompoundExtendedList
+    public class CompoundList
     {
-        private enum ElementType
+        protected enum ElementType
         {
+            None = 0,
             UInt8 = 1,
             UInt16 = 2,
             UInt32 = 3,
             UInt64 = 4,
-
-            // Probably, not confirmed
-            F32 = 5,
-            F64 = 6,
-            Int32 = 7,
-            // End
-
-            String = 8,
-            Binary = 9,
+            String = 5,
+            Binary = 6
         }
 
         private readonly Dictionary<byte, object> m_Data;
 
         public int Count => m_Data.Count;
 
-        public CompoundExtendedList()
+        public CompoundList()
         {
             m_Data = new Dictionary<byte, object>();
         }
@@ -49,11 +41,6 @@ namespace MHTriServer.Server
         public void Set(byte key, ushort value) => m_Data[key] = value;
         public void Set(byte key, uint value) => m_Data[key] = value;
         public void Set(byte key, ulong value) => m_Data[key] = value;
-
-        public void Set(byte key, int value) => m_Data[key] = value;
-        public void Set(byte key, long value) => m_Data[key] = value;
-        public void Set(byte key, float value) => m_Data[key] = value;
-
         public void Set(byte key, string value) => m_Data[key] = value;
         public void Set(byte key, byte[] value) => m_Data[key] = value;
 
@@ -85,8 +72,11 @@ namespace MHTriServer.Server
             foreach (var (id, value) in m_Data)
             {
                 writer.Write(id);
-                var result = TryWrite(id, value, writer);
-                Debug.Assert(result);
+                if (!TryWrite(id, value, writer))
+                {
+                    writer.Write((byte)ElementType.None);
+                    writer.Write((byte)0x00);
+                }
             }
         }
 
@@ -97,8 +87,11 @@ namespace MHTriServer.Server
             {
                 var key = reader.ReadByte();
                 var type = reader.ReadByte();
-                var result = TryRead(key, type, reader, out var value);
-                Debug.Assert(result);
+                if (!TryRead(key, type, reader, out var value))
+                {
+                    value = reader.ReadByte();
+                }
+
                 m_Data[key] = value;
             }
         }
@@ -120,19 +113,6 @@ namespace MHTriServer.Server
                 case ElementType.UInt64:
                     value = reader.ReadUInt64();
                     break;
-
-                // Not confirmed
-                case ElementType.F32:
-                    value = reader.ReadSingle();
-                    break;
-                case ElementType.F64:
-                    value = reader.ReadDouble();
-                    break;
-                case ElementType.Int32:
-                    value = reader.ReadInt32();
-                    break;
-                // End
-
                 case ElementType.String:
                     value = reader.ReadString();
                     break;
@@ -140,6 +120,7 @@ namespace MHTriServer.Server
                     value = reader.ReadShortBytes();
                     break;
 
+                case ElementType.None:
                 default:
                     return false;
             }
@@ -167,22 +148,6 @@ namespace MHTriServer.Server
                     writer.Write((byte)ElementType.UInt64);
                     writer.Write(l);
                     break;
-
-                // Not confirmed
-                case float f:
-                    writer.Write((byte)ElementType.F32);
-                    writer.Write(f);
-                    break;
-                case double d:
-                    writer.Write((byte)ElementType.F64);
-                    writer.Write(d);
-                    break;
-                case int i:
-                    writer.Write((byte)ElementType.Int32);
-                    writer.Write(i);
-                    break;
-                // End
-
                 case string str:
                     writer.Write((byte)ElementType.String);
                     writer.Write(str);
@@ -204,7 +169,7 @@ namespace MHTriServer.Server
             var builder = new StringBuilder();
             foreach(var (key, value) in m_Data)
             {
-                builder.Append($"\t  {{0x{key:X2}}}: ");
+                builder.Append($"\t  {{{(int)key}}}: ");
                 switch (value)
                 {
                     case byte b:
@@ -219,19 +184,6 @@ namespace MHTriServer.Server
                     case ulong l:
                         builder.AppendLine($"{l}");
                         break;
-
-                    // Not confirmed
-                    case int i:
-                        builder.AppendLine($"{i}");
-                        break;
-                    case long l:
-                        builder.AppendLine($"{l}");
-                        break;
-                    case float f:
-                        builder.AppendLine($"{f}");
-                        break;
-                    // End
-
                     case string str:
                         builder.AppendLine($"\"{str}\"");
                         break;
@@ -247,7 +199,7 @@ namespace MHTriServer.Server
             return builder.ToString();
         }
 
-        public static T Deserialize<T>(BEBinaryReader reader) where T : CompoundExtendedList, new()
+        public static T Deserialize<T>(BEBinaryReader reader) where T : CompoundList, new()
         {
             var compoindList = new T();
             compoindList.Deserialize(reader);

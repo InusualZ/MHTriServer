@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 
-namespace MHTriServer.Server
+namespace MHTriServer.Server.Packets.Properties
 {
     public class UserSlot : CompoundList
     {
@@ -15,7 +15,8 @@ namespace MHTriServer.Server
 
         public uint SlotIndex { get => Get<uint>(SLOT_INDEX_FIELD); set => Set(SLOT_INDEX_FIELD, value); }
 
-        public string SaveID { 
+        public string SaveID 
+        { 
             get => Get<string>(SAVE_ID_FIELD); 
             set {
                 Debug.Assert(value.Length < 8);
@@ -23,7 +24,8 @@ namespace MHTriServer.Server
             } 
         }
 
-        public string CharacterName { 
+        public string CharacterName 
+        { 
             get => Get<string>(CHARACTER_NAME_FIELD);
             set {
                 Debug.Assert(value.Length < 0x20);
@@ -39,7 +41,8 @@ namespace MHTriServer.Server
 
         public uint UnknownField7 { get => Get<uint>(FIELD_7); set => Set(FIELD_7, value); }
 
-        public string UnknownField8 { 
+        public string UnknownField8 
+        { 
             get => Get<string>(FIELD_8);
             set {
                 Debug.Assert(value.Length < 0x20);

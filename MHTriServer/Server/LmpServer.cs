@@ -1,6 +1,7 @@
 ﻿using log4net;
 using MHTriServer.Player;
 using MHTriServer.Server.Packets;
+using MHTriServer.Server.Packets.Properties;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net;

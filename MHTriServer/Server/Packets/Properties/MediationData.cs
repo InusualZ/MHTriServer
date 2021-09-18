@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 
-namespace MHTriServer.Server.Packets
+namespace MHTriServer.Server.Packets.Properties
 {
     public class MediationData : CompoundList
     {
