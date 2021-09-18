@@ -153,6 +153,7 @@ namespace MHTriServer.Server.Packets
             RegisterWith<NtcLayerUserNum>(NtcLayerUserNum.PACKET_ID);
             RegisterWith<NtcLayerUserPosition>(NtcLayerUserPosition.PACKET_ID);
             RegisterWith<NtcLogin>(NtcLogin.PACKET_ID);
+            RegisterWith<NtcShut>(NtcShut.PACKET_ID);
             RegisterWith<ReqAnnounce>(ReqAnnounce.PACKET_ID);
             RegisterWith<ReqAuthenticationToken>(ReqAuthenticationToken.PACKET_ID);
             RegisterWith<ReqBinaryData>(ReqBinaryData.PACKET_ID);
