@@ -7,9 +7,9 @@ namespace MHTriServer.Server.Packets
     {
         public const uint PACKET_ID = 0x61010100;
 
-        public CompoundList Data { get; set; }
+        public ChargeInfo Data { get; set; }
 
-        public ReqLoginInfo(CompoundList data) : base(PACKET_ID) => (Data) = (data);
+        public ReqLoginInfo(ChargeInfo data) : base(PACKET_ID) => (Data) = (data);
 
         public ReqLoginInfo(uint id, ushort size, ushort counter) : base(id, size, counter) { }
 
@@ -22,7 +22,7 @@ namespace MHTriServer.Server.Packets
         public override void Deserialize(BEBinaryReader reader)
         {
             Debug.Assert(ID == PACKET_ID);
-            Data = CompoundList.Deserialize<CompoundList>(reader);
+            Data = CompoundList.Deserialize<ChargeInfo>(reader);
         }
 
         public override void Handle(PacketHandler handler, NetworkSession networkSession) =>
