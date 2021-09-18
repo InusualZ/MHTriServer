@@ -1,10 +1,13 @@
 ﻿using System;
 
 namespace MHTriServer.Server.Packets
-
 {
     public class PacketHandler
     {
+        public virtual void HandleAnsConnection(NetworkSession session, AnsConnection ansConnection) => throw new NotImplementedException();
+
+        public virtual void HandleAnsLineCheck(NetworkSession session, AnsLineCheck ansLineCheck) => throw new NotImplementedException();
+
         public virtual void HandleReqAnnounce(NetworkSession session, ReqAnnounce reqAnnounce) => throw new NotImplementedException();
 
         public virtual void HandleReqAuthenticationToken(NetworkSession session, ReqAuthenticationToken reqAuthenticationToken) => throw new NotImplementedException();
@@ -124,7 +127,5 @@ namespace MHTriServer.Server.Packets
         public virtual void HandleReqVulgarityInfoLow(NetworkSession session, ReqVulgarityInfoLow reqVulgarityInfoLow) => throw new NotImplementedException();
 
         public virtual void HandleReqVulgarityLow(NetworkSession session, ReqVulgarityLow reqVulgarityLow) => throw new NotImplementedException();
-
-        public virtual void HandleAnsConnection(NetworkSession session, AnsConnection ansConnection) => throw new NotImplementedException();
     }
 }

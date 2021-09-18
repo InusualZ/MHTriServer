@@ -177,6 +177,8 @@ namespace MHTriServer.Server
             }
         }
 
+        public override void HandleAnsLineCheck(NetworkSession session, AnsLineCheck ansLineCheck) {}
+
         private void HandleSocketWrite(Socket socket)
         {
             var session = GetNetworkSession(socket);
