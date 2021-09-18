@@ -4,6 +4,18 @@ using MHTriServer.Server.Packets;
 using System.Diagnostics;
 using System.Security.Cryptography.X509Certificates;
 
+/// <summary>
+/// OpnServer (TLS)
+/// This is where the initial handshake with the game happen. This server is responsible for:
+///     * Maintenance announce (optional) - Announce if there would be any maintenance in the future
+///     * General Announcement (optional) - Any announce that the server owner would want to use
+///     * NASToken Exchange - Nintendo WFC connection token
+///     * Terms Exchange - Terms and Condition exchange terms and codition
+///     * VulgarityInfo (???) - Probably related to chat messages
+///     * CommonKey(optional) - This key is used to encrypt / decrypt packet with the other game related server.
+///         In the current state of the server, we don't use encryption, hopefully in the future we can start using it
+///     * LMP Server Address Exchange
+/// </summary>
 namespace MHTriServer.Server
 {
     public class OpnServer : BaseServer
