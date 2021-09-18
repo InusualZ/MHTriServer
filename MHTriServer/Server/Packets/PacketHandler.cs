@@ -8,6 +8,8 @@ namespace MHTriServer.Server.Packets
 
         public virtual void HandleAnsLineCheck(NetworkSession session, AnsLineCheck ansLineCheck) => throw new NotImplementedException();
 
+        public virtual void HandleNtcCollectionLog(NetworkSession session, NtcCollectionLog collectionLog) => throw new NotImplementedException();
+
         public virtual void HandleReqAnnounce(NetworkSession session, ReqAnnounce reqAnnounce) => throw new NotImplementedException();
 
         public virtual void HandleReqAuthenticationToken(NetworkSession session, ReqAuthenticationToken reqAuthenticationToken) => throw new NotImplementedException();
