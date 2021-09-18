@@ -748,7 +748,6 @@ namespace MHTriServer.Server
             session.SendPacket(new AnsLayerEnd());
         }
 
-
         public override void HandleReqShut(NetworkSession session, ReqShut reqShut)
         {
             session.SendPacket(new AnsShut(0), true);

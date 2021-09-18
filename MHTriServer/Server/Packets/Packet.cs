@@ -72,7 +72,7 @@ namespace MHTriServer.Server.Packets
                     {
                         m_PacketFactoryMap.Add(id, func);
                     }
-                    catch(Exception _)
+                    catch(Exception)
                     {
                         Console.Error.WriteLine($"Failed to registry {typeof(T).Name} with id {id:X8}");
                         throw;

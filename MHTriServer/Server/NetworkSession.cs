@@ -20,11 +20,14 @@ namespace MHTriServer.Server
         private static readonly ILog Log = LogManager.GetLogger(nameof(NetworkSession));
 
         private MemoryStream m_ReadStream;
+        private Stopwatch m_LastReceived;
 
         private BEBinaryWriter m_WriteStreamWriter;
         private Stopwatch m_LastWrite;
 
         private ushort m_PacketCounter;
+
+        private bool m_SentPingPacket;
 
         public Socket Socket { get; private set; }
 
@@ -42,11 +45,14 @@ namespace MHTriServer.Server
             Debug.Assert(newtworkStream != null);
 
             m_ReadStream = new MemoryStream(new byte[DEFAULT_BUFFER_SIZE], 0, DEFAULT_BUFFER_SIZE, true, true);
+            m_LastReceived = Stopwatch.StartNew();
 
             m_WriteStreamWriter = new BEBinaryWriter(new MemoryStream(DEFAULT_BUFFER_SIZE));
             m_LastWrite = Stopwatch.StartNew();
 
             m_PacketCounter = 0;
+
+            m_SentPingPacket = false;
 
             Socket = socket;
             RemoteEndPoint = socket.RemoteEndPoint;
@@ -92,6 +98,9 @@ namespace MHTriServer.Server
         public IReadOnlyList<Packet> ReadPackets()
         {
             Debug.Assert(Socket.Available > 0);
+
+            m_LastReceived.Restart();
+            m_SentPingPacket = false;
 
             var packets = new List<Packet>();
 
@@ -183,10 +192,30 @@ namespace MHTriServer.Server
             return packets;
         }
 
+        public void CheckPingSystem()
+        {
+            const long PING_TIMEOUT_MS = 30 /* seconds */ * 1000;
+            if (m_LastReceived.ElapsedMilliseconds < PING_TIMEOUT_MS)
+            {
+                return;
+            }
+
+            const long PING_FATAL_TIMEOUT_MS = 1 * /* minutes */ 60 /* seconds */ * 1000;
+            if (m_LastReceived.ElapsedMilliseconds >= PING_FATAL_TIMEOUT_MS)
+            {
+                Close(Constants.INACTIVITY_MESSAGE);
+                Log.InfoFormat("Player {0} was kicked due to inactivity", RemoteEndPoint);
+            }
+            else if (!m_SentPingPacket)
+            {
+                SendPacket(new ReqLineCheck(), true);
+                m_SentPingPacket = true;
+            }
+        }
+
         public bool CouldWrite()
         {
             const long MINIMUM_TIME_BETWEEN_SOCKET_WRITE_MS = 100L;
-            const long PING_TIMEOUT_MS = 30 /* seconds */ * 1000;
 
             if (m_LastWrite.ElapsedMilliseconds < MINIMUM_TIME_BETWEEN_SOCKET_WRITE_MS)
             {
@@ -196,14 +225,6 @@ namespace MHTriServer.Server
             if (m_WriteStreamWriter.Position > 0)
             {
                 return true;
-            }
-
-            // Ping System
-            if (m_LastWrite.ElapsedMilliseconds >= PING_TIMEOUT_MS)
-            {
-                // TODO: Make sure that the client responde to this packet
-                // if not close the connection
-                SendPacket(new ReqLineCheck(), true);
             }
 
             return false;
@@ -266,7 +287,19 @@ namespace MHTriServer.Server
             m_LastWrite.Restart();
         }
 
-        public void Close()
+        public void Close(string reason)
+        {
+            try
+            {
+                SendPacket(new NtcShut(1, reason), true);
+            }
+            finally
+            {
+                Dispose();
+            }
+        }
+
+        public void Dispose()
         {
             if (Socket == null)
             {
@@ -283,10 +316,11 @@ namespace MHTriServer.Server
             m_WriteStreamWriter.Dispose();
             m_WriteStreamWriter = null;
 
+            m_LastReceived.Stop();
+            m_LastReceived = null;
+
             m_LastWrite.Stop();
             m_LastWrite = null;
         }
-
-        public void Dispose() => Close();
     }
 }

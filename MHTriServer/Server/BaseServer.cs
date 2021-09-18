@@ -67,11 +67,13 @@ namespace MHTriServer.Server
 
                 foreach (var session in m_Sessions)
                 {
+                    Debug.Assert(session.Socket?.Connected == true);
                     selectReadList.Add(session.Socket);
                 }
 
                 foreach (var session in m_Sessions)
                 {
+                    Debug.Assert(session.Socket?.Connected == true);
                     selectWriteList.Add(session.Socket);
                 }
 
@@ -137,7 +139,7 @@ namespace MHTriServer.Server
 
             foreach (var socket in m_Sessions)
             {
-                socket.Close();
+                socket.Dispose();
             }
 
             m_Sessions.Clear();
@@ -166,7 +168,7 @@ namespace MHTriServer.Server
                 {
                     packet.Handle(this, session);
                 }
-                catch (NotImplementedException _)
+                catch (NotImplementedException)
                 {
                     Log.Error($"Packet `{packet.GetType().Name}` left unhandled by server");
                 }
@@ -174,6 +176,11 @@ namespace MHTriServer.Server
                 {
                     Log.Fatal($"Error ocurred while handling packet {packet.GetType().Name}", e);
                 }
+            }
+
+            if (!socket.Connected)
+            {
+                RemoveSession(session);
             }
         }
 
@@ -195,6 +202,21 @@ namespace MHTriServer.Server
                     Log.Fatal($"Error ocurred while writing to `{session.RemoteEndPoint}`", e);
                     RemoveSession(session);
                 }
+            }
+
+            try
+            {
+                session.CheckPingSystem();
+            }
+            catch (Exception e)
+            {
+                Log.Fatal($"PingSystem - Error ocurred while writing to`{session.RemoteEndPoint}`", e);
+                RemoveSession(session);
+            }
+
+            if (!socket.Connected)
+            {
+                RemoveSession(session);
             }
         }
 
@@ -221,7 +243,7 @@ namespace MHTriServer.Server
             {
                 OnSessionRemoved(session);
 
-                if (session.Socket.Connected)
+                if (session.Socket?.Connected == true)
                 {
                     Log.InfoFormat("Closed {0} connection", session.RemoteEndPoint);
                 }
@@ -231,6 +253,25 @@ namespace MHTriServer.Server
             }
 
             return false;
+        }
+
+        private void RemoveSessionBySocket(Socket socket)
+        {
+            for (var i = 0; i < m_Sessions.Count; ++i)
+            {
+                var session = m_Sessions[i];
+                if (session.Socket != socket)
+                {
+                    continue;
+                }
+                
+                OnSessionRemoved(session);
+
+                session.Dispose();
+
+                m_Sessions.RemoveAt(i);
+                return;
+            }
         }
 
         public virtual void Stop()
