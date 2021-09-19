@@ -1,35 +1,40 @@
-﻿namespace MHTriServer
+﻿using Tommy.Serializer;
+
+namespace MHTriServer
 {
-
-    public interface IConfig
+    [TommyRoot]
+    public class ServerConfig
     {
-        public IOpnServerConfig OpnServer { get; }
+        public OpnServerConfig OpnServer { get; set; }
 
-        public ILmpServerConfig LmpServer { get; }
+        public LmpServerConfig LmpServer { get; set; }
 
-        public IFmpServerConfig FmpServer { get; }
+        public FmpServerConfig FmpServer { get; set; }
     }
 
-    public interface IServerConfig
+    public class BaseServerConfig
     {
-        public string Address { get; }
+        public string Address { get; set; }
 
-        public ushort Port { get; }
+        public ushort Port { get; set; }
     }
 
-    public interface IOpnServerConfig : IServerConfig
+    [TommyTableName("OpnServer")]
+    public class OpnServerConfig : BaseServerConfig
     {
-        public string CertificatePath { get; }
+        public string CertificatePath { get; set; }
 
-        public string CertificatePassphrase { get; }
+        public string CertificatePassphrase { get; set; }
     }
 
-    public interface ILmpServerConfig : IServerConfig
+    [TommyTableName("LmpServer")]
+    public class LmpServerConfig : BaseServerConfig
     {
 
     }
 
-    public interface IFmpServerConfig : IServerConfig
+    [TommyTableName("FmpServer")]
+    public class FmpServerConfig : BaseServerConfig
     {
 
     }

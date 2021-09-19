@@ -6,14 +6,19 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Resources\MHTriServer.ini" />
+    <None Remove="Resources\log4net.xml" />
+    <None Remove="Resources\MHTriServer.toml" />
     <None Remove="Resources\ServerCertificate.p12" />
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Resources\MHTriServer.ini">
+    <EmbeddedResource Include="Resources\log4net.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	  <TargetPath>MHTriServer.ini</TargetPath>
+		<TargetPath>log4net.xml</TargetPath>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\MHTriServer.toml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  <TargetPath>MHTriServer.toml</TargetPath>
     </EmbeddedResource>
     <EmbeddedResource Include="Resources\ServerCertificate.p12">
 	  <!-- In the future, this default certificate would be removed -->
@@ -23,14 +28,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Config.Net" Version="4.15.0" />
     <PackageReference Include="log4net" Version="2.0.12" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Update="log4net.xml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
+    <PackageReference Include="Tommy" Version="3.0.1" />
   </ItemGroup>
 
 </Project>

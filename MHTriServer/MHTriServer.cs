@@ -1,5 +1,4 @@
-﻿using Config.Net;
-using log4net;
+﻿using log4net;
 using log4net.Config;
 using MHTriServer.Player;
 using MHTriServer.Server;
@@ -10,6 +9,8 @@ using System.Reflection;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading;
+using Tommy;
+using Tommy.Serializer;
 
 namespace MHTriServer
 {
@@ -17,12 +18,31 @@ namespace MHTriServer
     {
         private static readonly ILog Log = LogManager.GetLogger(nameof(MHTriServer));
 
-        public static IConfig Config;
+        private const string CONFIG_NAME = "MHTriServer.toml";
+
+        public static ServerConfig Config;
 
         public static int Main(string[] args)
         {
-            InitializeLogger();
-            Config = InitializeConfig();
+            try
+            {
+                InitializeLogger();
+            }
+            catch (Exception e)
+            {
+                Log.Fatal($"Unable to initialize the logging system", e);
+                return 1;
+            }
+
+            try
+            {
+                Config = InitializeConfig();
+            }
+            catch (Exception e)
+            {
+                Log.Fatal($"Unable to read config `{CONFIG_NAME}` file", e);
+                return 1;
+            }
 
             var playerManager = new PlayerManager();
 
@@ -67,7 +87,7 @@ namespace MHTriServer
             var filepath = Path.Join(Path.GetDirectoryName(executingAssembly.Location), "log4net.xml");
             if (!File.Exists(filepath))
             {
-                throw new ApplicationException("Unable to initialize the logging service\nPlease verify that `log4net.xml` exist at the root folder of the program binary");
+                throw new ApplicationException("Please verify that `log4net.xml` exist at the root folder of the program binary");
             }
 
             var repo = LogManager.GetRepository(executingAssembly);
@@ -77,9 +97,8 @@ namespace MHTriServer
             Thread.CurrentThread.Name = nameof(MHTriServer);
         }
 
-        public static IConfig InitializeConfig()
+        public static ServerConfig InitializeConfig()
         {
-            const string CONFIG_NAME = "MHTriServer.ini";
             var executingAssembly = Assembly.GetExecutingAssembly();
             var configPath = Path.Join(Path.GetDirectoryName(executingAssembly.Location), CONFIG_NAME);
             if (!File.Exists(configPath))
@@ -89,7 +108,7 @@ namespace MHTriServer
                 Log.Warn("Default config has been written");
             }
 
-            return new ConfigurationBuilder<IConfig>().UseIniFile(configPath).Build();
+            return TommySerializer.FromTomlFile<ServerConfig>(configPath);
         }
     }
 }
