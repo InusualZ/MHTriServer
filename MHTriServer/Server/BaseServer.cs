@@ -84,6 +84,18 @@ namespace MHTriServer.Server
                 {
                     if (socket == m_TcpListener.Server)
                     {
+                        try
+                        {
+                            if (!m_TcpListener.Pending())
+                            {
+                                continue;
+                            }
+                        }
+                        catch (Exception ex) when (ex is InvalidOperationException || ex is ObjectDisposedException)
+                        {
+                            continue;
+                        }
+
                         var newSocket = m_TcpListener.AcceptSocket();
 
                         Stream networkStream = new NetworkStream(newSocket);
@@ -137,9 +149,9 @@ namespace MHTriServer.Server
                 selectWriteList.Clear();
             }
 
-            foreach (var socket in m_Sessions)
+            foreach (var session in m_Sessions)
             {
-                socket.Dispose();
+                session.Close(Constants.SERVER_CLOSED_MESSAGE);
             }
 
             m_Sessions.Clear();
@@ -287,11 +299,16 @@ namespace MHTriServer.Server
             }
 
             Running = false;
+
+            m_TcpListener.Stop();
+
             m_ServerTask.Wait();
             m_ServerTask = null;
 
-            m_TcpListener.Stop();
             m_TcpListener = null;
+
+            Debug.Assert(m_Sessions.Count == 0);
+            m_Sessions = null;
         }
     }
 }
