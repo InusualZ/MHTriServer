@@ -800,7 +800,7 @@ namespace MHTriServer.Server
                 return;
             }
 
-            m_PlayerManager.RemovePlayer(player);
+            m_PlayerManager.UnloadPlayer(player);
         }
     }
 }

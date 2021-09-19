@@ -1,6 +1,6 @@
-﻿using MHTriServer.Server;
+﻿using MHTriServer.Database.Models;
+using MHTriServer.Server;
 using MHTriServer.Server.Packets.Properties;
-using System.Diagnostics;
 using System.Net;
 
 namespace MHTriServer.Player
@@ -14,9 +14,11 @@ namespace MHTriServer.Player
         public static readonly string BINARY_DATA_5_TEST = "\t\tWhat!!!!\n\t\tHello World\n\t\tInusualZ\n\t\tHello Dev\n\t\tMore\n\t\tDude\n\t\tStop\n\t\tPlease";
         public static readonly byte[] BINARY_DATA_1;
 
+        private readonly OfflinePlayer m_OfflinePlayer;
+
         public EndPoint RemoteEndPoint { get; set; }
 
-        public string OnlineSupportCode { get; }
+        public string OnlineSupportCode { get => m_OfflinePlayer.UUID; }
 
         public bool Created { get; set; }
 
@@ -40,12 +42,13 @@ namespace MHTriServer.Player
             BINARY_DATA_1 = ServerType.GenerateBinaryData();
         }
 
-        public Player(EndPoint remoteEndPoint, string onlineSupportCode)
+        public Player(OfflinePlayer offlinePlayer, EndPoint remoteEndPoint, bool created)
         {
+            m_OfflinePlayer = offlinePlayer;
+            
             RemoteEndPoint = remoteEndPoint;
-            OnlineSupportCode = onlineSupportCode;
 
-            Created = false;
+            Created = created;
             RequestedUserList = false;
             RequestedUserList = false;
         }
@@ -53,11 +56,7 @@ namespace MHTriServer.Player
 
     public static class PlayerExtension
     {
-        public static Player GetPlayer(this NetworkSession networkSession)
-        {
-            var player = networkSession.GetTag<Player>();
-            Debug.Assert(player != null);
-            return player;
-        }
+        public static Player GetPlayer(this NetworkSession networkSession) 
+            => networkSession.GetTag<Player>();
     }
 }

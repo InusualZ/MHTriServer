@@ -1,5 +1,8 @@
-﻿using MHTriServer.Server.Packets.Properties;
+﻿using MHTriServer.Database;
+using MHTriServer.Database.Models;
+using MHTriServer.Server.Packets.Properties;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net;
@@ -15,38 +18,31 @@ namespace MHTriServer.Player
     {
         private const char SERVER_ONLINE_CODE_PREFIX = 'W';
 
-        // TODO: Currently, is not thread-safe. Implement lock mechanism
-        private readonly List<Player> m_Players;
+        private readonly ConcurrentDictionary<string, Player> m_Players;
 
-        public PlayerManager()
+        private readonly IBackend m_Database;
+
+        public PlayerManager(IBackend database)
         {
-
-            m_Players = new List<Player>();
+            m_Players = new ConcurrentDictionary<string, Player>();
+            m_Database = database;
         }
 
-        public Player Create(EndPoint endPoint, ConnectionData connectionData)
+        public bool TryCreate(EndPoint endPoint, ConnectionData connectionData, out Player outPlayer)
         {
-            var onlineSupportCode = connectionData.OnlineSupportCode;
+            outPlayer = default;
+            var onlineSupportCode = GetOnlineSupportCodeFrom(connectionData);
 
             // Create Online Support Code
             if (!IsValidOnlineSupportCode(onlineSupportCode))
             {
-                const int MAX_ITERATION = 100;
+                const int MAX_ITERATION = 10;
+
                 var foundSlot = false;
                 for (var i = 0; i < MAX_ITERATION; ++i)
                 {
                     onlineSupportCode = GetNewOnlineCode();
-                    var foundDuplicate = false;
-                    foreach (var player in m_Players)
-                    {
-                        if (player.OnlineSupportCode == onlineSupportCode)
-                        {
-                            foundDuplicate = true;
-                            break;
-                        }
-                    }
-
-                    if (!foundDuplicate)
+                    if (!m_Database.PlayerExist(onlineSupportCode))
                     {
                         foundSlot = true;
                         break;
@@ -55,45 +51,63 @@ namespace MHTriServer.Player
 
                 if (!foundSlot)
                 {
-                    return null;
+                    return false;
                 }
             }
 
             // TODO: Do something with the other connection data fields
 
-            var result = new Player(endPoint, onlineSupportCode);
-            result.Created = true;
+            var offlinePlayer = new OfflinePlayer(onlineSupportCode);
+            m_Database.AddPlayer(offlinePlayer);
 
-            m_Players.Add(result);
-            return result;
+            // TODO: Remove from here
+            m_Database.SaveChanges();
+
+            outPlayer = new Player(offlinePlayer, endPoint, true);
+            return m_Players.TryAdd(outPlayer.OnlineSupportCode, outPlayer);
         }
 
-        public void RemovePlayer(Player toRemove) => m_Players.Remove(toRemove);
-
-        public void RemovePlayer(EndPoint endPoint)
+        public bool TryLoadOrCreatePlayer(EndPoint endPoint, ConnectionData connectionData, out Player outPlayer)
         {
-            for (var i = 0; i < m_Players.Count; ++i)
+            var onlineSupportCode = GetOnlineSupportCodeFrom(connectionData);
+            if (TryLoadPlayer(onlineSupportCode, endPoint, out outPlayer))
             {
-                var player = m_Players[i];
+                return true;
+            }
+
+            return TryCreate(endPoint, connectionData, out outPlayer);
+        }
+
+        public bool UnloadPlayer(Player toRemove) =>
+            m_Players.Remove(toRemove.OnlineSupportCode, out var _);
+
+        public bool UnloadPlayer(EndPoint endPoint)
+        {
+            foreach(var (uuid, player) in m_Players)
+            {
                 if (player.RemoteEndPoint == endPoint)
                 {
-                    m_Players.RemoveAt(i);
-                    return;
+                    return m_Players.Remove(uuid, out var _);
                 }
             }
+
+            return false;
         }
 
+        public bool UnloadPlayer(string onlineSupportCode) =>
+            m_Players.Remove(onlineSupportCode, out var player);
+
+        /// <summary>
+        /// This would remove the player completely, from the local list and the database
+        /// </summary>
+        /// <param name="onlineSupportCode"></param>
         public void RemovePlayer(string onlineSupportCode)
         {
-            for (var i = 0; i < m_Players.Count; ++i)
-            {
-                var player = m_Players[i];
-                if (player.OnlineSupportCode == onlineSupportCode)
-                {
-                    m_Players.RemoveAt(i);
-                    return;
-                }
-            }
+            m_Players.Remove(onlineSupportCode, out var _);
+
+            m_Database.RemovePlayer(onlineSupportCode);
+            // TODO: Remove from here
+            m_Database.SaveChanges();
         }
 
         public bool TryGetPlayer(EndPoint endpoint, out Player outPlayer)
@@ -101,7 +115,7 @@ namespace MHTriServer.Player
             Debug.Assert(endpoint != null);
 
             outPlayer = default;
-            foreach (var player in m_Players)
+            foreach (var (_, player) in m_Players)
             {
                 if (player.RemoteEndPoint == endpoint)
                 {
@@ -121,16 +135,21 @@ namespace MHTriServer.Player
                 return false;
             }
 
-            foreach (var player in m_Players)
+            return m_Players.TryGetValue(onlineSupportCode, out outPlayer);
+        }
+
+        public bool TryLoadPlayer(string onlineSupportCode, EndPoint remoteEndpoint, out Player outPlayer)
+        {
+            outPlayer = default;
+
+            var offlinePlayer = m_Database.GetPlayerByUUID(onlineSupportCode);
+            if (offlinePlayer == null)
             {
-                if (player.OnlineSupportCode == onlineSupportCode)
-                {
-                    outPlayer = player;
-                    return true;
-                }
+                return false;
             }
 
-            return false;
+            outPlayer = new Player(offlinePlayer, remoteEndpoint, false);
+            return m_Players.TryAdd(onlineSupportCode, outPlayer);
         }
 
         public static string GetOnlineSupportCodeFrom(ConnectionData connectionData)

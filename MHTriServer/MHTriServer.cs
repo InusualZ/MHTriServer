@@ -1,5 +1,6 @@
 ﻿using log4net;
 using log4net.Config;
+using MHTriServer.Database;
 using MHTriServer.Player;
 using MHTriServer.Server;
 using MHTriServer.Utils;
@@ -9,7 +10,6 @@ using System.Reflection;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading;
-using Tommy;
 using Tommy.Serializer;
 
 namespace MHTriServer
@@ -44,7 +44,18 @@ namespace MHTriServer
                 return 1;
             }
 
-            var playerManager = new PlayerManager();
+            BackendContext backend;
+            try
+            {
+                backend = new BackendContext();
+            }
+            catch (Exception e)
+            {
+                Log.Fatal($"Failed to initialize the backend", e);
+                return 1;
+            }
+
+            var playerManager = new PlayerManager(backend);
 
             X509Certificate2 opnServerCertificate;
             try
@@ -70,6 +81,7 @@ namespace MHTriServer
                 var key = Console.ReadKey(true);
                 if (key.Key == ConsoleKey.Q)
                 {
+                    Log.Warn("Closing servers...");
                     break;
                 }
             }
@@ -77,6 +89,9 @@ namespace MHTriServer
             fmpServer.Stop();
             lmpServer.Stop();
             opnServer.Stop();
+
+            backend.SaveChanges();
+            backend.Dispose();
 
             return 0;
         }

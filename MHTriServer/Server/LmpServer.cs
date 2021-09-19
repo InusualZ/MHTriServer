@@ -44,8 +44,7 @@ namespace MHTriServer.Server
             if (!m_PlayerManager.TryGetPlayer(onlineSupportCode, out var player))
             {
                 afterFirstConnection = false;
-                player = m_PlayerManager.Create/* OrLoad */(session.RemoteEndPoint, connectionData);
-                if (player == null)
+                if (!m_PlayerManager.TryLoadOrCreatePlayer(session.RemoteEndPoint, connectionData, out player))
                 {
                     Log.FatalFormat("Kicked {0}, the number of account have reach its limit", session.RemoteEndPoint);
                     session.Close(Constants.MAX_ACCOUNT_REACHED_ERROR_MESSAGE);
@@ -237,9 +236,13 @@ namespace MHTriServer.Server
                     // This means that the player disconnected before we even could send the 
                     // OnlineSupportCode to it. So don't flush the player to database because
                     // when the player reconnect, it would still have an invalid OnlineSupportCode
-                    // TODO: Mark player to not be flush to database
+
+                    m_PlayerManager.RemovePlayer(player.OnlineSupportCode);
                 }
-                m_PlayerManager.RemovePlayer(player);
+                else
+                {
+                    m_PlayerManager.UnloadPlayer(player);
+                }
             }
 
             // TODO: We have to make sure to cleanup this player reference in case the client 

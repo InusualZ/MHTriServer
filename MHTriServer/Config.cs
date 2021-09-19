@@ -10,6 +10,8 @@ namespace MHTriServer
         public LmpServerConfig LmpServer { get; set; }
 
         public FmpServerConfig FmpServer { get; set; }
+
+        public DatabaseConfig Database { get; set; }
     }
 
     public class BaseServerConfig
@@ -37,5 +39,11 @@ namespace MHTriServer
     public class FmpServerConfig : BaseServerConfig
     {
 
+    }
+
+    [TommyTableName("Database")]
+    public class DatabaseConfig
+    {
+        public string Connection { get; set; }
     }
 }

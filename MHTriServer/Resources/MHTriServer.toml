@@ -11,3 +11,6 @@ Port = 8210
 [FmpServer]
 Address = "127.0.0.1"
 Port = 8220
+
+[Database]
+Connection = "Data Source=MHTriServer.db"

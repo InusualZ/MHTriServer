@@ -51,15 +51,24 @@ namespace MHTriServer.Server
             var connectionData = ansConnection.Data;
             if (m_PlayerManager.TryGetPlayer(connectionData.OnlineSupportCode, out var player))
             {
-                if (ContainSessionWith(player.RemoteEndPoint))
+                if (session.RemoteEndPoint != player.RemoteEndPoint)
                 {
-                    Log.FatalFormat("Kicked {0}, there is a player already connected with {1}", session.RemoteEndPoint, connectionData.OnlineSupportCode);
-                    session.Close(Constants.MULTIPLE_ACCOUNT_ERROR_MESSAGE);
+                    if (ContainSessionWith(player.RemoteEndPoint))
+                    {
+                        Log.FatalFormat("Kicked {0}, there is a player already connected with {1}", session.RemoteEndPoint, connectionData.OnlineSupportCode);
+                        session.Close(Constants.MULTIPLE_ACCOUNT_ERROR_MESSAGE);
+                        return;
+                    }
+                }
+                else
+                {
+                    Log.FatalFormat("Kicked {0}, session is doing funny business", session.RemoteEndPoint, connectionData.OnlineSupportCode);
+                    session.Close(Constants.OUT_OF_ORDER_ERROR_MESSAGE);
                     return;
                 }
 
                 // This is a dangling player object
-                m_PlayerManager.RemovePlayer(player);
+                m_PlayerManager.UnloadPlayer(player);
             }
 
             // TODO: Load player if there is one associated with the OnlineSupportCode

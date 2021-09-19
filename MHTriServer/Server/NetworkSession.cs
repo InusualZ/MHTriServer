@@ -306,6 +306,7 @@ namespace MHTriServer.Server
             {
                 SendPacket(new NtcShut(1, reason), true);
             }
+            catch (Exception) { /* Ignored, since we want to close the session anyway */ }
             finally
             {
                 Dispose();
