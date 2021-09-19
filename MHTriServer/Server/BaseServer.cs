@@ -158,7 +158,10 @@ namespace MHTriServer.Server
             }
 
             var packets = session.ReadPackets();
-            Debug.Assert(packets.Count > 0);
+
+            // We can't have this assert, because this would fail when we receive a packet that we
+            // haven't implemented
+            // Debug.Assert(packets.Count > 0);
 
             foreach (var packet in packets)
             {
@@ -273,6 +276,8 @@ namespace MHTriServer.Server
                 return;
             }
         }
+
+        public bool ContainSessionWith(EndPoint endPoint) => m_Sessions.FindIndex(ns => ns.RemoteEndPoint == endPoint) != -1;
 
         public virtual void Stop()
         {

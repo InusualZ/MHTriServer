@@ -40,15 +40,38 @@ namespace MHTriServer.Server
             Log.InfoFormat("Running on {0}:{1}", Address, Port);
         }
 
+        public override void HandleNtcCollectionLog(NetworkSession session, NtcCollectionLog collectionLog)
+        {
+            var data = collectionLog.Data;
+            Log.WarnFormat("Session {0} Error {1:X8} {2} {3}", session.RemoteEndPoint, data.ErrorCode, data.UnknownField2, data.Timeout);
+        }
+
         public override void HandleAnsConnection(NetworkSession session, AnsConnection ansConnection)
         {
+            var connectionData = ansConnection.Data;
+            if (m_PlayerManager.TryGetPlayer(connectionData.OnlineSupportCode, out var player))
+            {
+                if (ContainSessionWith(player.RemoteEndPoint))
+                {
+                    Log.FatalFormat("Kicked {0}, there is a player already connected with {1}", session.RemoteEndPoint, connectionData.OnlineSupportCode);
+                    session.Close(Constants.MULTIPLE_ACCOUNT_ERROR_MESSAGE);
+                    return;
+                }
+
+                // This is a dangling player object
+                m_PlayerManager.RemovePlayer(player);
+            }
+
+            // TODO: Load player if there is one associated with the OnlineSupportCode
+            //  This is to check if we have to send the terms and condition again, because
+            //  they have changed
+
             session.SendPacket(new NtcLogin(ServerLoginType.OPN_SERVER_ANOUNCE));
         }
 
         public override void HandleReqAuthenticationToken(NetworkSession session, ReqAuthenticationToken reqAuthenticationToken)
         {
-            // TODO: Should probably store the token
-            Player.Player.PlayerToken = reqAuthenticationToken.Token;
+            // Ignore NAS Token?
             session.SendPacket(new AnsAuthenticationToken());
         }
 

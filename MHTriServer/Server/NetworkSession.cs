@@ -29,6 +29,8 @@ namespace MHTriServer.Server
 
         private bool m_SentPingPacket;
 
+        private object m_Tag;
+
         public Socket Socket { get; private set; }
 
         public EndPoint RemoteEndPoint { get; }
@@ -54,12 +56,23 @@ namespace MHTriServer.Server
 
             m_SentPingPacket = false;
 
+            m_Tag = null;
+
             Socket = socket;
             RemoteEndPoint = socket.RemoteEndPoint;
             NetworkStream = newtworkStream;
 
             NextResponseCounter = 0;
         }
+
+        public void SetTag(object tag) => m_Tag = tag;
+
+        /// <summary>
+        /// The caller must ensure that the returned object is indeed of type T
+        /// </summary>
+        /// <typeparam name="T">Type to cast the tag</typeparam>
+        /// <returns>Tag casted as T</returns>
+        public T GetTag<T>() => (T)m_Tag;
 
         private (long, long) ReadNetworkStream(int? leftToRead = null)
         {
@@ -321,6 +334,8 @@ namespace MHTriServer.Server
 
             m_LastWrite.Stop();
             m_LastWrite = null;
+
+            m_Tag = null;
         }
     }
 }

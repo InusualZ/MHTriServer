@@ -31,8 +31,32 @@ namespace MHTriServer.Server
             Log.InfoFormat("Running on {0}:{1}", Address, Port);
         }
 
+        public override void HandleNtcCollectionLog(NetworkSession session, NtcCollectionLog collectionLog)
+        {
+            var data = collectionLog.Data;
+            Log.WarnFormat("Session {0} Error {1:X8} {2} {3}", session.RemoteEndPoint, data.ErrorCode, data.UnknownField2, data.Timeout);
+        }
+
         public override void HandleAnsConnection(NetworkSession session, AnsConnection ansConnection)
         {
+            var onlineSupportCode = PlayerManager.GetOnlineSupportCodeFrom(ansConnection.Data);
+            if (!m_PlayerManager.TryGetPlayer(onlineSupportCode, out var player))
+            {
+                Log.FatalFormat("Kicked {0}, because it tried to connect to the server directly", session.RemoteEndPoint);
+                session.Close(Constants.PLAYER_NOT_LOADED_ERROR_MESSAGE);
+                return;
+            }
+            else
+            {
+                Debug.Assert(player.RequestedFmpServerAddress == true);
+                Debug.Assert(player.RequestedUserList == false);
+
+                // Make sure to update the remote endpoint so future player lookup work
+                player.RemoteEndPoint = session.RemoteEndPoint;
+            }
+
+            session.SetTag(player);
+
             // TODO: Figure out what login type 3/5 means.
             // Value need to be 3 or 5 in order to proceed with the login process
             session.SendPacket(new NtcLogin(ServerLoginType.FMP_NORMAL));
@@ -40,11 +64,20 @@ namespace MHTriServer.Server
 
         public override void HandleReqServerTime(NetworkSession session, ReqServerTime reqServerTime)
         {
+            // TODO: Do we need the player for this?
+
             session.SendPacket(new AnsServerTime(1500, 0));
         }
 
         public override void HandleReqFmpListVersion(NetworkSession session, ReqFmpListVersion reqFmpListVersion)
         {
+            if (!m_PlayerManager.TryGetPlayer(session.RemoteEndPoint, out var player))
+            {
+                Log.FatalFormat("Kicked {0}, because it tried to hijack a player", session.RemoteEndPoint);
+                session.Close(Constants.OUT_OF_ORDER_ERROR_MESSAGE);
+                return;
+            }
+
             // If the Fmp List Verion sent in the LMP server, mistmatch this version
             // the client would send a request that allow us to rewrite the previous sent list
             // but, if the versions matches the previously sended version, the client would send a request to update
@@ -366,7 +399,8 @@ namespace MHTriServer.Server
 
         public override void HandleReqLayerChildInfo(NetworkSession session, ReqLayerChildInfo reqLayerChildInfo)
         {
-            if (Player.Player.AfterLayerChildData)
+            var player = session.GetPlayer();
+            if (player.AfterLayerChildData)
             {
                 {
                     var userNumData = new UserNumData()
@@ -449,7 +483,8 @@ namespace MHTriServer.Server
 
         public override void HandleReqLayerChildListHead(NetworkSession session, ReqLayerChildListHead reqLayerChildListHead)
         {
-            if (Player.Player.AfterUserBinaryNotice)
+            var player = session.GetPlayer();
+            if (player.AfterUserBinaryNotice)
             {
                 session.SendPacket(new AnsLayerChildListHead(10));
             }
@@ -461,9 +496,10 @@ namespace MHTriServer.Server
 
         public override void HandleReqLayerChildListData(NetworkSession session, ReqLayerChildListData reqLayerChildListData)
         {
-            var childsData = new List<LayerChildData>();
+            var player = session.GetPlayer();
 
-            if (Player.Player.AfterUserBinaryNotice)
+            var childsData = new List<LayerChildData>();
+            if (player.AfterUserBinaryNotice)
             {
                 for (var cityIndex = 0; cityIndex < reqLayerChildListData.ExpectedDataCount; ++cityIndex)
                 {
@@ -517,7 +553,7 @@ namespace MHTriServer.Server
                     });
                 }
 
-                Player.Player.AfterLayerChildData = true;
+                player.AfterLayerChildData = true;
             }
 
             session.SendPacket(new AnsLayerChildListData(childsData));
@@ -540,7 +576,8 @@ namespace MHTriServer.Server
 
         public override void HandleReqUserBinaryNotice(NetworkSession session, ReqUserBinaryNotice reqUserBinaryNotice)
         {
-            Player.Player.AfterUserBinaryNotice = true;
+            var player = session.GetPlayer();
+            player.AfterUserBinaryNotice = true;
             session.SendPacket(new AnsUserBinaryNotice());
         }
 
@@ -752,6 +789,18 @@ namespace MHTriServer.Server
         {
             session.SendPacket(new AnsShut(0), true);
             RemoveSession(session);
+        }
+
+        public override void OnSessionRemoved(NetworkSession session)
+        {
+            // We can't use the session's tag, because at this point it may had been nulled
+
+            if (!m_PlayerManager.TryGetPlayer(session.RemoteEndPoint, out var player))
+            {
+                return;
+            }
+
+            m_PlayerManager.RemovePlayer(player);
         }
     }
 }

@@ -10,7 +10,6 @@ namespace MHTriServer.Server.Packets
 
         public byte[] Ticket { get; private set; }
 
-        // TODO: Remove asap
         public AnsTicketClient(string ticket) : this(Encoding.ASCII.GetBytes(ticket)) { }
 
         public AnsTicketClient(byte[] ticket) : base(PACKET_ID)
