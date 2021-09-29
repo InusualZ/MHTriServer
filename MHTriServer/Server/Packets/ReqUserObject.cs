@@ -11,9 +11,9 @@ namespace MHTriServer.Server.Packets
 
         public uint SlotIndex { get; private set; }
 
-        public UserSlot Slot { get; private set; }
+        public HunterSlot Slot { get; private set; }
 
-        public ReqUserObject(bool slotIsEmpty, uint slotIndex, UserSlot slot) : base(PACKET_ID) => (SlotIsEmpty, SlotIndex, Slot) = (slotIsEmpty, slotIndex, slot);
+        public ReqUserObject(bool slotIsEmpty, uint slotIndex, HunterSlot slot) : base(PACKET_ID) => (SlotIsEmpty, SlotIndex, Slot) = (slotIsEmpty, slotIndex, slot);
 
         public ReqUserObject(uint id, ushort size, ushort counter) : base(id, size, counter) { }
 
@@ -31,7 +31,7 @@ namespace MHTriServer.Server.Packets
 
             SlotIsEmpty = reader.ReadBoolean();
             SlotIndex = reader.ReadUInt32();
-            Slot = CompoundList.Deserialize<UserSlot>(reader);
+            Slot = CompoundList.Deserialize<HunterSlot>(reader);
         }
 
         public override void Handle(PacketHandler handler, NetworkSession networkSession) =>

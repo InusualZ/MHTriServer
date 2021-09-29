@@ -99,10 +99,10 @@ namespace MHTriServer.Server
             var player = session.GetPlayer();
 
             // TODO: Load from database,
-            var slots = new List<UserSlot>();
+            var slots = new List<HunterSlot>();
             for (var i = 0; i < reqUserListData.SlotCount; ++i)
             {
-                slots.Add(UserSlot.NoData((uint)i));
+                slots.Add(HunterSlot.NoData((uint)i));
             }
             session.SendPacket(new AnsUserListData(slots));
         }

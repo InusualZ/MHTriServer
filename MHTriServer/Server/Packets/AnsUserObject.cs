@@ -12,9 +12,9 @@ namespace MHTriServer.Server.Packets
 
         public string UnknownString { get; private set; }
 
-        public UserSlot UserObject { get; private set; }
+        public HunterSlot UserObject { get; private set; }
 
-        public AnsUserObject(byte loginInfoByte, string unknownString, UserSlot userObject) : base(PACKET_ID) 
+        public AnsUserObject(byte loginInfoByte, string unknownString, HunterSlot userObject) : base(PACKET_ID) 
             => (LoginInfoByte, UnknownString, UserObject) = (loginInfoByte, unknownString, userObject);
 
         public AnsUserObject(uint id, ushort size, ushort counter) : base(id, size, counter) { }
@@ -34,7 +34,7 @@ namespace MHTriServer.Server.Packets
             LoginInfoByte = reader.ReadByte();
             UnknownString = reader.ReadString();
             _ = reader.ReadUInt32();
-            UserObject = CompoundList.Deserialize<UserSlot>(reader);
+            UserObject = CompoundList.Deserialize<HunterSlot>(reader);
         }
     }
 }

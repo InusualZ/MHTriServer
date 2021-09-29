@@ -9,11 +9,11 @@ namespace MHTriServer.Server.Packets
     {
         public const uint PACKET_ID = 0x61110200;
 
-        private List<UserSlot> m_slots;
+        private List<HunterSlot> m_slots;
 
-        public IReadOnlyList<UserSlot> Slots => m_slots;
+        public IReadOnlyList<HunterSlot> Slots => m_slots;
 
-        public AnsUserListData(List<UserSlot> slots) : base(PACKET_ID) => m_slots = slots;
+        public AnsUserListData(List<HunterSlot> slots) : base(PACKET_ID) => m_slots = slots;
 
         public AnsUserListData(uint id, ushort size, ushort counter) : base(id, size, counter) { }
 
@@ -36,10 +36,10 @@ namespace MHTriServer.Server.Packets
             _ = reader.ReadUInt32();
 
             var slotListCount = reader.ReadUInt32();
-            m_slots = new List<UserSlot>((int)slotListCount);
+            m_slots = new List<HunterSlot>((int)slotListCount);
             for (var i = 0; i < slotListCount; ++i)
             {
-                m_slots.Add(CompoundList.Deserialize<UserSlot>(reader));
+                m_slots.Add(CompoundList.Deserialize<HunterSlot>(reader));
             }
         }
     }

@@ -2,11 +2,11 @@
 
 namespace MHTriServer.Server.Packets.Properties
 {
-    public class UserSlot : CompoundList
+    public class HunterSlot : CompoundList
     {
         private const byte SLOT_INDEX_FIELD = 0x01;
         private const byte SAVE_ID_FIELD = 0x02;
-        private const byte CHARACTER_NAME_FIELD = 0x03; // Fill
+        private const byte HUNTER_NAME_FIELD = 0x03; // Fill
         private const byte FIELD_4 = 0x04; // Fill
         private const byte FIELD_5 = 0x05; // Fill
         private const byte FIELD_6 = 0x06; // Fill
@@ -24,12 +24,12 @@ namespace MHTriServer.Server.Packets.Properties
             } 
         }
 
-        public string CharacterName 
+        public string HunterName 
         { 
-            get => Get<string>(CHARACTER_NAME_FIELD);
+            get => Get<string>(HUNTER_NAME_FIELD);
             set {
                 Debug.Assert(value.Length < 0x20);
-                Set(CHARACTER_NAME_FIELD, value);
+                Set(HUNTER_NAME_FIELD, value);
             } 
         }
 
@@ -50,9 +50,9 @@ namespace MHTriServer.Server.Packets.Properties
             }
         }
 
-        public static UserSlot NoData(uint slotIndex)
+        public static HunterSlot NoData(uint slotIndex)
         {
-            return new UserSlot() { 
+            return new HunterSlot() { 
                 SlotIndex = slotIndex,
                 SaveID = "******"
             };
