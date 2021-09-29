@@ -1,13 +1,15 @@
 ﻿using MHTriServer.Database.Models;
 using MHTriServer.Server;
 using MHTriServer.Server.Packets.Properties;
+using System;
+using System.Collections.Generic;
 using System.Net;
 
 namespace MHTriServer.Player
 {
     public class Player
     {
-        public const string DEFAULT_USER_ID = "AAAA";
+        public const int HUNTER_SAVE_ID_LENGTH = 8 - 1 /* null char */;
 
         // TEMP STATIC VARIABLE
         public static uint BINARY_VERSION_COUNT = 0;
@@ -29,6 +31,13 @@ namespace MHTriServer.Player
         public bool RequestedUserList { get; set; }
 
         public bool RequestedFmpServerAddress { get; set; }
+
+        public DateTime? LasLogin { get => m_OfflinePlayer.LastLogin; set => m_OfflinePlayer.LastLogin = value; }
+
+        // TODO: Refactor, I don't like exposing the databse interface
+        public List<OfflineHunter> Hunters { get => m_OfflinePlayer.Hunters; set => m_OfflinePlayer.Hunters = value; }
+
+        public OfflineHunter SelectedHunter { get; set; }
 
         /*
          * TEMP VARIABLES

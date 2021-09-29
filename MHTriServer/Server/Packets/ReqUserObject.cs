@@ -7,20 +7,20 @@ namespace MHTriServer.Server.Packets
     {
         public const uint PACKET_ID = 0x61200100;
 
-        public bool SlotIsEmpty { get; private set; }
+        public bool IsMissingFields { get; private set; }
 
         public uint SlotIndex { get; private set; }
 
         public HunterSlot Slot { get; private set; }
 
-        public ReqUserObject(bool slotIsEmpty, uint slotIndex, HunterSlot slot) : base(PACKET_ID) => (SlotIsEmpty, SlotIndex, Slot) = (slotIsEmpty, slotIndex, slot);
+        public ReqUserObject(bool isMissingFields, uint slotIndex, HunterSlot slot) : base(PACKET_ID) => (IsMissingFields, SlotIndex, Slot) = (isMissingFields, slotIndex, slot);
 
         public ReqUserObject(uint id, ushort size, ushort counter) : base(id, size, counter) { }
 
         public override void Serialize(BEBinaryWriter writer)
         {
             base.Serialize(writer);
-            writer.Write(SlotIsEmpty);
+            writer.Write(IsMissingFields);
             writer.Write(SlotIndex);
             Slot.Serialize(writer);
         }
@@ -29,7 +29,7 @@ namespace MHTriServer.Server.Packets
         {
             Debug.Assert(ID == PACKET_ID);
 
-            SlotIsEmpty = reader.ReadBoolean();
+            IsMissingFields = reader.ReadBoolean();
             SlotIndex = reader.ReadUInt32();
             Slot = CompoundList.Deserialize<HunterSlot>(reader);
         }
@@ -39,7 +39,7 @@ namespace MHTriServer.Server.Packets
 
         public override string ToString()
         {
-            return base.ToString() + $":\n\tSlotIsEmpty {SlotIsEmpty}\n\tSlotIndex {SlotIndex}\n\tSlot\n{Slot}";
+            return base.ToString() + $":\n\tIsMissingFields {IsMissingFields}\n\tSlotIndex {SlotIndex}\n\tSlot\n{Slot}";
         }
     }
 }

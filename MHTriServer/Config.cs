@@ -32,7 +32,7 @@ namespace MHTriServer
     [TommyTableName("LmpServer")]
     public class LmpServerConfig : BaseServerConfig
     {
-
+        public uint MaxHunterSlots { get; set; }
     }
 
     [TommyTableName("FmpServer")]

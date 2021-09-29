@@ -4,14 +4,14 @@ namespace MHTriServer.Server.Packets.Properties
 {
     public class HunterSlot : CompoundList
     {
-        private const byte SLOT_INDEX_FIELD = 0x01;
-        private const byte SAVE_ID_FIELD = 0x02;
-        private const byte HUNTER_NAME_FIELD = 0x03; // Fill
-        private const byte FIELD_4 = 0x04; // Fill
-        private const byte FIELD_5 = 0x05; // Fill
-        private const byte FIELD_6 = 0x06; // Fill
-        private const byte FIELD_7 = 0x07; // Fill
-        private const byte FIELD_8 = 0x08;
+        public const byte SLOT_INDEX_FIELD = 0x01;
+        public const byte SAVE_ID_FIELD = 0x02;
+        public const byte HUNTER_NAME_FIELD = 0x03; // Fill
+        public const byte FIELD_4 = 0x04; // Fill
+        public const byte FIELD_5 = 0x05; // Fill
+        public const byte FIELD_6 = 0x06; // Fill
+        public const byte FIELD_7 = 0x07; // Fill
+        public const byte FIELD_8 = 0x08;
 
         public uint SlotIndex { get => Get<uint>(SLOT_INDEX_FIELD); set => Set(SLOT_INDEX_FIELD, value); }
 

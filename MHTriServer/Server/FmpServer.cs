@@ -679,6 +679,8 @@ namespace MHTriServer.Server
 
         public override void HandleReqCircleCreate(NetworkSession session, ReqCircleCreate reqCircleCreate)
         {
+            var player = session.GetPlayer();
+
             // TODO: We should not always send NtcCircleListLayerCreate,
             //  in some situations we want to use NtcCircleListLayerChange
             reqCircleCreate.UnknownField1.UnknownField1 = 1; // *Required* Used
@@ -688,7 +690,7 @@ namespace MHTriServer.Server
             reqCircleCreate.UnknownField1.UnknownField9 = 8; // Used ???
             reqCircleCreate.UnknownField1.UnknownField10 = 5; // Used ???
             reqCircleCreate.UnknownField1.UnknownField12 = 1; // *Required* Used Quest Slot Index??
-            reqCircleCreate.UnknownField1.LeaderID = Player.Player.DEFAULT_USER_ID;
+            reqCircleCreate.UnknownField1.LeaderID = player.SelectedHunter.SaveID;
             reqCircleCreate.UnknownField1.UnknownField15 = 0x01; // Used, flag ???
 
             // We need to create the quest in the list, because of this packet the quest is shown in the quest board
@@ -700,11 +702,15 @@ namespace MHTriServer.Server
 
         public override void HandleReqLayerUserList(NetworkSession session, ReqLayerUserList reqLayerUserList)
         {
-            var currentUsers = new List<LayerUserData>();
-            currentUsers.Add(new LayerUserData()
+            var player = session.GetPlayer();
+
+            var currentUsers = new List<LayerUserData>()
             {
-                UnknownField = Player.Player.DEFAULT_USER_ID,
-            });
+                new LayerUserData()
+                {
+                    UnknownField = player.SelectedHunter.SaveID,
+                }
+            };
             session.SendPacket(new AnsLayerUserList(currentUsers));
         }
 
@@ -758,6 +764,8 @@ namespace MHTriServer.Server
 
         public override void HandleReqCircleMatchStart(NetworkSession session, ReqCircleMatchStart reqCircleMatchStart)
         {
+            var player = session.GetPlayer();
+
             session.SendPacket(new AnsCircleMatchStart());
 
             var hunters = new List<NtcCircleMatchStart.HunterData>()
@@ -765,7 +773,7 @@ namespace MHTriServer.Server
                 new NtcCircleMatchStart.HunterData()
                 {
                     UnknownField1 = 1,
-                    UnknownField2 = Player.Player.DEFAULT_USER_ID,
+                    UnknownField2 = player.SelectedHunter.SaveID,
                     UnknownField3 = 0xff,
                     UnknownField4 = 2
                 }

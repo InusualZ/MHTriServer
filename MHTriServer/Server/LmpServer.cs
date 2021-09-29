@@ -2,6 +2,7 @@
 using MHTriServer.Player;
 using MHTriServer.Server.Packets;
 using MHTriServer.Server.Packets.Properties;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
@@ -80,6 +81,7 @@ namespace MHTriServer.Server
 
             session.SendPacket(new AnsLoginInfo(NeedPATTicket, "Hello World3", chargeInfo), true);
 
+            player.LasLogin = DateTime.Now;
             player.SentOnlineSupportCode = true;
         }
 
@@ -88,30 +90,54 @@ namespace MHTriServer.Server
             var player = session.GetPlayer();
             session.SendPacket(new AnsTicketClient(player.OnlineSupportCode));
         }
-        public override void HandleReqUserListHead(NetworkSession session, ReqUserListHead reqUserListHead)
-        {
-            var player = session.GetPlayer();
-            session.SendPacket(new AnsUserListHead(0, 6));
-        }
-
-        public override void HandleReqUserListData(NetworkSession session, ReqUserListData reqUserListData)
-        {
-            var player = session.GetPlayer();
-
-            // TODO: Load from database,
-            var slots = new List<HunterSlot>();
-            for (var i = 0; i < reqUserListData.SlotCount; ++i)
-            {
-                slots.Add(HunterSlot.NoData((uint)i));
-            }
-            session.SendPacket(new AnsUserListData(slots));
-        }
 
         public override void HandleReqServerTime(NetworkSession session, ReqServerTime reqServerTime)
         {
             var player = session.GetPlayer();
 
             session.SendPacket(new AnsServerTime(1500, 0));
+        }
+
+        public override void HandleReqUserListHead(NetworkSession session, ReqUserListHead reqUserListHead)
+        {
+            var player = session.GetPlayer();
+            session.SendPacket(new AnsUserListHead(0, MHTriServer.Config.LmpServer.MaxHunterSlots));
+        }
+
+        public override void HandleReqUserListData(NetworkSession session, ReqUserListData reqUserListData)
+        {
+            var player = session.GetPlayer();
+
+            var slots = new List<HunterSlot>((int)MHTriServer.Config.LmpServer.MaxHunterSlots);
+            for (var i = 0; i < slots.Capacity; ++i)
+            {
+                if (i < player.Hunters.Count)
+                {
+                    var hunter = player.Hunters[i];
+                    var slot = new HunterSlot()
+                    {
+                        SlotIndex = (uint)i,
+                        SaveID = hunter.SaveID,
+                        HunterName = hunter.HunterName,
+                        UnknownField4 = hunter.UnknownField4,
+                        UnknownField5 = hunter.UnknownField5,
+                        UnknownField6 = hunter.UnknownField6,
+                        UnknownField7 = hunter.UnknownField7,
+                    };
+
+                    if (!string.IsNullOrEmpty(hunter.UnknownField8))
+                    {
+                        slot.UnknownField8 = hunter.UnknownField8;
+                    }
+
+                    slots.Add(slot);
+                }
+                else
+                {
+                    slots.Add(HunterSlot.NoData((uint)i));
+                }
+            }
+            session.SendPacket(new AnsUserListData(slots));
         }
 
         public override void HandleReqUserListFoot(NetworkSession session, ReqUserListFoot reqUserListFoot)
@@ -125,8 +151,87 @@ namespace MHTriServer.Server
         {
             var player = session.GetPlayer();
 
-            reqUserObject.Slot.SlotIndex = 1;
-            reqUserObject.Slot.SaveID = Player.Player.DEFAULT_USER_ID; // Guid.NewGuid().ToString().Substring(0, 7); // TODO: Replace this token
+            var slotIndex = reqUserObject.SlotIndex - 1;
+            if (slotIndex >= player.Hunters.Count)
+            {
+                // Create new hunter slot
+                if (slotIndex >= MHTriServer.Config.LmpServer.MaxHunterSlots)
+                {
+                    session.Close(Constants.PLAYER_NO_EMPTY_SLOT_ERROR_MESSAGE);
+                    return;
+                }
+
+                var saveID = Guid.NewGuid().ToString("N").Substring(0, Player.Player.HUNTER_SAVE_ID_LENGTH);
+
+                reqUserObject.Slot.SaveID = saveID;
+
+                player.SelectedHunter = new Database.Models.OfflineHunter()
+                {
+                    SaveID = saveID,
+                    HunterName = reqUserObject.Slot.HunterName,
+                    UnknownField4 = reqUserObject.Slot.UnknownField4,
+                    UnknownField5 = reqUserObject.Slot.UnknownField5,
+                    UnknownField6 = reqUserObject.Slot.UnknownField6,
+                    UnknownField7 = reqUserObject.Slot.UnknownField7,
+                    UnknownField8 = reqUserObject.Slot.UnknownField8,
+                };
+
+                player.Hunters.Add(player.SelectedHunter);
+            }
+            else
+            {
+                // Load from hunter slot
+
+                var hunter = player.Hunters[(int)slotIndex];
+                reqUserObject.Slot.SaveID = hunter.SaveID;
+                reqUserObject.Slot.HunterName = hunter.HunterName;
+
+                // Update any field given by the client
+                foreach (var (fieldKey, fieldValue) in reqUserObject.Slot)
+                {
+                    switch(fieldKey)
+                    {
+                        case HunterSlot.FIELD_4:
+                            {
+                                var value = (uint)fieldValue;
+                                hunter.UnknownField4 = value;
+                            }
+                            break;
+
+                        case HunterSlot.FIELD_5:
+                            {
+                                var value = (uint)fieldValue;
+                                hunter.UnknownField5 = value;
+                            }
+                            break;
+
+                        case HunterSlot.FIELD_6:
+                            {
+                                var value = (uint)fieldValue;
+                                hunter.UnknownField6 = value;
+                            }
+                            break;
+
+                        case HunterSlot.FIELD_7:
+                            {
+                                var value = (uint)fieldValue;
+                                hunter.UnknownField7 = value;
+                            }
+                            break;
+
+                        case HunterSlot.FIELD_8:
+                            {
+                                var value = (string)fieldValue;
+                                hunter.UnknownField8 = value;
+                            }
+                            break;
+                    }
+                }
+
+                player.SelectedHunter = hunter;
+            }
+
+            reqUserObject.Slot.SlotIndex = reqUserObject.SlotIndex;
             session.SendPacket(new AnsUserObject(1, string.Empty, reqUserObject.Slot));
         }
 
@@ -148,7 +253,7 @@ namespace MHTriServer.Server
         {
             var player = session.GetPlayer();
 
-            var servers = new List<FmpData>() 
+            var servers = new List<FmpData>()
             {
                 FmpData.Server(1, 2, 3, 2, "Valor333333", 1),
             };

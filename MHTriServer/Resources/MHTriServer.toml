@@ -7,6 +7,7 @@ Port = 8200
 [LmpServer]
 Address = "127.0.0.1"
 Port = 8210
+MaxHunterSlots = 4
 
 [FmpServer]
 Address = "127.0.0.1"

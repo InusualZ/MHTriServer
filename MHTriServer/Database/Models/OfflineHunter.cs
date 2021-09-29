@@ -21,6 +21,22 @@ namespace MHTriServer.Database.Models
         [MaxLength(31)]
         [Column(TypeName = "varchar(31)")]
         /// Max length 32 (0x20) including \0
-        public string CharacterName { get; set; }
+        public string HunterName { get; set; }
+
+        [Required]
+        public uint UnknownField4 { get; set; }
+
+        [Required]
+        public uint UnknownField5 { get; set; }
+
+        [Required]
+        public uint UnknownField6 { get; set; }
+
+        [Required]
+        public uint UnknownField7 { get; set; }
+
+        [MaxLength(31)]
+        [Column(TypeName = "varchar(31)")]
+        public string UnknownField8 { get; set; }
     }
 }

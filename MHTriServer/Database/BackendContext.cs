@@ -14,7 +14,7 @@ namespace MHTriServer.Database
         }
 
         public OfflinePlayer GetPlayerByUUID(string uuid) =>
-            Players.Where(p => p.UUID == uuid).FirstOrDefault();
+            Players.Include(p => p.Hunters).FirstOrDefault(p => p.UUID == uuid);
 
         public bool PlayerExist(string uuid) =>
             Players.Any(p => p.UUID == uuid);
@@ -29,6 +29,16 @@ namespace MHTriServer.Database
             var player = new OfflinePlayer(uuid);
             Players.Attach(player);
             Players.Remove(player);
+        }
+
+        public OfflinePlayer GetPlayer(string uuid, bool loadRelatedData)
+        {
+            if (loadRelatedData)
+            {
+                return Players.Include(p => p.Hunters).FirstOrDefault(p => p.UUID == uuid);
+            }
+
+            return Players.FirstOrDefault(p => p.UUID == uuid);
         }
 
         void IBackend.SaveChanges()

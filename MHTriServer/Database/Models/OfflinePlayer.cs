@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -19,6 +20,8 @@ namespace MHTriServer.Database.Models
 
         [ForeignKey("PlayerId")]
         public List<OfflineHunter> Hunters { get; set; } = new List<OfflineHunter>();
+
+        public DateTime? LastLogin { get; set; }
 
         public OfflinePlayer() { }
 

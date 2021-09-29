@@ -18,5 +18,7 @@
         public const string MULTIPLE_ACCOUNT_ERROR_MESSAGE = "<LF=5><BODY><CENTER><COLOR=1>There is already a player online with this account<END>";
         public const string MAX_ACCOUNT_REACHED_ERROR_MESSAGE = "<LF=5><BODY><CENTER><COLOR=3>Server maximum account have bean reach<END>";
         public const string PLAYER_NOT_LOADED_ERROR_MESSAGE = "<LF=5><BODY><CENTER><COLOR=3>You tried to skip steps...<END>";
+        public const string PLAYER_NO_EMPTY_SLOT_ERROR_MESSAGE = "<LF=5><BODY><CENTER><COLOR=3>There weren't any empty hunter slot available<END>";
+        public const string PLAYER_HUNTER_NOT_FOUND_ERROR_MESSAGE = "<LF=5><BODY><CENTER><COLOR=3>Hunter data not found<END>";
     }
 }
