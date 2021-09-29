@@ -93,7 +93,10 @@ namespace MHTriServer.Utils
         {
             var length = (ushort)Math.Min(values.Length, ushort.MaxValue);
             Write(length);
-            Write(values, 0, length);
+            if (length > 0)
+            {
+                Write(values, 0, length);
+            }
         }
 
         // TODO: better name
@@ -101,17 +104,23 @@ namespace MHTriServer.Utils
         {
             var length = (byte)Math.Min(values.Length, byte.MaxValue);
             Write(length);
-            Write(values, 0, length);
+            if (length > 0)
+            {
+                Write(values, 0, length);
+            }
         }
 
         public override void Write(string value)
         {
-            WriteUInt16((ushort)Math.Min(value.Length, ushort.MaxValue));
-            if (value.Length > 0)
+            if (string.IsNullOrEmpty(value))
             {
-                var bytes = m_Encoding.GetBytes(value);
-                Write(bytes);
+                WriteUInt16(0);
+                return;
             }
+
+            WriteUInt16((ushort)Math.Min(value.Length, ushort.MaxValue - 1 /* null char */));
+            var bytes = m_Encoding.GetBytes(value);
+            Write(bytes);
         }
     }
 }
