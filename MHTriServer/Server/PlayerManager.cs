@@ -8,7 +8,7 @@ using System.Diagnostics;
 using System.Net;
 using System.Text;
 
-namespace MHTriServer.Player
+namespace MHTriServer.Server
 {
     /// <summary>
     ///  TODO: We need to take care of player that were left alive due to disconnection

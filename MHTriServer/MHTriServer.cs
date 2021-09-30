@@ -1,7 +1,6 @@
 ﻿using log4net;
 using log4net.Config;
 using MHTriServer.Database;
-using MHTriServer.Player;
 using MHTriServer.Server;
 using MHTriServer.Utils;
 using System;

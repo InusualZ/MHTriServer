@@ -1,5 +1,4 @@
 ﻿using log4net;
-using MHTriServer.Player;
 using MHTriServer.Server.Packets;
 using MHTriServer.Server.Packets.Properties;
 using System;
@@ -161,7 +160,7 @@ namespace MHTriServer.Server
                     return;
                 }
 
-                var saveID = Guid.NewGuid().ToString("N").Substring(0, Player.Player.HUNTER_SAVE_ID_LENGTH);
+                var saveID = Guid.NewGuid().ToString("N").Substring(0, Player.HUNTER_SAVE_ID_LENGTH);
 
                 reqUserObject.Slot.SaveID = saveID;
 
@@ -281,7 +280,7 @@ namespace MHTriServer.Server
             if (reqBinaryHead.BinaryType == 5)
             {
                 // Arbitrary Length
-                binaryLength = (uint)(Player.Player.BINARY_DATA_5_TEST.Length);
+                binaryLength = (uint)(Player.BINARY_DATA_5_TEST.Length);
             }
             else
             {
@@ -300,7 +299,7 @@ namespace MHTriServer.Server
             if (reqBinaryData.Type == 5)
             {
                 // Unknown request, max size is 0x1ff
-                binaryData = Encoding.ASCII.GetBytes(Player.Player.BINARY_DATA_5_TEST);
+                binaryData = Encoding.ASCII.GetBytes(Player.BINARY_DATA_5_TEST);
             }
 
             session.SendPacket(new AnsBinaryData(reqBinaryData.Type, offset, binaryData));

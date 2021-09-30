@@ -1,11 +1,10 @@
 ﻿using MHTriServer.Database.Models;
-using MHTriServer.Server;
 using MHTriServer.Server.Packets.Properties;
 using System;
 using System.Collections.Generic;
 using System.Net;
 
-namespace MHTriServer.Player
+namespace MHTriServer.Server
 {
     public class Player
     {

@@ -1,5 +1,4 @@
 ﻿using log4net;
-using MHTriServer.Player;
 using MHTriServer.Server.Packets;
 using System.Diagnostics;
 using System.Security.Cryptography.X509Certificates;

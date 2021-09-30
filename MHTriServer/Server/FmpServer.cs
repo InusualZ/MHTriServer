@@ -1,5 +1,4 @@
 ﻿using log4net;
-using MHTriServer.Player;
 using MHTriServer.Server.Packets;
 using MHTriServer.Server.Packets.Properties;
 using System;
@@ -125,7 +124,7 @@ namespace MHTriServer.Server
             // For now, we are going to always send a new version, because we want to know
             // every single binary requets there is...
 
-            session.SendPacket(new AnsBinaryVersion(reqBinaryVersion.BinaryType, ++Player.Player.BINARY_VERSION_COUNT));
+            session.SendPacket(new AnsBinaryVersion(reqBinaryVersion.BinaryType, ++Player.BINARY_VERSION_COUNT));
         }
 
         public override void HandleReqBinaryHead(NetworkSession session, ReqBinaryHead reqBinaryHead)
@@ -134,7 +133,7 @@ namespace MHTriServer.Server
             if (reqBinaryHead.BinaryType == 5)
             {
                 // Unknown request, max size is 0x1ff
-                binaryLength = (uint)Player.Player.BINARY_DATA_5_TEST.Length;
+                binaryLength = (uint)Player.BINARY_DATA_5_TEST.Length;
             }
             else if (reqBinaryHead.BinaryType == 2)
             {
@@ -154,7 +153,7 @@ namespace MHTriServer.Server
             else if (reqBinaryHead.BinaryType == 1)
             {
                 // Unconfirmed expected length of 0x140c
-                binaryLength = (uint)Player.Player.BINARY_DATA_1.Length;
+                binaryLength = (uint)Player.BINARY_DATA_1.Length;
             }
             else if (reqBinaryHead.BinaryType == 6)
             {
@@ -231,7 +230,7 @@ namespace MHTriServer.Server
             if (reqBinaryData.Type == 5)
             {
                 // Unknown Data
-                binaryData = Encoding.ASCII.GetBytes(Player.Player.BINARY_DATA_5_TEST);
+                binaryData = Encoding.ASCII.GetBytes(Player.BINARY_DATA_5_TEST);
 
             }
             else if (reqBinaryData.Type == 2)
@@ -256,7 +255,7 @@ namespace MHTriServer.Server
             }
             else if (reqBinaryData.Type == 1)
             {
-                binaryData = Player.Player.BINARY_DATA_1;
+                binaryData = Player.BINARY_DATA_1;
             }
             else if (reqBinaryData.Type == 6)
             {
