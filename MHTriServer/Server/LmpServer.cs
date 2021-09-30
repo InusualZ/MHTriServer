@@ -22,10 +22,8 @@ namespace MHTriServer.Server
             m_PlayerManager = playerManager;
         }
 
-        public override void Start()
+        public override void OnStart()
         {
-            base.Start();
-
             Log.InfoFormat("Running on {0}:{1}", Address, Port);
         }
 

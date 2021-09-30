@@ -43,7 +43,7 @@ namespace MHTriServer.Server
             m_Sessions = new List<NetworkSession>();
         }
 
-        public virtual void Start()
+        public void Start()
         {
             Debug.Assert(Running == false);
             Running = true;
@@ -53,11 +53,15 @@ namespace MHTriServer.Server
             m_ServerTask = Task.Run(Run);
         }
 
+        public virtual void OnStart() {}
+
         public void Run()
         {
             const int WAIT_INDEFINITELY = -1;
 
             Thread.CurrentThread.Name = this.GetType().Name;
+
+            OnStart();
 
             var selectReadList = new List<Socket>();
             var selectWriteList = new List<Socket>();
@@ -149,6 +153,8 @@ namespace MHTriServer.Server
                 selectWriteList.Clear();
             }
 
+            OnStop();
+
             foreach (var session in m_Sessions)
             {
                 session.Close(Constants.SERVER_CLOSED_MESSAGE);
@@ -156,6 +162,8 @@ namespace MHTriServer.Server
 
             m_Sessions.Clear();
         }
+
+        public virtual void OnStop() { }
 
         private void HandleSocketRead(Socket socket)
         {
@@ -291,7 +299,7 @@ namespace MHTriServer.Server
 
         public bool ContainSessionWith(EndPoint endPoint) => m_Sessions.FindIndex(ns => ns.RemoteEndPoint == endPoint) != -1;
 
-        public virtual void Stop()
+        public void Stop()
         {
             if (!Running)
             {
