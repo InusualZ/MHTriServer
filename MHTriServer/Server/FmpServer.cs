@@ -52,6 +52,7 @@ namespace MHTriServer.Server
                 Debug.Assert(player.RequestedUserList == false);
 
                 // Make sure to update the remote endpoint so future player lookup work
+                player.RequestedFmpServerAddress = false;
                 player.RemoteEndPoint = session.RemoteEndPoint;
             }
 
@@ -110,8 +111,10 @@ namespace MHTriServer.Server
 
         public override void HandleReqFmpInfo(NetworkSession session, ReqFmpInfo reqFmpInfo)
         {
+            var player = session.GetPlayer();
             // Make it connect to the same server, I don't know what is the purpose of this
-            session.SendPacket(new AnsFmpInfo(FmpData.Address(MHTriServer.Config.FmpServer.Address, MHTriServer.Config.FmpServer.Port)));
+            session.SendPacket(new AnsFmpInfo(FmpData.Address(MHTriServer.Config.FmpServer.Address, MHTriServer.Config.FmpServer.Port)), true);
+            player.RequestedFmpServerAddress = true;
         }
 
         public override void HandleReqBinaryVersion(NetworkSession session, ReqBinaryVersion reqBinaryVersion)
@@ -804,6 +807,11 @@ namespace MHTriServer.Server
             // We can't use the session's tag, because at this point it may had been nulled
 
             if (!m_PlayerManager.TryGetPlayer(session.RemoteEndPoint, out var player))
+            {
+                return;
+            }
+
+            if (player.RequestedFmpServerAddress)
             {
                 return;
             }
