@@ -603,14 +603,45 @@ namespace MHTriServer.Server
 
             var player = session.GetPlayer();
 
-            var currentUsers = new List<LayerUserData>()
+            var currentUsers = new List<LayerUserData>();
+            if (player.SelectedCity != null)
             {
-                new LayerUserData()
+                foreach (var playerInCity in player.SelectedCity.Players)
                 {
-                    CapcomID = player.SelectedHunter.SaveID,
-                    Name = player.SelectedHunter.HunterName,
+                    var hunter = playerInCity.SelectedHunter;
+                    currentUsers.Add(new LayerUserData() {
+                        CapcomID = hunter.SaveID,
+                        Name = hunter.HunterName,
+                        // TODO: Do others field too
+                    });
                 }
-            };
+            }
+            else if (player.SelectedGate != null)
+            {
+                var gate = player.SelectedGate;
+                foreach (var playerInGate in gate.PlayerInGate.Concat(gate.PlayersInCity))
+                {
+                    var hunter = playerInGate.SelectedHunter;
+                    currentUsers.Add(new LayerUserData()
+                    {
+                        CapcomID = hunter.SaveID,
+                        Name = hunter.HunterName,
+                        // TODO: Do others field too
+                    });
+                }
+            }
+            else if (player.SelectedServer != null)
+            {
+                // TODO: Should we really send the player that are connected to the server?
+                var hunter = player.SelectedHunter;
+                currentUsers.Add(new LayerUserData()
+                {
+                    CapcomID = hunter.SaveID,
+                    Name = hunter.HunterName,
+                    // TODO: Do others field too
+                });
+            }
+
             session.SendPacket(new AnsLayerUserList(currentUsers));
         }
 
