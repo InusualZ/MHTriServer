@@ -23,5 +23,6 @@
         public const string SERVER_NOT_FOUND_ERROR_MESSAGE = "<LF=5><BODY><CENTER><COLOR=3>Selected Server Not Found<END>";
         public const string GATE_NOT_FOUND_ERROR_MESSAGE = "<LF=5><BODY><CENTER><COLOR=3>Selected Gate Not Found<END>";
         public const string GATE_FULL_ERROR_MESSAGE = "<LF=5><BODY><CENTER><COLOR=3>Gate Is Full<END>";
+        public const string CITY_NOT_FOUND_ERROR_MESSAGE = "<LF=5><BODY><CENTER><COLOR=3>City Not Found<END>";
     }
 }

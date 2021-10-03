@@ -22,6 +22,9 @@ namespace MHTriServer.Server.Game
         [TommyIgnore]
         public int DepartedPlayer { get; set; }
 
+        [TommyInclude]
+        public Player Leader { get; set; }
+
         [TommyIgnore]
         public List<Player> Players { get; set; }
 

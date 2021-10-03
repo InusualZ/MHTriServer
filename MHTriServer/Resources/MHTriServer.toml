@@ -42,6 +42,14 @@ Timeout8 = 32767
 				Name = "City 1" # Max Length 63
 				MaxPopulation = 4
 
+				[[Game.ServerType.Server.Gate.City]]
+				Name = "City 2" # Max Length 63
+				MaxPopulation = 4
+
+				[[Game.ServerType.Server.Gate.City]]
+				Name = "City 3" # Max Length 63
+				MaxPopulation = 4
+
 			[[Game.ServerType.Server.Gate]]
 			Name = "City Gate 2"
 			

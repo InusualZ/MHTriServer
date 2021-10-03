@@ -9,10 +9,10 @@ namespace MHTriServer.Server.Packets
 
         public ushort CityIndex { get; private set; }
 
-        public byte UnknownField2 { get; private set; }
+        public bool Cancelled { get; private set; }
 
-        public ReqLayerCreateFoot(ushort cityIndex, byte unknownField2) : base(PACKET_ID)
-            => (CityIndex, UnknownField2) = (cityIndex, unknownField2);
+        public ReqLayerCreateFoot(ushort cityIndex, bool cancelled) : base(PACKET_ID)
+            => (CityIndex, Cancelled) = (cityIndex, cancelled);
 
         public ReqLayerCreateFoot(uint id, ushort size, ushort counter) : base(id, size, counter) { }
 
@@ -20,7 +20,7 @@ namespace MHTriServer.Server.Packets
         {
             base.Serialize(writer);
             writer.Write(CityIndex);
-            writer.Write(UnknownField2);
+            writer.Write(Cancelled);
         }
 
         public override void Deserialize(BEBinaryReader reader)
@@ -29,7 +29,7 @@ namespace MHTriServer.Server.Packets
             Debug.Assert(Size == 3);
 
             CityIndex = reader.ReadUInt16();
-            UnknownField2 = reader.ReadByte();
+            Cancelled = reader.ReadBoolean();
         }
 
         public override void Handle(PacketHandler handler, NetworkSession networkSession) =>
@@ -37,7 +37,7 @@ namespace MHTriServer.Server.Packets
 
         public override string ToString()
         {
-            return base.ToString() + $":\n\tCityIndex {CityIndex}\n\tUnknownField2 {UnknownField2}";
+            return base.ToString() + $":\n\tCityIndex {CityIndex}\n\tCancelled {Cancelled}";
         }
     }
 }

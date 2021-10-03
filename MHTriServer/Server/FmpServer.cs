@@ -659,27 +659,83 @@ namespace MHTriServer.Server
         public override void HandleReqLayerCreateHead(NetworkSession session, ReqLayerCreateHead reqLayerCreateHead)
         {
             // Notify the server that the client want to create a city
+            var player = session.GetPlayer();
 
+            player.SelectedCity = player.SelectedGate.Cities.FirstOrDefault(c => c.Id == reqLayerCreateHead.CityIndex);
+            if (player.SelectedCity == default)
+            {
+                // I could not find a way of cancelling the transaction
+                session.Close(Constants.CITY_NOT_FOUND_ERROR_MESSAGE);
+                return;
+            }
+
+            player.SelectedCity.Leader = player;
+
+            // TODO: Notify other players in the gate, that this city is disabled for the time being
             session.SendPacket(new AnsLayerCreateHead(reqLayerCreateHead.CityIndex));
         }
 
         public override void HandleReqLayerCreateSet(NetworkSession session, ReqLayerCreateSet reqLayerCreateSet)
         {
-            // Mark city as created
+            var player = session.GetPlayer();
+            var city = player.SelectedCity;
+            if (city == null || city.Id != reqLayerCreateSet.CityIndex)
+            {
+                session.Close(Constants.CITY_NOT_FOUND_ERROR_MESSAGE);
+                return;
+            }
+
+            city.Players.Add(player);
+
             session.SendPacket(new AnsLayerCreateSet(reqLayerCreateSet.CityIndex));
         }
 
         public override void HandleReqLayerCreateFoot(NetworkSession session, ReqLayerCreateFoot reqLayerCreateFoot)
         {
-            // Notify the server that the client want to create a city
+            var player = session.GetPlayer();
+            var city = player.SelectedCity;
 
+            if (city == null || city.Id != reqLayerCreateFoot.CityIndex)
+            {
+                session.Close(Constants.CITY_NOT_FOUND_ERROR_MESSAGE);
+                return;
+            }
+
+            if (reqLayerCreateFoot.Cancelled)
+            {
+                city.Leader = null;
+                player.SelectedCity = null;
+            }
+            else
+            {
+                player.SelectedGate.PlayerInGate.Remove(player);
+            }
+            
             session.SendPacket(new AnsLayerCreateFoot(reqLayerCreateFoot.CityIndex));
         }
 
         public override void HandleReqLayerUserListHead(NetworkSession session, ReqLayerUserListHead reqLayerUserListHead)
         {
+            const int CITY_INDEX_INDEX = 2;
             // Request list of hunter in a city
-            session.SendPacket(new AnsLayerUserListHead(reqLayerUserListHead.UnknownField3, 1));
+            var player = session.GetPlayer();
+            var gate = player.SelectedGate;
+            var cityData = reqLayerUserListHead.CityData;
+            if (cityData.UnknownField3.Count < 3)
+            {
+                session.Close(Constants.CITY_NOT_FOUND_ERROR_MESSAGE);
+                return;
+            }
+
+            var cityIndex = cityData.UnknownField3[CITY_INDEX_INDEX];
+            player.SelectedCity = gate.Cities.FirstOrDefault(c => c.Id == cityIndex);
+            if (player.SelectedCity == null)
+            {
+                session.Close(Constants.CITY_NOT_FOUND_ERROR_MESSAGE);
+                return;
+            }
+
+            session.SendPacket(new AnsLayerUserListHead(reqLayerUserListHead.Offset, (uint)player.SelectedCity.Players.Count));
         }
 
         public override void HandleReqLayerUserListData(NetworkSession session, ReqLayerUserListData reqLayerUserListData)
@@ -687,16 +743,23 @@ namespace MHTriServer.Server
             // Get the user list in the city
 
             var player = session.GetPlayer();
+            var city = player.SelectedCity;
+            if (city == null)
+            {
+                session.Close(Constants.CITY_NOT_FOUND_ERROR_MESSAGE);
+                return;
+            }
 
             var childData = new List<LayerUserListData>();
-            for (var i = 0; i < 1 /*4*/; i++)
+            foreach (var playerInCity in city.Players)
             {
+                var hunter = playerInCity.SelectedHunter;
                 childData.Add(new LayerUserListData()
                 {
                     ChildData = new LayerUserData()
                     {
-                        CapcomID = player.SelectedHunter.SaveID,
-                        Name = player.SelectedHunter.HunterName,
+                        CapcomID = hunter.SaveID,
+                        Name = hunter.HunterName,
                         UnknownField3 = new UnkShortArrayStruct()
                         {
                             UnknownField = 1,
@@ -724,6 +787,19 @@ namespace MHTriServer.Server
         public override void HandleReqLayerUserListFoot(NetworkSession session, ReqLayerUserListFoot reqLayerUserListFoot)
         {
             // End hunter list request
+            var player = session.GetPlayer();
+            var city = player.SelectedCity;
+            if (city == null)
+            {
+                session.Close(Constants.CITY_NOT_FOUND_ERROR_MESSAGE);
+                return;
+            }
+
+            if (!city.Players.Contains(player))
+            {
+                player.SelectedCity = null;
+            }
+
             session.SendPacket(new AnsLayerUserListFoot());
         }
 
