@@ -975,8 +975,11 @@ namespace MHTriServer.Server
                 player.SelectedServer = null;
             }
 
-            player.SelectedGate = null;
-            player.SelectedCity = null;
+            if (!RemoveFromCity(player))
+            {
+                RemoveFromGate(player);
+            }
+
             session.SendPacket(new AnsLayerEnd());
         }
 
@@ -995,17 +998,8 @@ namespace MHTriServer.Server
                 return;
             }
 
-            if (player.SelectedCity != null)
-            {
-                player.SelectedCity.Players.Remove(player);
-                player.SelectedCity = null;
-            }
-
-            if (player.SelectedGate != null)
-            {
-                player.SelectedGate.PlayerInGate.Remove(player);
-                player.SelectedGate = null;
-            }
+            RemoveFromCity(player);
+            RemoveFromGate(player);
 
             if (player.RequestedFmpServerAddress)
             {
@@ -1015,6 +1009,34 @@ namespace MHTriServer.Server
 
             player.SelectedServer = null;
             m_PlayerManager.UnloadPlayer(player);
+        }
+
+        private bool RemoveFromGate(Player player)
+        {
+            if (player.SelectedGate == null)
+            {
+                return false;
+            }
+
+            // TODO: Notify other user of this user departure
+            player.SelectedGate.PlayerInGate.Remove(player);
+            player.SelectedGate = null;
+
+            return true;
+        }
+
+        private bool RemoveFromCity(Player player)
+        {
+            if (player.SelectedCity == null)
+            {
+                return false;
+            }
+
+            // TODO: Notify other user of this user departure
+            player.SelectedCity.Players.Remove(player);
+            player.SelectedCity = null;
+
+            return true;
         }
 
         private void InitServerTypes()
