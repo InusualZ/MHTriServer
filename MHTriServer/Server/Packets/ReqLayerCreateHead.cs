@@ -18,7 +18,7 @@ namespace MHTriServer.Server.Packets
         public override void Serialize(BEBinaryWriter writer)
         {
             base.Serialize(writer);
-            writer.Write(CityIndex + 1);
+            writer.Write(CityIndex);
         }
 
         public override void Deserialize(BEBinaryReader reader)
@@ -27,8 +27,6 @@ namespace MHTriServer.Server.Packets
             Debug.Assert(Size == 2);
 
             CityIndex = reader.ReadUInt16();
-
-            --CityIndex;
         }
 
         public override void Handle(PacketHandler handler, NetworkSession networkSession) =>

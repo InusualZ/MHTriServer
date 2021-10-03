@@ -23,7 +23,7 @@ namespace MHTriServer.Server.Packets
         public override void Serialize(BEBinaryWriter writer)
         {
             base.Serialize(writer);
-            writer.Write(CityIndex + 1);
+            writer.Write(CityIndex);
             UnknownField2.Serialize(writer);
             UnkByteIntStruct.SerializeArray(UnknownField3, writer);
         }
@@ -33,8 +33,6 @@ namespace MHTriServer.Server.Packets
             Debug.Assert(ID == PACKET_ID);
 
             CityIndex = reader.ReadUInt16();
-            --CityIndex;
-
             UnknownField2 =  CompoundList.Deserialize<LayerDownData>(reader);
             UnknownField3 = UnkByteIntStruct.DeserializeArray(reader);
         }
