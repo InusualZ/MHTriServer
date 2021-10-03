@@ -11,7 +11,7 @@ namespace MHTriServer.Server.Packets.Properties
         private const byte FIELD_6 = 0x06;
         private const byte FIELD_7 = 0x07;
 
-        public string UnknownField {
+        public string CapcomID {
             get => Get<string>(FIELD_1);
             set {
                 Debug.Assert(value.Length < 8);
@@ -20,7 +20,7 @@ namespace MHTriServer.Server.Packets.Properties
         }
 
 
-        public string UnknownField2 {
+        public string Name {
             get => Get<string>(FIELD_2);
             set {
                 Debug.Assert(value.Length < 0x20);

@@ -1,5 +1,5 @@
 ﻿using MHTriServer.Database.Models;
-using MHTriServer.Server.Packets.Properties;
+using MHTriServer.Server.Game;
 using System;
 using System.Collections.Generic;
 using System.Net;
@@ -13,7 +13,6 @@ namespace MHTriServer.Server
         // TEMP STATIC VARIABLE
         public static uint BINARY_VERSION_COUNT = 0;
         public static readonly string BINARY_DATA_5_TEST = "\t\tWhat!!!!\n\t\tHello World\n\t\tInusualZ\n\t\tHello Dev\n\t\tMore\n\t\tDude\n\t\tStop\n\t\tPlease";
-        public static readonly byte[] BINARY_DATA_1;
 
         private readonly OfflinePlayer m_OfflinePlayer;
 
@@ -38,17 +37,11 @@ namespace MHTriServer.Server
 
         public OfflineHunter SelectedHunter { get; set; }
 
-        /*
-         * TEMP VARIABLES
-         */
+        public GameServer SelectedServer { get; set; }
 
-        public bool AfterLayerChildData = false;
-        public bool AfterUserBinaryNotice = false;
+        public Gate SelectedGate { get; set; }
 
-        static Player()
-        {
-            BINARY_DATA_1 = ServerType.GenerateBinaryData();
-        }
+        public City SelectedCity { get; set; }
 
         public Player(OfflinePlayer offlinePlayer, EndPoint remoteEndPoint, bool created)
         {

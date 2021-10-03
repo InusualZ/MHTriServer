@@ -7,7 +7,7 @@ namespace MHTriServer.Server.Packets
     {
         public const uint PACKET_ID = 0x64140100;
 
-        public ushort UnknownField { get; private set; }
+        public ushort Index { get; private set; }
 
         public LayerDownData Slot { get; private set; }
 
@@ -18,14 +18,14 @@ namespace MHTriServer.Server.Packets
         public override void Serialize(BEBinaryWriter writer)
         {
             base.Serialize(writer);
-            writer.Write(UnknownField);
+            writer.Write(Index);
             Slot.Serialize(writer);
         }
 
         public override void Deserialize(BEBinaryReader reader)
         {
             Debug.Assert(ID == PACKET_ID);
-            UnknownField = reader.ReadUInt16();
+            Index = reader.ReadUInt16();
             Slot = CompoundList.Deserialize<LayerDownData>(reader);
         }
 
@@ -34,7 +34,7 @@ namespace MHTriServer.Server.Packets
 
         public override string ToString()
         {
-            return base.ToString() + $":\n\tUnknownField {UnknownField}\n\tSlot\n{Slot}";
+            return base.ToString() + $":\n\tIndex {Index}\n\tSlot\n{Slot}";
         }
     }
 }

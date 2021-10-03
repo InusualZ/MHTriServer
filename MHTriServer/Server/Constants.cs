@@ -20,5 +20,8 @@
         public const string PLAYER_NOT_LOADED_ERROR_MESSAGE = "<LF=5><BODY><CENTER><COLOR=3>You tried to skip steps...<END>";
         public const string PLAYER_NO_EMPTY_SLOT_ERROR_MESSAGE = "<LF=5><BODY><CENTER><COLOR=3>There weren't any empty hunter slot available<END>";
         public const string PLAYER_HUNTER_NOT_FOUND_ERROR_MESSAGE = "<LF=5><BODY><CENTER><COLOR=3>Hunter data not found<END>";
+        public const string SERVER_NOT_FOUND_ERROR_MESSAGE = "<LF=5><BODY><CENTER><COLOR=3>Selected Server Not Found<END>";
+        public const string GATE_NOT_FOUND_ERROR_MESSAGE = "<LF=5><BODY><CENTER><COLOR=3>Selected Gate Not Found<END>";
+        public const string GATE_FULL_ERROR_MESSAGE = "<LF=5><BODY><CENTER><COLOR=3>Gate Is Full<END>";
     }
 }

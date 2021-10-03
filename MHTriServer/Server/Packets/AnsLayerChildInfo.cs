@@ -11,12 +11,12 @@ namespace MHTriServer.Server.Packets
 
         public ushort UnknownField { get; private set; }
 
-        public LayerData UnknownField2 { get; private set; }
+        public LayerData ChildInfo { get; private set; }
 
         public List<UnkByteIntStruct> UnknownField3 { get; private set; }
 
         public AnsLayerChildInfo(ushort unknownField, LayerData layerData, List<UnkByteIntStruct> unknownField3) : base(PACKET_ID)
-            => (UnknownField, UnknownField2, UnknownField3) = (unknownField, layerData, unknownField3);
+            => (UnknownField, ChildInfo, UnknownField3) = (unknownField, layerData, unknownField3);
 
         public AnsLayerChildInfo(uint id, ushort size, ushort counter) : base(id, size, counter) { }
 
@@ -24,7 +24,7 @@ namespace MHTriServer.Server.Packets
         {
             base.Serialize(writer);
             writer.Write(UnknownField);
-            UnknownField2.Serialize(writer);
+            ChildInfo.Serialize(writer);
 
             UnkByteIntStruct.SerializeArray(UnknownField3, writer);
         }
@@ -33,13 +33,13 @@ namespace MHTriServer.Server.Packets
         {
             Debug.Assert(ID == PACKET_ID);
             UnknownField = reader.ReadUInt16();
-            UnknownField2 = CompoundList.Deserialize<LayerData>(reader);
+            ChildInfo = CompoundList.Deserialize<LayerData>(reader);
             UnknownField3 = UnkByteIntStruct.DeserializeArray(reader);
         }
 
         public override string ToString()
         {
-            var str = $":\n\tUnknownField {UnknownField}\n\tUnknownField2\n\t{UnknownField2})\n\tUnknownField3({UnknownField3.Count})";
+            var str = $":\n\tUnknownField {UnknownField}\n\tChildInfo\n\t{ChildInfo})\n\tUnknownField3({UnknownField3.Count})";
             for (var i = 0; i < UnknownField3.Count; ++i)
             {
                 var data = UnknownField3[i];

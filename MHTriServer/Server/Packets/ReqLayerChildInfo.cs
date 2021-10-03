@@ -8,21 +8,21 @@ namespace MHTriServer.Server.Packets
     {
         public const uint PACKET_ID = 0x64230100;
 
-        public ushort UnknownField { get; private set; }
+        public short Index { get; private set; }
 
         public byte[] Format { get; private set; }
 
         public List<Unk2ByteArray> UnknownField2 { get; private set; }
 
-        public ReqLayerChildInfo(ushort unknownField, byte[] format, List<Unk2ByteArray> data) : base(PACKET_ID)
-            => (UnknownField, Format, UnknownField2) = (unknownField, format, data);
+        public ReqLayerChildInfo(short index, byte[] format, List<Unk2ByteArray> data) : base(PACKET_ID)
+            => (Index, Format, UnknownField2) = (index, format, data);
 
         public ReqLayerChildInfo(uint id, ushort size, ushort counter) : base(id, size, counter) { }
 
         public override void Serialize(BEBinaryWriter writer)
         {
             base.Serialize(writer);
-            writer.Write(UnknownField);
+            writer.Write(Index);
             writer.WriteByteBytes(Format);
 
             Unk2ByteArray.SerializeArray(UnknownField2, writer);
@@ -31,7 +31,7 @@ namespace MHTriServer.Server.Packets
         public override void Deserialize(BEBinaryReader reader)
         {
             Debug.Assert(ID == PACKET_ID);
-            UnknownField = reader.ReadUInt16();
+            Index = reader.ReadInt16();
 
             Format = reader.ReadByteBytes();
             UnknownField2 = Unk2ByteArray.DeserializeArray(reader);
@@ -42,7 +42,7 @@ namespace MHTriServer.Server.Packets
 
         public override string ToString()
         {
-            var str = $":\n\tUnknownField {UnknownField}\n\tFormat '{Packet.Hexstring(Format, ' ')}'\n\tUnknownField2({UnknownField2.Count})";
+            var str = $":\n\tIndex {Index}\n\tFormat '{Packet.Hexstring(Format, ' ')}'\n\tUnknownField2({UnknownField2.Count})";
             for (var i = 0; i < UnknownField2.Count; ++i)
             {
                 var data = UnknownField2[i];

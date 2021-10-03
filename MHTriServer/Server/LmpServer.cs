@@ -248,18 +248,19 @@ namespace MHTriServer.Server
 
         public override void HandleReqFmpListData(NetworkSession session, ReqFmpListData reqFmpListData)
         {
-            var player = session.GetPlayer();
+            /// It seem Capcom had multiple fmp server instance, which were listed here and sent to the client
+            /// the client would always connect to the first one
 
             var servers = new List<FmpData>()
             {
-                FmpData.Server(1, 2, 3, 2, "Valor333333", 1),
+                FmpData.Server(1, 0, 1, 1, "", 0),
             };
+
             session.SendPacket(new AnsFmpListData(servers));
         }
 
         public override void HandleReqFmpListFoot(NetworkSession session, ReqFmpListFoot reqFmpListFoot)
         {
-            var player = session.GetPlayer();
             session.SendPacket(new AnsFmpListFoot());
         }
 

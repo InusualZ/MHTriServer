@@ -9,7 +9,7 @@ namespace MHTriServer.Server.Packets
 
         public ushort UnknownField { get; private set; }
 
-        public AnsLayerDown(byte unknownField) : base(PACKET_ID) => UnknownField = unknownField;
+        public AnsLayerDown(ushort unknownField) : base(PACKET_ID) => UnknownField = unknownField;
 
         public AnsLayerDown(uint id, ushort size, ushort counter) : base(id, size, counter) { }
 

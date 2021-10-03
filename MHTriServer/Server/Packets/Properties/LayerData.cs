@@ -43,8 +43,7 @@ namespace MHTriServer.Server.Packets.Properties
             }
         }
 
-        // Any value that you put here, when the client receive it would substract one
-        public ushort UnknownField5 { get => Get<ushort>(FIELD_5); set => Set(FIELD_5, value); }
+        public short Index { get => (short)Get<ushort>(FIELD_5); set => Set(FIELD_5, (ushort)value); }
 
         public uint CurrentPopulation { get => Get<uint>(FIELD_6); set => Set(FIELD_6, value); }
 

@@ -1,19 +1,28 @@
 ﻿using log4net;
+using MHTriServer.Server.Game;
 using MHTriServer.Server.Packets;
 using MHTriServer.Server.Packets.Properties;
+using MHTriServer.Utils;
 using System;
 using System.Buffers.Binary;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
+using System.Linq;
 using System.Text;
 
 namespace MHTriServer.Server
 {
     public class FmpServer : BaseServer
     {
+        private const int MAX_SERVER_TYPE = 4;
+
         private static readonly ILog Log = LogManager.GetLogger(nameof(FmpServer));
 
         private readonly PlayerManager m_PlayerManager = null;
+
+        private ServerType[] m_ServerTypes;
+        private byte[] m_ServerTypesPropertiesPayload;
 
         public FmpServer(PlayerManager playerManager, string address, int port) : base(address, port)
         {
@@ -26,6 +35,8 @@ namespace MHTriServer.Server
         public override void OnStart()
         {
             Log.InfoFormat("Running on {0}:{1}", Address, Port);
+
+            InitServerTypes();
         }
 
         public override void HandleNtcCollectionLog(NetworkSession session, NtcCollectionLog collectionLog)
@@ -55,6 +66,16 @@ namespace MHTriServer.Server
 
             session.SetTag(player);
 
+            if (player.SelectedServer == null)
+            {
+                player.SelectedServer = m_ServerTypes.SelectMany(st => st.Servers).FirstOrDefault(s => s.ServerIndex == 1);
+                if (player.SelectedServer == default)
+                {
+                    session.Close(Constants.SERVER_NOT_FOUND_ERROR_MESSAGE);
+                    return;
+                }
+            }
+
             // TODO: Figure out what login type 3/5 means.
             // Value need to be 3 or 5 in order to proceed with the login process
             session.SendPacket(new NtcLogin(ServerLoginType.FMP_NORMAL));
@@ -69,13 +90,6 @@ namespace MHTriServer.Server
 
         public override void HandleReqFmpListVersion(NetworkSession session, ReqFmpListVersion reqFmpListVersion)
         {
-            if (!m_PlayerManager.TryGetPlayer(session.RemoteEndPoint, out var player))
-            {
-                Log.FatalFormat("Kicked {0}, because it tried to hijack a player", session.RemoteEndPoint);
-                session.Close(Constants.OUT_OF_ORDER_ERROR_MESSAGE);
-                return;
-            }
-
             // If the Fmp List Verion sent in the LMP server, mistmatch this version
             // the client would send a request that allow us to rewrite the previous sent list
             // but, if the versions matches the previously sended version, the client would send a request to update
@@ -85,18 +99,30 @@ namespace MHTriServer.Server
 
         public override void HandleReqFmpListHead(NetworkSession session, ReqFmpListHead reqFmpListHead)
         {
-            session.SendPacket(new AnsFmpListHead(0, 4));
+            var serverCount = m_ServerTypes.Sum(st => st.Servers.Length);
+            session.SendPacket(new AnsFmpListHead(0, (uint)serverCount));
         }
 
         public override void HandleReqFmpListData(NetworkSession session, ReqFmpListData reqFmpListData)
         {
-            var servers = new List<FmpData>() 
+            const uint UNKNOWN_SERVER_VALUE = 1;
+
+            var servers = new List<FmpData>();
+
+            for (var serverTypeIndex = 0U; serverTypeIndex < MAX_SERVER_TYPE; ++serverTypeIndex)
             {
-                FmpData.Server(1, 0, 4, 1, "Valor1", 5),
-                FmpData.Server(2, 0, 4, 2, "Rookies1", 6),
-                FmpData.Server(3, 0, 4, 3, "Veterans1", 7),
-                FmpData.Server(4, 0, 4, 4, "Greed1", 8)
-            };
+                if (serverTypeIndex >= m_ServerTypes.Length)
+                {
+                    break;
+                }
+
+                var serverType = m_ServerTypes[serverTypeIndex];
+                foreach (var server in serverType.Servers) 
+                {
+                    servers.Add(FmpData.Server(server.ServerIndex, (uint)server.CurrentPopulation, (uint)server.MaxPopulation, 
+                        serverTypeIndex + 1, server.Name, UNKNOWN_SERVER_VALUE));
+                }
+            }
 
             session.SendPacket(new AnsFmpListData(servers));
         }
@@ -108,8 +134,20 @@ namespace MHTriServer.Server
 
         public override void HandleReqFmpInfo(NetworkSession session, ReqFmpInfo reqFmpInfo)
         {
+            // This means that the player have selected a server from the list other than the current one
+
             var player = session.GetPlayer();
-            // Make it connect to the same server, I don't know what is the purpose of this
+
+            var serverIndex = reqFmpInfo.SelectedServerIndex;
+            var selectedServer = m_ServerTypes.SelectMany(st => st.Servers).FirstOrDefault(s => s.ServerIndex == serverIndex);
+            if (selectedServer == default)
+            {
+                session.Close(Constants.SERVER_NOT_FOUND_ERROR_MESSAGE);
+                return;
+            }
+
+            player.SelectedServer = selectedServer;
+
             session.SendPacket(new AnsFmpInfo(FmpData.Address(MHTriServer.Config.FmpServer.Address, MHTriServer.Config.FmpServer.Port)), true);
             player.RequestedFmpServerAddress = true;
         }
@@ -151,7 +189,7 @@ namespace MHTriServer.Server
             else if (reqBinaryHead.BinaryType == 1)
             {
                 // Unconfirmed expected length of 0x140c
-                binaryLength = (uint)Player.BINARY_DATA_1.Length;
+                binaryLength = (uint)m_ServerTypesPropertiesPayload.Length;
             }
             else if (reqBinaryHead.BinaryType == 6)
             {
@@ -253,7 +291,7 @@ namespace MHTriServer.Server
             }
             else if (reqBinaryData.Type == 1)
             {
-                binaryData = Player.BINARY_DATA_1;
+                binaryData = m_ServerTypesPropertiesPayload;
             }
             else if (reqBinaryData.Type == 6)
             {
@@ -338,26 +376,29 @@ namespace MHTriServer.Server
             *  Atleast up until the server selection screen.
             */
 
+            var player = session.GetPlayer();
+            var selectedServer = player.SelectedServer;
+
             var data = new LayerData()
             {
                 UnknownField1 = 1,
                 UnknownField2 = new UnkShortArrayStruct()
                 {
-                    UnknownField = 2,
+                    UnknownField = 1,
                     UnknownField2 = 3,
                     UnknownField3 = new List<ushort>()
                     {
                         4, 5, 6
                     }
                 },
-                Name = "Joe",
-                UnknownField5 = (ushort)"Joe".Length,
-                CurrentPopulation = 1,
+                Name = selectedServer.Name,
+                Index = (short)selectedServer.ServerIndex,
+                CurrentPopulation = (uint)selectedServer.CurrentPopulation,
                 UnknownField7 = 7,
                 UnknownField8 = 8,
-                MaxPopulation = 4,
+                MaxPopulation = (uint)selectedServer.MaxPopulation,
                 UnknownField10 = 10,
-                InCityPopulation = 11,
+                InCityPopulation = (uint)selectedServer.InCityPopulation,
                 UnknownField12 = 12,
                 UnknownField13 = 13,
                 State = LayerData.StateEnum.Enable,
@@ -400,98 +441,88 @@ namespace MHTriServer.Server
         public override void HandleReqLayerChildInfo(NetworkSession session, ReqLayerChildInfo reqLayerChildInfo)
         {
             var player = session.GetPlayer();
-            if (player.AfterLayerChildData)
-            {
-                {
-                    var userNumData = new UserNumData()
-                    {
-                        UnknownField = new UnkShortArrayStruct()
-                        {
-                            UnknownField = 0,
-                            UnknownField2 = 1,
-                            UnknownField3 = new List<ushort>() 
-                            {
-                                2, 3, 4
-                            },
-                        },
-                        UnknownField2 = 2,
-                        UnknownField3 = 3,
-                        UnknownField4 = 4,
-                        UnknownField5 = 5,
-                        UnknownField6 = 6,
-                        UnknownField7 = 7,
-                    };
 
-                    // TODO: Figure out what this packet does
-                    session.SendPacket(new NtcLayerUserNum(4, userNumData));
+
+            // This data would replace some field sent with ReqLayerStart/ReqLayerChildListData
+            var layerData = new LayerData()
+            {
+                // if Index == 0, all the other field except UnknownField12, would be ignored by the client
+                Index = reqLayerChildInfo.Index,
+
+                // This field would be sent when the game send the packet `ReqLayerDown`
+                UnknownField12 = 1,
+            };
+
+            List<UnkByteIntStruct> extraProperties = null;
+
+            if (reqLayerChildInfo.Index < 1)
+            {
+                // Index should not be < 1, it (probably) means that the game want to know if anything have changed
+                // in the layer that we are in
+
+                // TODO: What should we update here?
+            }
+            else if (player.SelectedGate == null)
+            {
+                // It means that we have selected a gate
+                var gate = player.SelectedServer.Gates.FirstOrDefault(g => g.Id == reqLayerChildInfo.Index);
+                if (gate == default)
+                {
+                    session.Close(Constants.GATE_NOT_FOUND_ERROR_MESSAGE);
+                    return;
                 }
 
-                var data = new LayerData()
+                if (gate.CurrentPopulation + 1 > gate.MaxPopulation)
                 {
-                    Name = "Joe",
-                    UnknownField5 = 2,
-                    CurrentPopulation = 0,
-                    UnknownField7 = 100,
-                    UnknownField10 = 3,
-                    InCityPopulation = 0,
-                    UnknownField12 = 2,
-                    UnknownField17 = 4,
-                    UnknownField18 = 1
-                };
 
-                var unkData = new List<UnkByteIntStruct>() 
-                {
-                    new UnkByteIntStruct() 
+                    session.Close(Constants.GATE_FULL_ERROR_MESSAGE);
+                    return;
+                }
+
+                player.SelectedGate = gate;
+                gate.PlayerInGate.Add(player);
+
+                layerData.Name = gate.Name;
+                layerData.Index = (short)gate.Id;
+                layerData.CurrentPopulation = (uint)gate.CurrentPopulation + 1;
+                layerData.MaxPopulation = (uint)gate.MaxPopulation;
+                layerData.UnknownField7 = 0xff; // ???
+                layerData.InCityPopulation = (uint)gate.InCityPopulation;
+                layerData.State = LayerData.StateEnum.Enable;
+
+                extraProperties = reqLayerChildInfo.UnknownField2.Select(f => {
+                    return new UnkByteIntStruct()
                     {
-                        UnknownField = 1,
+                        UnknownField = f.UnknownField1,
                         ContainUnknownField3 = true,
-                        UnknownField3 = 8
-                    }
-                };
-
-                session.SendPacket(new AnsLayerChildInfo(1, data, unkData));
+                        UnknownField3 = f.UnknownField2
+                    };
+                }).ToList();
             }
             else
             {
-
-                var data = new LayerData()
-                {
-                    Name = "Joe",
-                    UnknownField5 = 0,
-                    CurrentPopulation = 1,
-                    UnknownField7 = 100,
-                    UnknownField10 = 3,
-                    InCityPopulation = 2,
-                    UnknownField12 = 2,
-                    UnknownField17 = 4,
-                    UnknownField18 = 1
-                };
-
-                var unkData = new List<UnkByteIntStruct>() 
-                {
-                    new UnkByteIntStruct() 
-                    {
-                        UnknownField = 1,
-                        ContainUnknownField3 = true,
-                        UnknownField3 = 8
-                    }
-                };
-
-                session.SendPacket(new AnsLayerChildInfo(1, data, unkData));
+                Debug.Assert(false);
             }
+
+            session.SendPacket(new AnsLayerChildInfo(1, layerData, extraProperties));
         }
 
         public override void HandleReqLayerChildListHead(NetworkSession session, ReqLayerChildListHead reqLayerChildListHead)
         {
             var player = session.GetPlayer();
-            if (player.AfterUserBinaryNotice)
+            Debug.Assert(player.SelectedServer != null);
+
+            var childElementCount = 0U;
+            if (player.SelectedGate == null)
             {
-                session.SendPacket(new AnsLayerChildListHead(10));
+                childElementCount = (uint)player.SelectedServer.Gates.Length;
             }
-            else
+            else if (player.SelectedCity == null)
             {
-                session.SendPacket(new AnsLayerChildListHead(1));
+                childElementCount = (uint)player.SelectedGate.Cities.Length;
             }
+
+            session.SendPacket(new AnsLayerChildListHead(childElementCount));
         }
 
         public override void HandleReqLayerChildListData(NetworkSession session, ReqLayerChildListData reqLayerChildListData)
@@ -499,61 +530,58 @@ namespace MHTriServer.Server
             var player = session.GetPlayer();
 
             var childsData = new List<LayerChildData>();
-            if (player.AfterUserBinaryNotice)
+            var selectedServer = player.SelectedServer;
+            var startOffset = Math.Min(0, reqLayerChildListData.Offset - 1);
+            if (player.SelectedGate == null)
             {
-                for (var cityIndex = 0; cityIndex < reqLayerChildListData.ExpectedDataCount; ++cityIndex)
+                for (var gateIndex = startOffset; gateIndex < selectedServer.Gates.Length; ++gateIndex)
                 {
+                    var gate = selectedServer.Gates[gateIndex];
                     childsData.Add(new LayerChildData()
                     {
                         ChildData = new LayerData()
                         {
-                            Name = $"City {cityIndex + 1}",
-                            UnknownField5 = 1,
-                            CurrentPopulation = 0,
-                            MaxPopulation = 4,
-                            UnknownField7 = 0,
-                            UnknownField10 = 0,
-                            InCityPopulation = 0,
-                            UnknownField12 = 0,
-                            State = LayerData.StateEnum.Empty,
-                            UnknownField17 = 0,
+                            Name = gate.Name,
+                            Index = (short)gate.Id,
+                            CurrentPopulation = (uint)gate.CurrentPopulation,
+                            MaxPopulation = (uint)gate.MaxPopulation,
+                            UnknownField7 = 0xff, // ???
+                            InCityPopulation = (uint)gate.InCityPopulation,
+                            State = LayerData.StateEnum.Enable,
                         }
                     });
                 }
             }
-            else
+            else if (player.SelectedCity == null)
             {
-                for (var gateIndex = 0; gateIndex < reqLayerChildListData.ExpectedDataCount; ++gateIndex)
+                var selectedGate = player.SelectedGate;
+                for (var cityIndex = startOffset; cityIndex < selectedGate.Cities.Length; ++cityIndex)
                 {
+                    var city = selectedGate.Cities[cityIndex];
+                    var state = LayerData.StateEnum.Empty;
+                    if (city.Players.Count == city.MaxPopulation)
+                    {
+                        state = LayerData.StateEnum.Disable;
+                    }
+                    else if (city.Players.Count > 0)
+                    {
+                        state = LayerData.StateEnum.Enable;
+                    }
+
                     childsData.Add(new LayerChildData()
                     {
                         ChildData = new LayerData()
                         {
-                            Name = $"City Gate {gateIndex + 1}",
-                            UnknownField5 = 1,
-                            CurrentPopulation = 0,
-                            MaxPopulation = 100,
-                            UnknownField7 = 5,
-                            UnknownField10 = 3,
-                            InCityPopulation = 0,
-                            UnknownField12 = 1,
-                            State = LayerData.StateEnum.Enable,
-                            UnknownField17 = 4,
-                            UnknownField18 = 1
-                        },
-                        UnknownField2 = new List<UnkByteIntStruct>() 
-                        {
-                            new UnkByteIntStruct() 
-                            {
-                                UnknownField = 5,
-                                ContainUnknownField3 = true,
-                                UnknownField3 = 6
-                            }
+                            Name = city.Name,
+                            Index = (short)city.Id,
+                            CurrentPopulation = (uint)city.CurrentPopulation,
+                            MaxPopulation = city.MaxPopulation,
+                            UnknownField7 = 0xff, // ???
+                            InCityPopulation = (uint)(city.CurrentPopulation - city.DepartedPlayer),
+                            State = state,
                         }
                     });
                 }
-
-                player.AfterLayerChildData = true;
             }
 
             session.SendPacket(new AnsLayerChildListData(childsData));
@@ -569,6 +597,23 @@ namespace MHTriServer.Server
             session.SendPacket(new AnsLayerDown(2));
         }
 
+        public override void HandleReqLayerUserList(NetworkSession session, ReqLayerUserList reqLayerUserList)
+        {
+            // Request user list from the current layer
+
+            var player = session.GetPlayer();
+
+            var currentUsers = new List<LayerUserData>()
+            {
+                new LayerUserData()
+                {
+                    CapcomID = player.SelectedHunter.SaveID,
+                    Name = player.SelectedHunter.HunterName,
+                }
+            };
+            session.SendPacket(new AnsLayerUserList(currentUsers));
+        }
+
         public override void HandleReqUserStatusSet(NetworkSession session, ReqUserStatusSet reqUserStatusSet)
         {
             session.SendPacket(new AnsUserStatusSet());
@@ -576,8 +621,7 @@ namespace MHTriServer.Server
 
         public override void HandleReqUserBinaryNotice(NetworkSession session, ReqUserBinaryNotice reqUserBinaryNotice)
         {
-            var player = session.GetPlayer();
-            player.AfterUserBinaryNotice = true;
+            var player = session.GetPlayer();   
             session.SendPacket(new AnsUserBinaryNotice());
         }
 
@@ -603,6 +647,10 @@ namespace MHTriServer.Server
 
         public override void HandleReqLayerUserListData(NetworkSession session, ReqLayerUserListData reqLayerUserListData)
         {
+            // Get the user list in the city
+
+            var player = session.GetPlayer();
+
             var childData = new List<LayerUserListData>();
             for (var i = 0; i < 1 /*4*/; i++)
             {
@@ -610,8 +658,8 @@ namespace MHTriServer.Server
                 {
                     ChildData = new LayerUserData()
                     {
-                        UnknownField = "Hello",
-                        UnknownField2 = "World",
+                        CapcomID = player.SelectedHunter.SaveID,
+                        Name = player.SelectedHunter.HunterName,
                         UnknownField3 = new UnkShortArrayStruct()
                         {
                             UnknownField = 1,
@@ -700,20 +748,6 @@ namespace MHTriServer.Server
             session.SendPacket(new AnsCircleCreate(1));
         }
 
-        public override void HandleReqLayerUserList(NetworkSession session, ReqLayerUserList reqLayerUserList)
-        {
-            var player = session.GetPlayer();
-
-            var currentUsers = new List<LayerUserData>()
-            {
-                new LayerUserData()
-                {
-                    UnknownField = player.SelectedHunter.SaveID,
-                }
-            };
-            session.SendPacket(new AnsLayerUserList(currentUsers));
-        }
-
         public override void HandleReqCircleMatchOptionSet(NetworkSession session, ReqCircleMatchOptionSet reqCircleMatchOptionSet)
         {
             // Sent by the client when the player succesfully submit a quest. 
@@ -790,6 +824,15 @@ namespace MHTriServer.Server
 
         public override void HandleReqLayerEnd(NetworkSession session, ReqLayerEnd reqLayerEnd)
         {
+            var player = session.GetPlayer();
+            if (!player.RequestedFmpServerAddress)
+            {
+                // This means that it's leaving the current selected server
+                player.SelectedServer = null;
+            }
+
+            player.SelectedGate = null;
+            player.SelectedCity = null;
             session.SendPacket(new AnsLayerEnd());
         }
 
@@ -808,12 +851,194 @@ namespace MHTriServer.Server
                 return;
             }
 
+            if (player.SelectedCity != null)
+            {
+                player.SelectedCity.Players.Remove(player);
+                player.SelectedCity = null;
+            }
+
+            if (player.SelectedGate != null)
+            {
+                player.SelectedGate.PlayerInGate.Remove(player);
+                player.SelectedGate = null;
+            }
+
             if (player.RequestedFmpServerAddress)
             {
+                // This means that it's changing fmp server
                 return;
             }
 
+            player.SelectedServer = null;
             m_PlayerManager.UnloadPlayer(player);
+        }
+
+        private void InitServerTypes()
+        {
+            InitServerPropertiesPayload();
+
+            var gameConfig = MHTriServer.Config.Game;
+
+            m_ServerTypes = gameConfig.ServerTypes;
+            var serverIndex = 0U;
+            foreach (var serverType in m_ServerTypes)
+            {
+                serverType.Init(ref serverIndex);
+
+                Log.Info($"ServerType {serverType.Name} initialized, with a capacity {serverType.MaxPopulation} for hunters");
+
+            }
+        }
+
+        private void InitServerPropertiesPayload()
+        {
+            const int BIG_BINARY_BLOB_SIZE = 0x140c;
+
+            var gameConfig = MHTriServer.Config.Game;
+            if (gameConfig.ServerTypes.Length > MAX_SERVER_TYPE) {
+                Log.Warn($"Max ServerType allowed is {MAX_SERVER_TYPE}");
+            }
+
+            var asciiEncoder = Encoding.ASCII;
+            using var serializer = new BEBinaryWriter(new MemoryStream(BIG_BINARY_BLOB_SIZE));
+
+            // Max Length including null char
+            void WriteCString(string value, int maxLength)
+            {
+                var bytes = asciiEncoder.GetBytes(value);
+                var maxWritten = Math.Min(bytes.Length, maxLength);
+                serializer.Write(bytes, 0, maxWritten);
+                serializer.Position += Math.Max(0, maxLength - maxWritten) - 1; // Skip remaining
+                serializer.Write('\0'); // Write Null Character
+            }
+
+            const int SERVER_TYPE_NAME_SIZE = 24;
+            const int SERVER_TYPE_DESC_SIZE = 168;
+            for (var index = 0; index < MAX_SERVER_TYPE; ++index)
+            {
+                if (index < gameConfig.ServerTypes.Length)
+                {
+                    var serverType = gameConfig.ServerTypes[index];
+                    WriteCString(serverType.Name, SERVER_TYPE_NAME_SIZE);
+                    WriteCString(serverType.Description, SERVER_TYPE_DESC_SIZE);
+                }
+                else 
+                {
+                    WriteCString(string.Empty, SERVER_TYPE_NAME_SIZE);
+                    WriteCString(string.Empty, SERVER_TYPE_DESC_SIZE);
+                }
+            }
+
+            // Unknown Field
+            serializer.WriteUInt32(0);
+
+            // Confirmed! It control how long last the day/night cycle
+            // Need more RE in order to know how exactly it work
+            // 2 uint array
+            // Offset: 0x304
+            // Used: @8042d91c
+            serializer.WriteUInt32(0); // Current Time Tick
+            serializer.WriteUInt32(0); // Max Tick Per Cycle, if 0 game default to 1500
+
+
+            // Seeking City Strings
+            const int SEEKING_LIST_COUNT = 32; // Confirmed max amount
+            const int SEEKING_DESC_MAX_LENGTH = 48;
+            for (var i = 0; i < SEEKING_LIST_COUNT; ++i)
+            {
+                if (i < gameConfig.Seekings.Length)
+                {
+                    var seeking = gameConfig.Seekings[i];
+                    WriteCString(seeking.Name, SEEKING_DESC_MAX_LENGTH);
+                    serializer.Write((byte)0x00); // Unknown
+                    serializer.Write(seeking.Enabled);
+                    serializer.Write(seeking.Flag);
+                    serializer.Write((byte)0x00); // Unknown
+                }
+                else
+                {
+                    WriteCString(string.Empty, SEEKING_DESC_MAX_LENGTH);
+                    serializer.Write((byte)0x00); // Unknown
+                    serializer.Write(false);
+                    serializer.Write((byte)0x00);
+                    serializer.Write((byte)0x00); // Unknown
+                }
+            }
+
+            const int HR_LIMIT_COUNT = 8;
+            const int HR_LIMIT_NAME_MAX_LENGTH = 30;
+            for (int i = 0; i < HR_LIMIT_COUNT; ++i)
+            {
+                if (i < gameConfig.HRLimits.Length) 
+                {
+                    var hrLimit = gameConfig.HRLimits[i];
+                    WriteCString(hrLimit.Name, HR_LIMIT_NAME_MAX_LENGTH);
+                    serializer.Write(hrLimit.Enabled);
+                    serializer.Write((byte)0x00); // Unused
+                    serializer.Write(hrLimit.Minimum);
+                    serializer.Write(hrLimit.Maximum);
+                }
+                else
+                {
+                    WriteCString(string.Empty, HR_LIMIT_NAME_MAX_LENGTH);
+                    serializer.Write(false);
+                    serializer.Write((byte)0x00); // Unused
+                    serializer.Write(0);
+                    serializer.Write(0);
+                }
+            }
+
+            const int GOAL_COUNT = 64;
+            const int GOAL_NAME_MAX_LENGTH = 30;
+            for(int i = 0; i < GOAL_COUNT; i++)
+            {
+                if (i < GOAL_COUNT)
+                {
+                    var goal = gameConfig.Goals[i];
+                    WriteCString(goal.Name, GOAL_NAME_MAX_LENGTH);
+                    serializer.Write(goal.Enabled);
+                    serializer.Write(goal.RestrictionMode);
+                    serializer.Write(goal.Minimum);
+                    serializer.Write(goal.Maximum);
+                }
+                else
+                {
+                    WriteCString(string.Empty, GOAL_NAME_MAX_LENGTH);
+                    serializer.Write(false);
+                    serializer.Write((byte)0x00);
+                    serializer.Write(0);
+                    serializer.Write(0);
+                }
+            }
+
+            for (int i = 0; i < MAX_SERVER_TYPE; ++i)
+            {
+                if (i < gameConfig.ServerTypes.Length)
+                {
+                    var serverType = gameConfig.ServerTypes[i];
+                    serializer.Write(serverType.MinimumRank);
+                    serializer.Write(serverType.MaximumRank);
+                }
+                else
+                {
+                    serializer.Write((ushort)0);
+                    serializer.Write((ushort)0);
+                }
+            }
+
+            // Timeout related short
+            serializer.Write(gameConfig.Timeout1);
+            serializer.Write(gameConfig.Timeout2);
+            serializer.Write(gameConfig.Timeout3);
+            serializer.Write(gameConfig.Timeout4);
+            serializer.Write(gameConfig.Timeout5);
+            serializer.Write(gameConfig.Timeout6);
+            serializer.Write(gameConfig.Timeout7);
+            serializer.Write(gameConfig.Timeout8);
+
+            // TODO: Figure out the purpose of the 64 missing byte
+
+            m_ServerTypesPropertiesPayload = (serializer.BaseStream as MemoryStream).GetBuffer();
         }
     }
 }
