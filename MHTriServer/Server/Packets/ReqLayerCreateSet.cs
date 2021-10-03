@@ -11,11 +11,11 @@ namespace MHTriServer.Server.Packets
 
         public ushort CityIndex { get; private set; }
 
-        public LayerDownData UnknownField2 { get; private set; }
+        public LayerData UnknownField2 { get; private set; }
 
         public List<UnkByteIntStruct> UnknownField3 { get; private set; }
 
-        public ReqLayerCreateSet(ushort cityIndex, LayerDownData unknownField2, List<UnkByteIntStruct> unknownField3) : base(PACKET_ID)
+        public ReqLayerCreateSet(ushort cityIndex, LayerData unknownField2, List<UnkByteIntStruct> unknownField3) : base(PACKET_ID)
             => (CityIndex, UnknownField2, UnknownField3) = (cityIndex, unknownField2, unknownField3);
 
         public ReqLayerCreateSet(uint id, ushort size, ushort counter) : base(id, size, counter) { }
@@ -33,7 +33,7 @@ namespace MHTriServer.Server.Packets
             Debug.Assert(ID == PACKET_ID);
 
             CityIndex = reader.ReadUInt16();
-            UnknownField2 =  CompoundList.Deserialize<LayerDownData>(reader);
+            UnknownField2 =  CompoundList.Deserialize<LayerData>(reader);
             UnknownField3 = UnkByteIntStruct.DeserializeArray(reader);
         }
 

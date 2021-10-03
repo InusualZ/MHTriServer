@@ -9,9 +9,9 @@ namespace MHTriServer.Server.Packets
 
         public ushort Index { get; private set; }
 
-        public LayerDownData Slot { get; private set; }
+        public LayerData Slot { get; private set; }
 
-        public ReqLayerDown(LayerDownData slot) : base(PACKET_ID) => Slot = slot;
+        public ReqLayerDown(LayerData slot) : base(PACKET_ID) => Slot = slot;
 
         public ReqLayerDown(uint id, ushort size, ushort counter) : base(id, size, counter) { }
 
@@ -26,7 +26,7 @@ namespace MHTriServer.Server.Packets
         {
             Debug.Assert(ID == PACKET_ID);
             Index = reader.ReadUInt16();
-            Slot = CompoundList.Deserialize<LayerDownData>(reader);
+            Slot = CompoundList.Deserialize<LayerData>(reader);
         }
 
         public override void Handle(PacketHandler handler, NetworkSession networkSession) =>
