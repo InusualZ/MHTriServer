@@ -88,81 +88,6 @@ namespace MHTriServer.Server
             session.SendPacket(new AnsServerTime(1500, 0));
         }
 
-        public override void HandleReqFmpListVersion(NetworkSession session, ReqFmpListVersion reqFmpListVersion)
-        {
-            // If the Fmp List Verion sent in the LMP server, mistmatch this version
-            // the client would send a request that allow us to rewrite the previous sent list
-            // but, if the versions matches the previously sended version, the client would send a request to update
-            // the population and max population of the server.
-            session.SendPacket(new AnsFmpListVersion(2));
-        }
-
-        public override void HandleReqFmpListHead(NetworkSession session, ReqFmpListHead reqFmpListHead)
-        {
-            var serverCount = m_ServerTypes.Sum(st => st.Servers.Length);
-            session.SendPacket(new AnsFmpListHead(0, (uint)serverCount));
-        }
-
-        public override void HandleReqFmpListData(NetworkSession session, ReqFmpListData reqFmpListData)
-        {
-            const uint UNKNOWN_SERVER_VALUE = 1;
-
-            var servers = new List<FmpData>();
-
-            for (var serverTypeIndex = 0U; serverTypeIndex < MAX_SERVER_TYPE; ++serverTypeIndex)
-            {
-                if (serverTypeIndex >= m_ServerTypes.Length)
-                {
-                    break;
-                }
-
-                var serverType = m_ServerTypes[serverTypeIndex];
-                foreach (var server in serverType.Servers) 
-                {
-                    servers.Add(FmpData.Server(server.ServerIndex, (uint)server.CurrentPopulation, (uint)server.MaxPopulation, 
-                        serverTypeIndex + 1, server.Name, UNKNOWN_SERVER_VALUE));
-                }
-            }
-
-            session.SendPacket(new AnsFmpListData(servers));
-        }
-
-        public override void HandleReqFmpListFoot(NetworkSession session, ReqFmpListFoot reqFmpListFoot)
-        {
-            session.SendPacket(new AnsFmpListFoot());
-        }
-
-        public override void HandleReqFmpInfo(NetworkSession session, ReqFmpInfo reqFmpInfo)
-        {
-            // This means that the player have selected a server from the list other than the current one
-
-            var player = session.GetPlayer();
-
-            var serverIndex = reqFmpInfo.SelectedServerIndex;
-            var selectedServer = m_ServerTypes.SelectMany(st => st.Servers).FirstOrDefault(s => s.ServerIndex == serverIndex);
-            if (selectedServer == default)
-            {
-                session.Close(Constants.SERVER_NOT_FOUND_ERROR_MESSAGE);
-                return;
-            }
-
-            player.SelectedServer = selectedServer;
-
-            session.SendPacket(new AnsFmpInfo(FmpData.Address(MHTriServer.Config.FmpServer.Address, MHTriServer.Config.FmpServer.Port)), true);
-            player.RequestedFmpServerAddress = true;
-        }
-
-        public override void HandleReqBinaryVersion(NetworkSession session, ReqBinaryVersion reqBinaryVersion)
-        {
-            // This packet means that the client is asking the server 
-            // If the binary data of type {reqBinaryVersion.BinaryType} has change.
-
-            // For now, we are going to always send a new version, because we want to know
-            // every single binary requets there is...
-
-            session.SendPacket(new AnsBinaryVersion(reqBinaryVersion.BinaryType, ++Player.BINARY_VERSION_COUNT));
-        }
-
         public override void HandleReqBinaryHead(NetworkSession session, ReqBinaryHead reqBinaryHead)
         {
             uint binaryLength = 0;
@@ -351,15 +276,15 @@ namespace MHTriServer.Server
             session.SendPacket(new AnsBinaryData(reqBinaryData.Version, reqBinaryData.Offset, binaryData));
         }
 
+        public override void HandleReqBinaryFoot(NetworkSession session, ReqBinaryFoot reqBinaryFoot)
+        {
+            session.SendPacket(new AnsBinaryFoot());
+        }
+
         public override void HandleReqUserSearchInfoMine(NetworkSession session, ReqUserSearchInfoMine reqUserSearchInfoMine)
         {
             // The client won't even read the data that we would send, so why bother.
             session.SendPacket(new AnsUserSearchInfoMine(new CompoundList()));
-        }
-
-        public override void HandleReqBinaryFoot(NetworkSession session, ReqBinaryFoot reqBinaryFoot)
-        {
-            session.SendPacket(new AnsBinaryFoot());
         }
 
         public override void HandleReqLayerStart(NetworkSession session, ReqLayerStart reqLayerStart)
@@ -426,22 +351,84 @@ namespace MHTriServer.Server
             session.SendPacket(new AnsUserSearchSet());
         }
 
-        public override void HandleReqFriendList(NetworkSession session, ReqFriendList reqFriendList)
+        public override void HandleReqBinaryVersion(NetworkSession session, ReqBinaryVersion reqBinaryVersion)
         {
-            var friends = new List<FriendData>();
-            session.SendPacket(new AnsFriendList(friends));
+            // This packet means that the client is asking the server 
+            // If the binary data of type {reqBinaryVersion.BinaryType} has change.
+
+            // For now, we are going to always send a new version, because we want to know
+            // every single binary requets there is...
+
+            session.SendPacket(new AnsBinaryVersion(reqBinaryVersion.BinaryType, ++Player.BINARY_VERSION_COUNT));
         }
 
-        public override void HandleReqBlackList(NetworkSession session, ReqBlackList reqBlackList)
+        public override void HandleReqFmpListVersion(NetworkSession session, ReqFmpListVersion reqFmpListVersion)
         {
-            var blackList = new List<FriendData>();
-            session.SendPacket(new AnsBlackList(blackList));
+            // If the Fmp List Verion sent in the LMP server, mistmatch this version
+            // the client would send a request that allow us to rewrite the previous sent list
+            // but, if the versions matches the previously sended version, the client would send a request to update
+            // the population and max population of the server.
+            session.SendPacket(new AnsFmpListVersion(2));
+        }
+
+        public override void HandleReqFmpListHead(NetworkSession session, ReqFmpListHead reqFmpListHead)
+        {
+            var serverCount = m_ServerTypes.Sum(st => st.Servers.Length);
+            session.SendPacket(new AnsFmpListHead(0, (uint)serverCount));
+        }
+
+        public override void HandleReqFmpListData(NetworkSession session, ReqFmpListData reqFmpListData)
+        {
+            const uint UNKNOWN_SERVER_VALUE = 1;
+
+            var servers = new List<FmpData>();
+
+            for (var serverTypeIndex = 0U; serverTypeIndex < MAX_SERVER_TYPE; ++serverTypeIndex)
+            {
+                if (serverTypeIndex >= m_ServerTypes.Length)
+                {
+                    break;
+                }
+
+                var serverType = m_ServerTypes[serverTypeIndex];
+                foreach (var server in serverType.Servers) 
+                {
+                    servers.Add(FmpData.Server(server.ServerIndex, (uint)server.CurrentPopulation, (uint)server.MaxPopulation, 
+                        serverTypeIndex + 1, server.Name, UNKNOWN_SERVER_VALUE));
+                }
+            }
+
+            session.SendPacket(new AnsFmpListData(servers));
+        }
+
+        public override void HandleReqFmpListFoot(NetworkSession session, ReqFmpListFoot reqFmpListFoot)
+        {
+            session.SendPacket(new AnsFmpListFoot());
+        }
+
+        public override void HandleReqFmpInfo(NetworkSession session, ReqFmpInfo reqFmpInfo)
+        {
+            // This means that the player have selected a server from the list other than the current one
+
+            var player = session.GetPlayer();
+
+            var serverIndex = reqFmpInfo.SelectedServerIndex;
+            var selectedServer = m_ServerTypes.SelectMany(st => st.Servers).FirstOrDefault(s => s.ServerIndex == serverIndex);
+            if (selectedServer == default)
+            {
+                session.Close(Constants.SERVER_NOT_FOUND_ERROR_MESSAGE);
+                return;
+            }
+
+            player.SelectedServer = selectedServer;
+
+            session.SendPacket(new AnsFmpInfo(FmpData.Address(MHTriServer.Config.FmpServer.Address, MHTriServer.Config.FmpServer.Port)), true);
+            player.RequestedFmpServerAddress = true;
         }
 
         public override void HandleReqLayerChildInfo(NetworkSession session, ReqLayerChildInfo reqLayerChildInfo)
         {
             var player = session.GetPlayer();
-
 
             // This data would replace some field sent with ReqLayerStart/ReqLayerChildListData
             var layerData = new LayerData()
@@ -505,6 +492,72 @@ namespace MHTriServer.Server
             }
 
             session.SendPacket(new AnsLayerChildInfo(1, layerData, extraProperties));
+        }
+
+        public override void HandleReqLayerUserList(NetworkSession session, ReqLayerUserList reqLayerUserList)
+        {
+            // Request user list from the current layer
+
+            var player = session.GetPlayer();
+
+            var currentUsers = new List<LayerUserData>();
+            if (player.SelectedCity != null)
+            {
+                foreach (var playerInCity in player.SelectedCity.Players)
+                {
+                    var hunter = playerInCity.SelectedHunter;
+                    currentUsers.Add(new LayerUserData()
+                    {
+                        CapcomID = hunter.SaveID,
+                        Name = hunter.HunterName,
+                        // TODO: Do others field too
+                    });
+                }
+            }
+            else if (player.SelectedGate != null)
+            {
+                var gate = player.SelectedGate;
+                foreach (var playerInGate in gate.PlayerInGate.Concat(gate.PlayersInCity))
+                {
+                    var hunter = playerInGate.SelectedHunter;
+                    currentUsers.Add(new LayerUserData()
+                    {
+                        CapcomID = hunter.SaveID,
+                        Name = hunter.HunterName,
+                        // TODO: Do others field too
+                    });
+                }
+            }
+            else if (player.SelectedServer != null)
+            {
+                // TODO: Should we really send the player that are connected to the server?
+                var hunter = player.SelectedHunter;
+                currentUsers.Add(new LayerUserData()
+                {
+                    CapcomID = hunter.SaveID,
+                    Name = hunter.HunterName,
+                    // TODO: Do others field too
+                });
+            }
+
+            session.SendPacket(new AnsLayerUserList(currentUsers));
+        }
+
+        public override void HandleReqFriendList(NetworkSession session, ReqFriendList reqFriendList)
+        {
+            var friends = new List<FriendData>();
+            session.SendPacket(new AnsFriendList(friends));
+        }
+
+        public override void HandleReqBlackList(NetworkSession session, ReqBlackList reqBlackList)
+        {
+            var blackList = new List<FriendData>();
+            session.SendPacket(new AnsBlackList(blackList));
+        }
+
+        public override void HandleReqUserStatusSet(NetworkSession session, ReqUserStatusSet reqUserStatusSet)
+        {
+            session.SendPacket(new AnsUserStatusSet());
         }
 
         public override void HandleReqLayerChildListHead(NetworkSession session, ReqLayerChildListHead reqLayerChildListHead)
@@ -597,100 +650,10 @@ namespace MHTriServer.Server
             session.SendPacket(new AnsLayerDown(2));
         }
 
-        public override void HandleReqLayerUserList(NetworkSession session, ReqLayerUserList reqLayerUserList)
-        {
-            // Request user list from the current layer
-
-            var player = session.GetPlayer();
-
-            var currentUsers = new List<LayerUserData>();
-            if (player.SelectedCity != null)
-            {
-                foreach (var playerInCity in player.SelectedCity.Players)
-                {
-                    var hunter = playerInCity.SelectedHunter;
-                    currentUsers.Add(new LayerUserData() {
-                        CapcomID = hunter.SaveID,
-                        Name = hunter.HunterName,
-                        // TODO: Do others field too
-                    });
-                }
-            }
-            else if (player.SelectedGate != null)
-            {
-                var gate = player.SelectedGate;
-                foreach (var playerInGate in gate.PlayerInGate.Concat(gate.PlayersInCity))
-                {
-                    var hunter = playerInGate.SelectedHunter;
-                    currentUsers.Add(new LayerUserData()
-                    {
-                        CapcomID = hunter.SaveID,
-                        Name = hunter.HunterName,
-                        // TODO: Do others field too
-                    });
-                }
-            }
-            else if (player.SelectedServer != null)
-            {
-                // TODO: Should we really send the player that are connected to the server?
-                var hunter = player.SelectedHunter;
-                currentUsers.Add(new LayerUserData()
-                {
-                    CapcomID = hunter.SaveID,
-                    Name = hunter.HunterName,
-                    // TODO: Do others field too
-                });
-            }
-
-            session.SendPacket(new AnsLayerUserList(currentUsers));
-        }
-
-        public override void HandleReqUserStatusSet(NetworkSession session, ReqUserStatusSet reqUserStatusSet)
-        {
-            session.SendPacket(new AnsUserStatusSet());
-        }
-
         public override void HandleReqUserBinaryNotice(NetworkSession session, ReqUserBinaryNotice reqUserBinaryNotice)
         {
             var player = session.GetPlayer();   
             session.SendPacket(new AnsUserBinaryNotice());
-        }
-
-        public override void HandleNtcLayerChat(NetworkSession session, NtcLayerChat layerChat)
-        {
-            var player = session.GetPlayer();
-
-            var messageProperties = layerChat.Properties;
-            messageProperties.Color = 0xffffffff /* White */;
-            messageProperties.SenderID = player.SelectedHunter.SaveID;
-            messageProperties.SenderName = player.SelectedHunter.HunterName;
-
-            if (player.SelectedCity != null)
-            {
-                foreach (var cityPlayer in player.SelectedCity.Players)
-                {
-                    if (player == cityPlayer)
-                    {
-                        continue;
-                    }
-
-                    var seesion = GetNetworkSession(cityPlayer.RemoteEndPoint);
-                    seesion.SendPacket(new NtcLayerChat(layerChat.UnknownField1, messageProperties, layerChat.Message));
-                }
-            }
-            else if (player.SelectedGate != null)
-            {
-                foreach (var gatePlayer in player.SelectedGate.PlayerInGate)
-                {
-                    if (player == gatePlayer)
-                    {
-                        continue;
-                    }
-
-                    var seesion = GetNetworkSession(gatePlayer.RemoteEndPoint);
-                    seesion.SendPacket(new NtcLayerChat(layerChat.UnknownField1, messageProperties, layerChat.Message));
-                }
-            }
         }
 
         public override void HandleReqLayerCreateHead(NetworkSession session, ReqLayerCreateHead reqLayerCreateHead)
@@ -698,6 +661,12 @@ namespace MHTriServer.Server
             // Notify the server that the client want to create a city
 
             session.SendPacket(new AnsLayerCreateHead(reqLayerCreateHead.CityIndex));
+        }
+
+        public override void HandleReqLayerCreateSet(NetworkSession session, ReqLayerCreateSet reqLayerCreateSet)
+        {
+            // Mark city as created
+            session.SendPacket(new AnsLayerCreateSet(reqLayerCreateSet.CityIndex));
         }
 
         public override void HandleReqLayerCreateFoot(NetworkSession session, ReqLayerCreateFoot reqLayerCreateFoot)
@@ -756,12 +725,6 @@ namespace MHTriServer.Server
         {
             // End hunter list request
             session.SendPacket(new AnsLayerUserListFoot());
-        }
-
-        public override void HandleReqLayerCreateSet(NetworkSession session, ReqLayerCreateSet reqLayerCreateSet)
-        {
-            // Mark city as created
-            session.SendPacket(new AnsLayerCreateSet(reqLayerCreateSet.CityIndex));
         }
 
         public override void HandleReqLayerMediationList(NetworkSession session, ReqLayerMediationList reqLayerMediationList)
@@ -888,6 +851,43 @@ namespace MHTriServer.Server
             // Sent when the player finish/abandon a quest
 
             session.SendPacket(new AnsCircleMatchEnd());
+        }
+
+        public override void HandleNtcLayerChat(NetworkSession session, NtcLayerChat layerChat)
+        {
+            var player = session.GetPlayer();
+
+            var messageProperties = layerChat.Properties;
+            messageProperties.Color = 0xffffffff /* White */;
+            messageProperties.SenderID = player.SelectedHunter.SaveID;
+            messageProperties.SenderName = player.SelectedHunter.HunterName;
+
+            if (player.SelectedCity != null)
+            {
+                foreach (var cityPlayer in player.SelectedCity.Players)
+                {
+                    if (player == cityPlayer)
+                    {
+                        continue;
+                    }
+
+                    var seesion = GetNetworkSession(cityPlayer.RemoteEndPoint);
+                    seesion.SendPacket(new NtcLayerChat(layerChat.UnknownField1, messageProperties, layerChat.Message));
+                }
+            }
+            else if (player.SelectedGate != null)
+            {
+                foreach (var gatePlayer in player.SelectedGate.PlayerInGate)
+                {
+                    if (player == gatePlayer)
+                    {
+                        continue;
+                    }
+
+                    var seesion = GetNetworkSession(gatePlayer.RemoteEndPoint);
+                    seesion.SendPacket(new NtcLayerChat(layerChat.UnknownField1, messageProperties, layerChat.Message));
+                }
+            }
         }
 
         public override void HandleReqLayerEnd(NetworkSession session, ReqLayerEnd reqLayerEnd)
