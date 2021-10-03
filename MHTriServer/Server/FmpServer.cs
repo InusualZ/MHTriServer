@@ -494,6 +494,30 @@ namespace MHTriServer.Server
             session.SendPacket(new AnsLayerChildInfo(1, layerData, extraProperties));
         }
 
+        public override void HandleNtcLayerBinary(NetworkSession session, NtcLayerBinary layerBinary)
+        {
+            // We don't know the actual purpose of this packet, we only know that
+            // we must re-transmit it content to the other players in the gate
+
+            var senderPlayer = session.GetPlayer();
+            var gate = senderPlayer.SelectedGate;
+
+            var unknownField2 = new NtcBinaryCompoundData()
+            {
+                UnknownField1 = 0,
+                CapcomID = senderPlayer.SelectedHunter.SaveID,
+                Name = senderPlayer.SelectedHunter.HunterName
+            };
+
+            // Should we include the player in cities? I don't think so
+            foreach (var playerInGate in gate.PlayerInGate)
+            {
+                var playerSession = GetNetworkSession(playerInGate.RemoteEndPoint);
+                playerSession.SendPacket(new NtcLayerBinary(senderPlayer.SelectedHunter.SaveID, unknownField2,
+                    layerBinary.UnknownField3, layerBinary.UnknownField4));
+            }
+        }
+
         public override void HandleReqLayerUserList(NetworkSession session, ReqLayerUserList reqLayerUserList)
         {
             // Request user list from the current layer

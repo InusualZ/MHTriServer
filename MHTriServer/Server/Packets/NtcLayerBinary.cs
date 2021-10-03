@@ -8,7 +8,7 @@ namespace MHTriServer.Server.Packets
     {
         public const uint PACKET_ID = 0x64701000;
 
-        public string UnknownField1 { get; private set; }
+        public string CapcomID { get; private set; }
 
         public NtcBinaryCompoundData UnknownField2 { get; private set; }
 
@@ -17,7 +17,7 @@ namespace MHTriServer.Server.Packets
         public CompoundExtendedList UnknownField4 { get; private set; }
 
         public NtcLayerBinary(string unknownField1, NtcBinaryCompoundData unknownField2, ushort unknownField3, CompoundExtendedList unknownField4) : base(PACKET_ID)
-            => (UnknownField1, UnknownField2, UnknownField3, UnknownField4) = (unknownField1, unknownField2, unknownField3, unknownField4);
+            => (CapcomID, UnknownField2, UnknownField3, UnknownField4) = (unknownField1, unknownField2, unknownField3, unknownField4);
 
         public NtcLayerBinary(uint id, ushort size, ushort counter) : base(id, size, counter) { }
 
@@ -26,7 +26,7 @@ namespace MHTriServer.Server.Packets
             // TODO: Struct is not correct
             base.Serialize(writer);
 
-            writer.Write(UnknownField1);
+            writer.Write(CapcomID);
             UnknownField2.Serialize(writer);
 
             writer.Write(UnknownField3);
@@ -41,9 +41,12 @@ namespace MHTriServer.Server.Packets
             UnknownField4 = CompoundExtendedList.Deserialize<CompoundExtendedList>(reader);
         }
 
+        public override void Handle(PacketHandler handler, NetworkSession networkSession)
+            => handler.HandleNtcLayerBinary(networkSession, this);
+
         public override string ToString()
         {
-            return base.ToString() + $"\n\tUnknownField1 {UnknownField1}\n\tUnknownField2 {UnknownField2}\n\tUnknownField3 {UnknownField3}" +
+            return base.ToString() + $"\n\tUnknownField1 {CapcomID}\n\tUnknownField2 {UnknownField2}\n\tUnknownField3 {UnknownField3}" +
                 $"\n\tUnknownField4\n{UnknownField4}";
         }
     }

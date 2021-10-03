@@ -12,8 +12,8 @@ namespace MHTriServer.Server.Packets.Properties
         /// </summary>
         public uint UnknownField1 { get => Get<uint>(FIELD_1); set => Set(FIELD_1, value); }
 
-        public string UnknownField2 { get => Get<string>(FIELD_2); set => Set(FIELD_2, value); }
+        public string CapcomID { get => Get<string>(FIELD_2); set => Set(FIELD_2, value); }
 
-        public string UnknownField3 { get => Get<string>(FIELD_3); set => Set(FIELD_3, value); }
+        public string Name { get => Get<string>(FIELD_3); set => Set(FIELD_3, value); }
     }
 }
