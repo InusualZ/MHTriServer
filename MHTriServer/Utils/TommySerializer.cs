@@ -126,15 +126,12 @@ namespace Tommy.Serializer
                     List<string> tableKeys = table.Keys.ToList();
 
                     // -- Process Properties -------------------------------------------
-                    PropertyInfo[] properties = fileType.GetProperties(bindingFlags)
-                        .Where(x => tableKeys.Contains(x.Name))
-                        .ToArray();
-
+                    PropertyInfo[] properties = fileType.GetProperties(bindingFlags);
                     ProcessPropertiesFromFile(table, tableKeys, properties, dataClass);
 
                     // -- Process Fields -----------------------------------------------
                     FieldInfo[] fields = fileType.GetFields(bindingFlags)
-                        .Where(x => !x.Name.Contains("k__BackingField") && tableKeys.Contains(x.Name))
+                        .Where(x => !x.Name.Contains("k__BackingField"))
                         .ToArray();
 
                     ProcessFieldsFromFile(table, tableKeys, fields, dataClass);
@@ -147,10 +144,7 @@ namespace Tommy.Serializer
                     List<string> tableKeys = tableData.Keys.ToList();
 
                     // -- Process Properties -------------------------------------------
-                    PropertyInfo[] properties = fileType.GetProperties(bindingFlags)
-                        .Where(x => tableKeys.Contains(x.Name))
-                        .ToArray();
-
+                    PropertyInfo[] properties = fileType.GetProperties(bindingFlags);
                     ProcessPropertiesFromFile(tableData, tableKeys, properties, dataClass);
 
                     // -- Process Fields -----------------------------------------------
@@ -179,10 +173,11 @@ namespace Tommy.Serializer
                 if (!property.PropertyType.IsPublic && !Attribute.IsDefined(property, typeof(TommyInclude))) continue;
 
                 // -- Check if property has comment attribute --------------
-                string comment = (Attribute.GetCustomAttributes(property, typeof(TommyComment), false).FirstOrDefault() as TommyComment)?.Value;
+                string comment = (Attribute.GetCustomAttribute(property, typeof(TommyComment), false) as TommyComment)?.Value;
 
                 // -- Check if property has SortOrder attribute ------------
-                int? sortOrder = (Attribute.GetCustomAttributes(property, typeof(TommySortOrder), false).FirstOrDefault() as TommySortOrder)?.SortOrder;
+                var valueAttribute = Attribute.GetCustomAttribute(property, typeof(TommyValue), false) as TommyValue;
+                int? sortOrder = valueAttribute?.SortOrder;
 
                 var propertyValue = data.GetPropertyValue(property.Name);
                 Type propertyType = property.PropertyType;
@@ -242,7 +237,11 @@ namespace Tommy.Serializer
             for (int k = 0; k < tableKeys.Count; k++)
             {
                 string key = tableKeys[k];
-                PropertyInfo property = properties.FirstOrDefault(x => x.Name == key);
+                var property = properties.FirstOrDefault((prop) => {
+                    var altName = prop.GetCustomAttribute<TommyValue>()?.Name;
+                    return altName == key || prop.Name == key;
+                });
+
                 if (property == null) continue;
 
                 if (property.GetCustomAttribute<TommyIgnore>() != null) continue;
@@ -277,15 +276,13 @@ namespace Tommy.Serializer
                     List<string> propertyTableKeys = node.Keys.ToList();
 
                     // -- Process Properties -------------------------------------------
-                    PropertyInfo[] dataClassProperties = propertyType.GetProperties(bindingFlags)
-                        .Where(x => propertyTableKeys.Contains(x.Name))
-                        .ToArray();
+                    PropertyInfo[] dataClassProperties = propertyType.GetProperties(bindingFlags);
 
                     ProcessPropertiesFromFile(node, propertyTableKeys, dataClassProperties, propertyDataClass);
 
                     // -- Process Fields -----------------------------------------------
                     FieldInfo[] dataClassFields = propertyType.GetFields(bindingFlags)
-                        .Where(x => !x.Name.Contains("k__BackingField") && propertyTableKeys.Contains(x.Name))
+                        .Where(x => !x.Name.Contains("k__BackingField"))
                         .ToArray();
 
                     ProcessFieldsFromFile(node, propertyTableKeys, dataClassFields, propertyDataClass);
@@ -305,6 +302,33 @@ namespace Tommy.Serializer
 
                     if (valueType.GetInterface(nameof(IConvertible)) != null)
                         dataClass.SetPropertyValue(key, CreateGenericList(array, propertyType));
+                    else if (valueType.IsClass)
+                    {
+                        var propertyValue = Array.CreateInstance(valueType, array.Length);
+
+                        for(var elementIndex = 0; elementIndex < propertyValue.Length; ++elementIndex)
+                        {
+                            var element = array[elementIndex];
+                            var valueDataClass = Activator.CreateInstance(valueType) ?? throw new TommySerializerException($"Unable to instantiate {propertyType.Name}");
+                            propertyValue.SetValue(valueDataClass, elementIndex);
+
+                            List<string> propertyTableKeys = element.Keys.ToList();
+
+                            // -- Process Properties -------------------------------------------
+                            PropertyInfo[] dataClassProperties = valueType.GetProperties(bindingFlags);
+
+                            ProcessPropertiesFromFile(element, propertyTableKeys, dataClassProperties, valueDataClass);
+
+                            // -- Process Fields -----------------------------------------------
+                            FieldInfo[] dataClassFields = propertyType.GetFields(bindingFlags)
+                                .Where(x => !x.Name.Contains("k__BackingField"))
+                                .ToArray();
+
+                            ProcessFieldsFromFile(element, propertyTableKeys, dataClassFields, valueDataClass);
+                        }
+
+                        property.SetValue(dataClass, propertyValue);
+                    }
                     else throw new TommySerializerException($"{valueType.Name} is not able to be converted.");
                 }
             }
@@ -326,7 +350,9 @@ namespace Tommy.Serializer
                 string comment = (Attribute.GetCustomAttributes(field, typeof(TommyComment), false).FirstOrDefault() as TommyComment)?.Value;
 
                 // -- Check if property has SortOrder attribute ----------
-                int? sortOrder = (Attribute.GetCustomAttributes(field, typeof(TommySortOrder), false).FirstOrDefault() as TommySortOrder)?.SortOrder;
+                
+                var valueAttribute = field.GetCustomAttribute<TommyValue>();
+                int? sortOrder = valueAttribute?.SortOrder;
 
                 var fieldValue = data.GetFieldValue(field.Name);
                 Type fieldType = field.FieldType;
@@ -384,7 +410,11 @@ namespace Tommy.Serializer
             for (int k = 0; k < tableKeys.Count; k++)
             {
                 string key = tableKeys[k];
-                FieldInfo field = fields.FirstOrDefault(x => x.Name == key);
+                var field = fields.FirstOrDefault((prop) => {
+                    var altName = (Attribute.GetCustomAttribute(prop, typeof(TommyValue), false) as TommyValue)?.Name;
+                    return altName == key || prop.Name == key;
+                });
+
                 if (field == null) continue;
 
                 Type fieldType = field.FieldType;
@@ -786,6 +816,29 @@ namespace Tommy.Serializer
     }
 
     /// <summary>
+    /// 
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
+    public class TommyValue : Attribute
+    {
+        /// <summary>
+        /// Alternative name for the property|field
+        /// </summary>
+        public string Name { get; }
+
+        /// <summary>
+        /// Int value representing the order in which this item will appear in the Toml file
+        /// Determines the order in which the properties will be written to file, sorted by numeric value with 0 being
+        /// the first entry but below the table name (if applicable).
+        /// </summary>
+        public int SortOrder { get; }
+
+        /// <summary>  </summary>
+        /// <param name="sortOrder">Int value representing the order in which this item will appear in the Toml file</param>
+        public TommyValue(string name = null, int sortOrder = -1) => (Name, SortOrder) = (name, sortOrder);
+    }
+
+    /// <summary>
     ///  Adds a toml comment to a property or field
     /// </summary>
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
@@ -799,22 +852,6 @@ namespace Tommy.Serializer
         /// <summary> Adds a toml comment to a property or field </summary>
         /// <param name="comment">String value which will be used as a comment for the property/field</param>
         public TommyComment(string comment) => Value = comment;
-    }
-
-    /// <summary> Determines the order in which the properties will be written to file, sorted by numeric value with 0 being
-    /// the first entry but below the table name (if applicable). </summary>
-    [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
-    public class TommySortOrder : Attribute
-    {
-        /// <summary>
-        /// Int value representing the order in which this item will appear in the Toml file
-        /// </summary>
-        public int SortOrder { get; }
-
-        /// <summary> Determines the order in which the properties will be written to file, sorted by numeric value with 0 being
-        /// the first entry but below the table name (if applicable). </summary>
-        /// <param name="sortOrder">Int value representing the order in which this item will appear in the Toml file</param>
-        public TommySortOrder(int sortOrder = -1) => SortOrder = sortOrder;
     }
 
     /// <summary> When applied to a private property, the property will be included when loading or saving Toml to disk </summary>

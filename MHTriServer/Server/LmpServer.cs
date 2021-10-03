@@ -98,14 +98,14 @@ namespace MHTriServer.Server
         public override void HandleReqUserListHead(NetworkSession session, ReqUserListHead reqUserListHead)
         {
             var player = session.GetPlayer();
-            session.SendPacket(new AnsUserListHead(0, MHTriServer.Config.LmpServer.MaxHunterSlots));
+            session.SendPacket(new AnsUserListHead(0, MHTriServer.Config.Game.MaxHunterSlots));
         }
 
         public override void HandleReqUserListData(NetworkSession session, ReqUserListData reqUserListData)
         {
             var player = session.GetPlayer();
 
-            var slots = new List<HunterSlot>((int)MHTriServer.Config.LmpServer.MaxHunterSlots);
+            var slots = new List<HunterSlot>((int)MHTriServer.Config.Game.MaxHunterSlots);
             for (var i = 0; i < slots.Capacity; ++i)
             {
                 if (i < player.Hunters.Count)
@@ -152,7 +152,7 @@ namespace MHTriServer.Server
             if (slotIndex >= player.Hunters.Count)
             {
                 // Create new hunter slot
-                if (slotIndex >= MHTriServer.Config.LmpServer.MaxHunterSlots)
+                if (slotIndex >= MHTriServer.Config.Game.MaxHunterSlots)
                 {
                     session.Close(Constants.PLAYER_NO_EMPTY_SLOT_ERROR_MESSAGE);
                     return;

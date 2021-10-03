@@ -43,6 +43,13 @@ namespace MHTriServer
                 return 1;
             }
 
+            if (!ValidateConfig(Config))
+            {
+                Log.Fatal("Unable to validate config file");
+                return 1;
+            }
+
+
             BackendContext backend;
             try
             {
@@ -93,6 +100,20 @@ namespace MHTriServer
             backend.Dispose();
 
             return 0;
+        }
+
+        public static bool ValidateConfig(ServerConfig config)
+        {
+            var gameConfig = config.Game;
+            if (gameConfig.ServerTypes.Length == 0)
+            {
+                Log.Fatal("MHTriServer.Game.ServerType[] is empty");
+                return false;
+            }
+
+            // TODO: Validate more stuff
+
+            return true;
         }
 
         public static void InitializeLogger()

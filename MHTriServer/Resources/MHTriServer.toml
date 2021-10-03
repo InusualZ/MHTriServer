@@ -7,7 +7,6 @@ Port = 8200
 [LmpServer]
 Address = "127.0.0.1"
 Port = 8210
-MaxHunterSlots = 4
 
 [FmpServer]
 Address = "127.0.0.1"
@@ -15,3 +14,839 @@ Port = 8220
 
 [Database]
 Connection = "Data Source=MHTriServer.db"
+
+[Game]
+MaxHunterSlots = 4
+Timeout1 = 32767
+Timeout2 = 32767
+Timeout3 = 32767
+Timeout4 = 32767
+Timeout5 = 32767
+Timeout6 = 32767
+Timeout7 = 32767
+Timeout8 = 32767
+
+	[[Game.ServerType]]
+	Name = "Open" # Max Length 23 
+	Description = "Hunters of all Ranks\ncan gather here.NEW" # Max Length 167
+	MinimumRank = 0
+	MaximumRank = 65535
+
+		[[Game.ServerType.Server]]
+		Name = "Valor1"
+
+			[[Game.ServerType.Server.Gate]]
+			Name = "City Gate 1" # Max Length 63 
+
+				[[Game.ServerType.Server.Gate.City]]
+				Name = "City 1" # Max Length 63
+				MaxPopulation = 4
+
+			[[Game.ServerType.Server.Gate]]
+			Name = "City Gate 2"
+			
+				[[Game.ServerType.Server.Gate.City]]
+				Name = "City 1"
+				MaxPopulation = 4
+
+			[[Game.ServerType.Server.Gate]]
+			Name = "City Gate 3"
+			
+				[[Game.ServerType.Server.Gate.City]]
+				Name = "City 1"
+				MaxPopulation = 4
+
+			[[Game.ServerType.Server.Gate]]
+			Name = "City Gate 4"
+
+				[[Game.ServerType.Server.Gate.City]]
+				Name = "City 1"
+				MaxPopulation = 4
+
+		
+		[[Game.ServerType.Server]]
+		Name = "Valor2"
+
+			[[Game.ServerType.Server.Gate]]
+			Name = "City Gate 1" # Max Length 63 
+
+				[[Game.ServerType.Server.Gate.City]]
+				Name = "City 1" # Max Length 63
+				MaxPopulation = 4
+
+	[[Game.ServerType]]
+	Name = "Rookie" # Max Length 23 
+	Description = "Only hunters HR 30\nor lower may enter.NEW" # Max Length 167
+	MinimumRank = 0
+	MaximumRank = 30
+
+		[[Game.ServerType.Server]]
+		Name = "Rookies1"
+
+			[[Game.ServerType.Server.Gate]]
+			Name = "City Gate 1"
+
+				[[Game.ServerType.Server.Gate.City]]
+				Name = "City 1"
+				MaxPopulation = 4
+
+			[[Game.ServerType.Server.Gate]]
+			Name = "City Gate 2"
+			
+				[[Game.ServerType.Server.Gate.City]]
+				Name = "City 1"
+				MaxPopulation = 4
+
+			[[Game.ServerType.Server.Gate]]
+			Name = "City Gate 3"
+			
+				[[Game.ServerType.Server.Gate.City]]
+				Name = "City 1"
+				MaxPopulation = 4
+
+			[[Game.ServerType.Server.Gate]]
+			Name = "City Gate 4"
+
+				[[Game.ServerType.Server.Gate.City]]
+				Name = "City 1"
+				MaxPopulation = 4
+
+		[[Game.ServerType.Server]]
+		Name = "Rookies2"
+
+			[[Game.ServerType.Server.Gate]]
+			Name = "City Gate 1"
+
+				[[Game.ServerType.Server.Gate.City]]
+				Name = "City 1"
+				MaxPopulation = 4
+
+	[[Game.ServerType]]
+	Name = "Expert" # Max Length 23 
+	Description = "Only hunters HR 31\nor higher may enter.NEW" # Max Length 167
+	MinimumRank = 31
+	MaximumRank = 65535
+
+		[[Game.ServerType.Server]]
+			Name = "Veterans1"
+
+			[[Game.ServerType.Server.Gate]]
+			Name = "City Gate 1"
+
+				[[Game.ServerType.Server.Gate.City]]
+				Name = "City 1"
+				MaxPopulation = 4
+
+			[[Game.ServerType.Server.Gate]]
+			Name = "City Gate 2"
+			
+				[[Game.ServerType.Server.Gate.City]]
+				Name = "City 1"
+				MaxPopulation = 4
+
+			[[Game.ServerType.Server.Gate]]
+			Name = "City Gate 3"
+			
+				[[Game.ServerType.Server.Gate.City]]
+				Name = "City 1"
+				MaxPopulation = 4
+
+			[[Game.ServerType.Server.Gate]]
+			Name = "City Gate 4"
+
+				[[Game.ServerType.Server.Gate.City]]
+				Name = "City 1"
+				MaxPopulation = 4
+
+	[[Game.ServerType]]
+	Name = "Recruiting" # Max Length 23 
+	Description = "Hunters in search of\nhunting companions\ncan gather here.NEW" # Max Length 167
+	MinimumRank = 0
+	MaximumRank = 65535
+
+		[[Game.ServerType.Server]]
+		Name = "Greed1"
+
+			[[Game.ServerType.Server.Gate]]
+			Name = "City Gate 1"
+
+				[[Game.ServerType.Server.Gate.City]]
+				Name = "City 1"
+				MaxPopulation = 4
+
+			[[Game.ServerType.Server.Gate]]
+			Name = "City Gate 2"
+			
+				[[Game.ServerType.Server.Gate.City]]
+				Name = "City 1"
+				MaxPopulation = 4
+
+			[[Game.ServerType.Server.Gate]]
+			Name = "City Gate 3"
+			
+				[[Game.ServerType.Server.Gate.City]]
+				Name = "City 1"
+				MaxPopulation = 4
+
+			[[Game.ServerType.Server.Gate]]
+			Name = "City Gate 4"
+
+				[[Game.ServerType.Server.Gate.City]]
+				Name = "City 1"
+				MaxPopulation = 4
+
+	[[Game.HRLimit]]
+	Name = "None"
+	Enabled = true
+	Minimum = 0
+	Maximum = 65535
+
+	[[Game.HRLimit]]
+	Name = "Low"
+	Enabled = true
+	Minimum = 0
+	Maximum = 30
+
+	[[Game.HRLimit]]
+	Name = "High"
+	Enabled = true
+	Minimum = 31
+	Maximum = 65535
+
+	[[Game.HRLimit]]
+	Name = "Limit4"
+	Enabled = false
+	Minimum = 0
+	Maximum = 65535
+
+	[[Game.HRLimit]]
+	Name = "Limit5"
+	Enabled = false
+	Minimum = 0
+	Maximum = 65535
+
+	[[Game.HRLimit]]
+	Name = "Limit6"
+	Enabled = false
+	Minimum = 0
+	Maximum = 65535
+
+	[[Game.HRLimit]]
+	Name = "Limit7"
+	Enabled = false
+	Minimum = 0
+	Maximum = 65535
+
+	[[Game.HRLimit]]
+	Name = "Limit8"
+	Enabled = false
+	Minimum = 0
+	Maximum = 65535
+
+	[[Game.Seeking]]
+	Name = "Everyone welcome!"
+	Enabled = true
+	Flag = 0xff
+
+	[[Game.Seeking]]
+	Name = "Casual play"
+	Enabled = true
+	Flag = 0xff
+
+	[[Game.Seeking]]
+	Name = "Huntin' and chattin'"
+	Enabled = true
+	Flag = 0xff
+
+	[[Game.Seeking]]
+	Name = "Beginners welcome!"
+	Enabled = true
+	Flag = 0xff
+
+	[[Game.Seeking]]
+	Name = "Skilled players only"
+	Enabled = true
+	Flag = 0xff
+
+	[[Game.Seeking]]
+	Name = "Let's Quest together"
+	Enabled = true
+	Flag = 0xff
+
+	[[Game.Seeking]]
+	Name = "Event Quest ho!"
+	Enabled = true
+	Flag = 0xff
+
+	[[Game.Seeking]]
+	Name = "Arena battles!"
+	Enabled = true
+	Flag = 0xff
+
+	[[Game.Seeking]]
+	Name = "Earning money"
+	Enabled = true
+	Flag = 0xff
+
+	[[Game.Seeking]]
+	Name = "HR grinding"
+	Enabled = true
+	Flag = 0xff
+
+	[[Game.Seeking]]
+	Name = "Gathering materials"
+	Enabled = true
+	Flag = 0xff
+
+	[[Game.Seeking]]
+	Name = "Rare material search"
+	Enabled = true
+	Flag = 0xff
+
+	[[Game.Seeking]]
+	Name = "Just a Quest or two"
+	Enabled = true
+	Flag = 0xff
+
+	[[Game.Seeking]]
+	Name = "In for the long haul"
+	Enabled = true
+	Flag = 0xff
+
+	[[Game.Seeking]]
+	Name = "Seeking14" 
+	Enabled = false
+	Flag = 0xff
+
+	[[Game.Seeking]]
+	Name = "Seeking15" 
+	Enabled = false
+	Flag = 0xff
+
+	[[Game.Seeking]]
+	Name = "Seeking16" 
+	Enabled = false
+	Flag = 0xff
+
+	[[Game.Seeking]]
+	Name = "Seeking17"
+	Enabled = false
+	Flag = 0xff
+
+	[[Game.Seeking]]
+	Name = "Seeking18" 
+	Enabled = false
+	Flag = 0xff
+
+	[[Game.Seeking]]
+	Name = "Seeking19" 
+	Enabled = false
+	Flag = 0xff
+
+	[[Game.Seeking]]
+	Name = "Seeking20" 
+	Enabled = false
+	Flag = 0xff
+
+	[[Game.Seeking]]
+	Name = "Seeking21"
+	Enabled = false
+	Flag = 0xff
+
+	[[Game.Seeking]]
+	Name = "Seeking22" 
+	Enabled = false
+	Flag = 0xff
+
+	[[Game.Seeking]]
+	Name = "Seeking23" 
+	Enabled = false
+	Flag = 0xff
+
+	[[Game.Seeking]]
+	Name = "Seeking24" 
+	Enabled = false
+	Flag = 0xff
+
+	[[Game.Seeking]]
+	Name = "Seeking25"
+	Enabled = false
+	Flag = 0xff
+
+	[[Game.Seeking]]
+	Name = "Seeking26" 
+	Enabled = false
+	Flag = 0xff
+
+	[[Game.Seeking]]
+	Name = "Seeking27" 
+	Enabled = false
+	Flag = 0xff
+
+	[[Game.Seeking]]
+	Name = "Seeking28" 
+	Enabled = false
+	Flag = 0xff
+
+	[[Game.Seeking]]
+	Name = "Seeking29"
+	Enabled = false
+	Flag = 0xff
+
+	[[Game.Seeking]]
+	Name = "Seeking30" 
+	Enabled = false
+	Flag = 0xff
+
+	[[Game.Seeking]]
+	Name = "Seeking31"
+	Enabled = false
+	Flag = 0xff
+
+	[[Game.Goal]]
+	Name = "None" 
+	Enabled = true
+	RestrictionMode = 0 # None - 0, HR Limit - 1, Unknown - 2
+	Minimum = 0
+	Maximum = 0
+
+	[[Game.Goal]]
+	Name = "HR1~" 
+	Enabled = true
+	RestrictionMode = 1
+	Minimum = 1
+	Maximum = 8
+
+	[[Game.Goal]]
+	Name = "HR9~" 
+	Enabled = true
+	RestrictionMode = 1
+	Minimum = 9
+	Maximum = 17
+
+	[[Game.Goal]]
+	Name = "HR18~"
+	Enabled = true
+	RestrictionMode = 1
+	Minimum = 18
+	Maximum = 30
+
+	[[Game.Goal]]
+	Name = "HR31~" 
+	Enabled = true
+	RestrictionMode = 1
+	Minimum = 31
+	Maximum = 39
+
+	[[Game.Goal]]
+	Name = "HR40~" 
+	Enabled = true
+	RestrictionMode = 0
+	Minimum = 40
+	Maximum = 50
+
+	[[Game.Goal]]
+	Name = "HR51~"
+	Enabled = true
+	RestrictionMode = 0
+	Minimum = 51
+	Maximum = 65535
+
+	[[Game.Goal]]
+	Name = "1* Urgent Quest"
+	Enabled = true
+	RestrictionMode = 0
+	Minimum = 0
+	Maximum = 0
+
+	[[Game.Goal]]
+	Name = "2* Urgent Quest"
+	Enabled = true
+	RestrictionMode = 0
+	Minimum = 0
+	Maximum = 0
+
+	[[Game.Goal]]
+	Name = "3* Urgent Quest"
+	Enabled = true
+	RestrictionMode = 0
+	Minimum = 0
+	Maximum = 0
+
+	[[Game.Goal]]
+	Name = "4* Urgent Quest"
+	Enabled = true 
+	RestrictionMode = 0
+	Minimum = 0
+	Maximum = 0
+
+	[[Game.Goal]]
+	Name = "5* Urgent Quest"
+	Enabled = true
+	RestrictionMode = 0
+	Minimum = 0
+	Maximum = 0
+
+	[[Game.Goal]]
+	Name = "Great Jaggi"
+	Enabled = true 
+	RestrictionMode = 0
+	Minimum = 0
+	Maximum = 0
+
+	[[Game.Goal]]
+	Name = "Qurupecco" 
+	Enabled = true
+	RestrictionMode = 0
+	Minimum = 0
+	Maximum = 0
+
+	[[Game.Goal]]
+	Name = "Royal Ludroth"
+	Enabled = true
+	RestrictionMode = 0
+	Minimum = 0
+	Maximum = 0
+
+	[[Game.Goal]]
+	Name = "Barroth"
+	Enabled = true
+	RestrictionMode = 0
+	Minimum = 0
+	Maximum = 0
+
+	[[Game.Goal]]
+	Name = "Gobul" 
+	Enabled = true
+	RestrictionMode = 0
+	Minimum = 0
+	Maximum = 0
+
+	[[Game.Goal]]
+	Name = "Rathian" 
+	Enabled = true
+	RestrictionMode = 0
+	Minimum = 0
+	Maximum = 0
+
+	[[Game.Goal]]
+	Name = "Great Baggi"
+	Enabled = true
+	RestrictionMode = 0
+	Minimum = 0
+	Maximum = 0
+
+	[[Game.Goal]]
+	Name = "Gigginox"
+	Enabled = true
+	RestrictionMode = 0
+	Minimum = 0
+	Maximum = 0
+
+	[[Game.Goal]]
+	Name = "Lagiacrus" 
+	Enabled = true
+	RestrictionMode = 0
+	Minimum = 0
+	Maximum = 0
+
+	[[Game.Goal]]
+	Name = "Barioth" 
+	Enabled = true
+	RestrictionMode = 0
+	Minimum = 0
+	Maximum = 0
+
+	[[Game.Goal]]
+	Name = "Rathalos" 
+	Enabled = true
+	RestrictionMode = 0
+	Minimum = 0
+	Maximum = 0
+
+	[[Game.Goal]]
+	Name = "Diablos"
+	Enabled = true
+	RestrictionMode = 0
+	Minimum = 0
+	Maximum = 0
+
+	[[Game.Goal]]
+	Name = "Uragaan" 
+	Enabled = true
+	RestrictionMode = 0
+	Minimum = 0
+	Maximum = 0
+
+	[[Game.Goal]]
+	Name = "Agnaktor" 
+	Enabled = true
+	RestrictionMode = 0
+	Minimum = 0
+	Maximum = 0
+
+	[[Game.Goal]]
+	Name = "Jhen Mohran" 
+	Enabled = true
+	RestrictionMode = 0
+	Minimum = 0
+	Maximum = 0
+
+	[[Game.Goal]]
+	Name = "Deviljho"
+	Enabled = true
+	RestrictionMode = 0
+	Minimum = 0
+	Maximum = 0
+
+	[[Game.Goal]]
+	Name = "Alatreon" 
+	Enabled = true
+	RestrictionMode = 0
+	Minimum = 0
+	Maximum = 0
+
+	[[Game.Goal]]
+	Name = "Mining Ore"
+	Enabled = true 
+	RestrictionMode = 0
+	Minimum = 0
+	Maximum = 0
+
+	[[Game.Goal]]
+	Name = "Catching Bugs" 
+	Enabled = true
+	RestrictionMode = 0
+	Minimum = 0
+	Maximum = 0
+
+	[[Game.Goal]]
+	Name = "Fishing"
+	Enabled = true
+	RestrictionMode = 0
+	Minimum = 0
+	Maximum = 0
+
+	[[Game.Goal]]
+	Name = "Small Monsters" 
+	Enabled = true
+	RestrictionMode = 0
+	Minimum = 0
+	Maximum = 0
+
+	[[Game.Goal]]
+	Name = "Gathering" 
+	Enabled = true
+	RestrictionMode = 0
+	Minimum = 0
+	Maximum = 0
+
+	[[Game.Goal]]
+	Name = "Transporting" 
+	Enabled = true
+	RestrictionMode = 0
+	Minimum = 0
+	Maximum = 0
+
+	[[Game.Goal]]
+	Name = "The Arena"
+	Enabled = true
+	RestrictionMode = 0
+	Minimum = 0
+	Maximum = 0
+
+	[[Game.Goal]]
+	Name = "Goal36" 
+	Enabled = true
+	RestrictionMode = 0
+	Minimum = 0
+	Maximum = 0
+
+	[[Game.Goal]]
+	Name = "Goal37" 
+	Enabled = true
+	RestrictionMode = 0
+	Minimum = 0
+	Maximum = 0
+
+	[[Game.Goal]]
+	Name = "Goal38" 
+	Enabled = true
+	RestrictionMode = 0
+	Minimum = 0
+	Maximum = 0
+
+	[[Game.Goal]]
+	Name = "Goal39"
+	Enabled = true
+	RestrictionMode = 0
+	Minimum = 0
+	Maximum = 0
+
+	[[Game.Goal]]
+	Name = "Goal40" 
+	Enabled = true
+	RestrictionMode = 0
+	Minimum = 0
+	Maximum = 0
+
+	[[Game.Goal]]
+	Name = "Goal41" 
+	Enabled = true
+	RestrictionMode = 0
+	Minimum = 0
+	Maximum = 0
+
+	[[Game.Goal]]
+	Name = "Goal42" 
+	Enabled = true
+	RestrictionMode = 0
+	Minimum = 0
+	Maximum = 0
+
+	[[Game.Goal]]
+	Name = "Goal43"
+	Enabled = true
+	RestrictionMode = 0
+	Minimum = 0
+	Maximum = 0
+
+	[[Game.Goal]]
+	Name = "Goal44" 
+	Enabled = true
+	RestrictionMode = 0
+	Minimum = 0
+	Maximum = 0
+
+	[[Game.Goal]]
+	Name = "Goal45" 
+	Enabled = true
+	RestrictionMode = 0
+	Minimum = 0
+	Maximum = 0
+
+	[[Game.Goal]]
+	Name = "Goal46" 
+	Enabled = true
+	RestrictionMode = 0
+	Minimum = 0
+	Maximum = 0
+
+	[[Game.Goal]]
+	Name = "Goal47"
+	Enabled = true
+	RestrictionMode = 0
+	Minimum = 0
+	Maximum = 0
+
+	[[Game.Goal]]
+	Name = "Goal48" 
+	Enabled = true
+	RestrictionMode = 0
+	Minimum = 0
+	Maximum = 0
+
+	[[Game.Goal]]
+	Name = "Goal49" 
+	Enabled = true
+	RestrictionMode = 0
+	Minimum = 0
+	Maximum = 0
+
+	[[Game.Goal]]
+	Name = "Goal50" 
+	Enabled = true
+	RestrictionMode = 0
+	Minimum = 0
+	Maximum = 0
+
+	[[Game.Goal]]
+	Name = "Goal51"
+	Enabled = true
+	RestrictionMode = 0
+	Minimum = 0
+	Maximum = 0
+
+	[[Game.Goal]]
+	Name = "Goal52" 
+	Enabled = true
+	RestrictionMode = 0
+	Minimum = 0
+	Maximum = 0
+
+	[[Game.Goal]]
+	Name = "Goal53" 
+	Enabled = true
+	RestrictionMode = 0
+	Minimum = 0
+	Maximum = 0
+
+	[[Game.Goal]]
+	Name = "Goal54" 
+	Enabled = true
+	RestrictionMode = 0
+	Minimum = 0
+	Maximum = 0
+
+	[[Game.Goal]]
+	Name = "Goal55"
+	Enabled = true
+	RestrictionMode = 0
+	Minimum = 0
+	Maximum = 0
+
+	[[Game.Goal]]
+	Name = "Goal56" 
+	Enabled = true
+	RestrictionMode = 0
+	Minimum = 0
+	Maximum = 0
+
+	[[Game.Goal]]
+	Name = "Goal57" 
+	Enabled = true
+	RestrictionMode = 0
+	Minimum = 0
+	Maximum = 0
+
+	[[Game.Goal]]
+	Name = "Goal58" 
+	Enabled = true
+	RestrictionMode = 0
+	Minimum = 0
+	Maximum = 0
+
+	[[Game.Goal]]
+	Name = "Goal59"
+	Enabled = true
+	RestrictionMode = 0
+	Minimum = 0
+	Maximum = 0
+
+	[[Game.Goal]]
+	Name = "Goal60" 
+	Enabled = true
+	RestrictionMode = 0
+	Minimum = 0
+	Maximum = 0
+
+	[[Game.Goal]]
+	Name = "Goal61" 
+	Enabled = true
+	RestrictionMode = 0
+	Minimum = 0
+	Maximum = 0
+
+	[[Game.Goal]]
+	Name = "Goal62" 
+	Enabled = true
+	RestrictionMode = 0
+	Minimum = 0
+	Maximum = 0
+
+	[[Game.Goal]]
+	Name = "Goal63"
+	Enabled = true
+	RestrictionMode = 0
+	Minimum = 0
+	Maximum = 0

@@ -1,4 +1,5 @@
-﻿using Tommy.Serializer;
+﻿using MHTriServer.Server.Game;
+using Tommy.Serializer;
 
 namespace MHTriServer
 {
@@ -12,6 +13,8 @@ namespace MHTriServer
         public FmpServerConfig FmpServer { get; set; }
 
         public DatabaseConfig Database { get; set; }
+
+        public GameConfig Game { get; set; }
     }
 
     public class BaseServerConfig
@@ -32,7 +35,7 @@ namespace MHTriServer
     [TommyTableName("LmpServer")]
     public class LmpServerConfig : BaseServerConfig
     {
-        public uint MaxHunterSlots { get; set; }
+
     }
 
     [TommyTableName("FmpServer")]
@@ -45,5 +48,40 @@ namespace MHTriServer
     public class DatabaseConfig
     {
         public string Connection { get; set; }
+    }
+
+    [TommyTableName("Game")]
+    public class GameConfig
+    {
+        public uint MaxHunterSlots { get; set; }
+
+        public short Timeout1 { get; set; }
+
+        public short Timeout2 { get; set; }
+
+        public short Timeout3 { get; set; }
+
+        public short Timeout4 { get; set; }
+
+        public short Timeout5 { get; set; }
+
+        public short Timeout6 { get; set; }
+
+        public short Timeout7 { get; set; }
+
+        public short Timeout8 { get; set; }
+
+
+        [TommyValue("ServerType")]
+        public ServerType[] ServerTypes { get; set; }
+
+        [TommyValue("HRLimit")]
+        public HRLimit[] HRLimits { get; set; }
+
+        [TommyValue("Seeking")]
+        public Seeking[] Seekings { get; set; }
+
+        [TommyValue("Goal")]
+        public Goal[] Goals { get; set; }
     }
 }
