@@ -10,6 +10,8 @@ namespace MHTriServer.Server.Packets
 
         public virtual void HandleNtcCollectionLog(NetworkSession session, NtcCollectionLog collectionLog) => throw new NotImplementedException();
 
+        public virtual void HandleNtcLayerChat(NetworkSession session, NtcLayerChat layerChat) => throw new NotImplementedException();
+
         public virtual void HandleReqAnnounce(NetworkSession session, ReqAnnounce reqAnnounce) => throw new NotImplementedException();
 
         public virtual void HandleReqAuthenticationToken(NetworkSession session, ReqAuthenticationToken reqAuthenticationToken) => throw new NotImplementedException();
