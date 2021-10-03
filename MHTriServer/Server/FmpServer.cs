@@ -625,6 +625,43 @@ namespace MHTriServer.Server
             session.SendPacket(new AnsUserBinaryNotice());
         }
 
+        public override void HandleNtcLayerChat(NetworkSession session, NtcLayerChat layerChat)
+        {
+            var player = session.GetPlayer();
+
+            var messageProperties = layerChat.Properties;
+            messageProperties.Color = 0xffffffff /* White */;
+            messageProperties.SenderID = player.SelectedHunter.SaveID;
+            messageProperties.SenderName = player.SelectedHunter.HunterName;
+
+            if (player.SelectedCity != null)
+            {
+                foreach (var cityPlayer in player.SelectedCity.Players)
+                {
+                    if (player == cityPlayer)
+                    {
+                        continue;
+                    }
+
+                    var seesion = GetNetworkSession(cityPlayer.RemoteEndPoint);
+                    seesion.SendPacket(new NtcLayerChat(layerChat.UnknownField1, messageProperties, layerChat.Message));
+                }
+            }
+            else if (player.SelectedGate != null)
+            {
+                foreach (var gatePlayer in player.SelectedGate.PlayerInGate)
+                {
+                    if (player == gatePlayer)
+                    {
+                        continue;
+                    }
+
+                    var seesion = GetNetworkSession(gatePlayer.RemoteEndPoint);
+                    seesion.SendPacket(new NtcLayerChat(layerChat.UnknownField1, messageProperties, layerChat.Message));
+                }
+            }
+        }
+
         public override void HandleReqLayerCreateHead(NetworkSession session, ReqLayerCreateHead reqLayerCreateHead)
         {
             // Notify the server that the client want to create a city

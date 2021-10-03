@@ -258,6 +258,21 @@ namespace MHTriServer.Server
             return null;
         }
 
+        protected NetworkSession GetNetworkSession(EndPoint endPoint)
+        {
+            foreach (var session in m_Sessions)
+            {
+                if (session.RemoteEndPoint == endPoint)
+                {
+                    return session;
+                }
+            }
+
+            // TEST: Under current condition this should be imposible
+            Debug.Assert(false);
+            return null;
+        }
+
         public virtual void OnSessionRemoved(NetworkSession session) { }
 
         public bool RemoveSession(NetworkSession session)
