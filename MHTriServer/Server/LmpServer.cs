@@ -119,7 +119,7 @@ namespace MHTriServer.Server
                         UnknownField4 = hunter.UnknownField4,
                         UnknownField5 = hunter.UnknownField5,
                         UnknownField6 = hunter.UnknownField6,
-                        UnknownField7 = hunter.UnknownField7,
+                        Rank = hunter.Rank,
                     };
 
                     if (!string.IsNullOrEmpty(hunter.UnknownField8))
@@ -169,7 +169,7 @@ namespace MHTriServer.Server
                     UnknownField4 = reqUserObject.Slot.UnknownField4,
                     UnknownField5 = reqUserObject.Slot.UnknownField5,
                     UnknownField6 = reqUserObject.Slot.UnknownField6,
-                    UnknownField7 = reqUserObject.Slot.UnknownField7,
+                    Rank = reqUserObject.Slot.Rank,
                     UnknownField8 = reqUserObject.Slot.UnknownField8,
                 };
 
@@ -209,10 +209,10 @@ namespace MHTriServer.Server
                             }
                             break;
 
-                        case HunterSlot.FIELD_7:
+                        case HunterSlot.RANK_FIELD:
                             {
                                 var value = (uint)fieldValue;
-                                hunter.UnknownField7 = value;
+                                hunter.Rank = value;
                             }
                             break;
 

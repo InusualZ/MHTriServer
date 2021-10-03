@@ -10,7 +10,7 @@ namespace MHTriServer.Server.Packets.Properties
         public const byte FIELD_4 = 0x04; // Fill
         public const byte FIELD_5 = 0x05; // Fill
         public const byte FIELD_6 = 0x06; // Fill
-        public const byte FIELD_7 = 0x07; // Fill
+        public const byte RANK_FIELD = 0x07;
         public const byte FIELD_8 = 0x08;
 
         public uint SlotIndex { get => Get<uint>(SLOT_INDEX_FIELD); set => Set(SLOT_INDEX_FIELD, value); }
@@ -39,7 +39,7 @@ namespace MHTriServer.Server.Packets.Properties
 
         public uint UnknownField6 { get => Get<uint>(FIELD_6); set => Set(FIELD_6, value); }
 
-        public uint UnknownField7 { get => Get<uint>(FIELD_7); set => Set(FIELD_7, value); }
+        public uint Rank { get => Get<uint>(RANK_FIELD); set => Set(RANK_FIELD, value); }
 
         public string UnknownField8 
         { 

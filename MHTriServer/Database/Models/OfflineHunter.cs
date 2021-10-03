@@ -33,7 +33,7 @@ namespace MHTriServer.Database.Models
         public uint UnknownField6 { get; set; }
 
         [Required]
-        public uint UnknownField7 { get; set; }
+        public uint Rank { get; set; }
 
         [MaxLength(31)]
         [Column(TypeName = "varchar(31)")]
