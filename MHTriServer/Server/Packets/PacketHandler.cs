@@ -78,6 +78,8 @@ namespace MHTriServer.Server.Packets
 
         public virtual void HandleReqLayerEnd(NetworkSession session, ReqLayerEnd reqLayerEnd) => throw new NotImplementedException();
 
+        public virtual void HandleReqLayerHost(NetworkSession session, ReqLayerHost reqLayerHost) => throw new NotImplementedException();
+
         public virtual void HandleReqLayerMediationList(NetworkSession session, ReqLayerMediationList reqLayerMediationList) => throw new NotImplementedException();
 
         public virtual void HandleReqLayerMediationLock(NetworkSession session, ReqLayerMediationLock reqLayerMediationLock) => throw new NotImplementedException();

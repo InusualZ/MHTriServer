@@ -440,7 +440,14 @@ namespace MHTriServer.Server
                 UnknownField12 = 1,
             };
 
-            List<UnkByteIntStruct> extraProperties = null;
+            var extraProperties = reqLayerChildInfo.UnknownField2.Select(f => {
+                return new UnkByteIntStruct()
+                {
+                    UnknownField = f.UnknownField1,
+                    ContainUnknownField3 = true,
+                    UnknownField3 = f.UnknownField2
+                };
+            }).ToList(); ;
 
             if (reqLayerChildInfo.Index < 1)
             {
@@ -476,19 +483,36 @@ namespace MHTriServer.Server
                 layerData.UnknownField7 = 0xff; // ???
                 layerData.InCityPopulation = (uint)gate.InCityPopulation;
                 layerData.State = LayerData.StateEnum.Enable;
-
-                extraProperties = reqLayerChildInfo.UnknownField2.Select(f => {
-                    return new UnkByteIntStruct()
-                    {
-                        UnknownField = f.UnknownField1,
-                        ContainUnknownField3 = true,
-                        UnknownField3 = f.UnknownField2
-                    };
-                }).ToList();
             }
-            else
+            else if (player.SelectedCity == null)
             {
-                Debug.Assert(false);
+                var gate = player.SelectedGate;
+                var city = gate.Cities.FirstOrDefault(c => c.Id == reqLayerChildInfo.Index);
+                if (city == default)
+                {
+                    session.Close(Constants.CITY_NOT_FOUND_ERROR_MESSAGE);
+                    return;
+                }
+
+                if (city.CurrentPopulation + 1 > city.MaxPopulation)
+                {
+                    session.Close(Constants.CITY_FULL_ERROR_MESSAGE);
+                    return;
+                }
+
+                player.SelectedCity = city;
+                gate.PlayerInGate.Remove(player);
+
+                // How do I notify to the host this new player?
+                player.SelectedCity.Players.Add(player);
+
+                layerData.Name = city.Name;
+                layerData.Index = (short)city.Id;
+                layerData.CurrentPopulation = (uint)city.CurrentPopulation + 1;
+                layerData.MaxPopulation = (uint)city.MaxPopulation;
+                layerData.UnknownField7 = 0xff; // ???
+                layerData.InCityPopulation = (uint)city.Players.Count - (uint)city.DepartedPlayer;
+                layerData.State = LayerData.StateEnum.Enable;
             }
 
             session.SendPacket(new AnsLayerChildInfo(1, layerData, extraProperties));
@@ -509,8 +533,8 @@ namespace MHTriServer.Server
                 Name = senderPlayer.SelectedHunter.HunterName
             };
 
-            // Should we include the player in cities? I don't think so
-            foreach (var playerInGate in gate.PlayerInGate)
+            // Should we include the player in cities?
+            foreach (var playerInGate in gate.PlayerInGate.Concat(gate.PlayersInCity))
             {
                 var playerSession = GetNetworkSession(playerInGate.RemoteEndPoint);
                 playerSession.SendPacket(new NtcLayerBinary(senderPlayer.SelectedHunter.SaveID, unknownField2,
@@ -825,6 +849,24 @@ namespace MHTriServer.Server
             }
 
             session.SendPacket(new AnsLayerUserListFoot());
+        }
+
+        public override void HandleReqLayerHost(NetworkSession session, ReqLayerHost reqLayerHost)
+        {
+            // Sent when you join a city
+
+            // Should we do something with this data?
+            var cityData = reqLayerHost.CityData;
+
+            var player = session.GetPlayer();
+            var selectedCity = player.SelectedCity;
+            var leader = selectedCity.Leader;
+            var leaderSession = GetNetworkSession(leader.RemoteEndPoint);
+            var leaderHunter = leader.SelectedHunter;
+
+            // session.SendPacket(new NtcLayerHost(cityData, leaderHunter.SaveID, leaderHunter.HunterName));
+
+            session.SendPacket(new AnsLayerHost(cityData, leaderHunter.SaveID, leaderHunter.HunterName));
         }
 
         public override void HandleReqLayerMediationList(NetworkSession session, ReqLayerMediationList reqLayerMediationList)

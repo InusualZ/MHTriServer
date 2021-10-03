@@ -151,6 +151,7 @@ namespace MHTriServer.Server.Packets
             RegisterWith<NtcCollectionLog>(NtcCollectionLog.PACKET_ID);
             RegisterWith<NtcLayerBinary>(NtcLayerBinary.PACKET_ID);
             RegisterWith<NtcLayerChat>(NtcLayerChat.PACKET_ID);
+            RegisterWith<NtcLayerHost>(NtcLayerHost.PACKET_ID);
             RegisterWith<NtcLayerUserNum>(NtcLayerUserNum.PACKET_ID);
             RegisterWith<NtcLayerUserPosition>(NtcLayerUserPosition.PACKET_ID);
             RegisterWith<NtcLogin>(NtcLogin.PACKET_ID);
@@ -189,6 +190,7 @@ namespace MHTriServer.Server.Packets
             RegisterWith<ReqLayerDetailSearchHead>(ReqLayerDetailSearchHead.PACKET_ID);
             RegisterWith<ReqLayerDown>(ReqLayerDown.PACKET_ID);
             RegisterWith<ReqLayerEnd>(ReqLayerEnd.PACKET_ID);
+            RegisterWith<ReqLayerHost>(ReqLayerHost.PACKET_ID);
             RegisterWith<ReqLayerMediationList>(ReqLayerMediationList.PACKET_ID);
             RegisterWith<ReqLayerMediationLock>(ReqLayerMediationLock.PACKET_ID);
             RegisterWith<ReqLayerStart>(ReqLayerStart.PACKET_ID);
