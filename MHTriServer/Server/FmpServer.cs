@@ -536,6 +536,11 @@ namespace MHTriServer.Server
             // Should we include the player in cities?
             foreach (var playerInGate in gate.PlayerInGate.Concat(gate.PlayersInCity))
             {
+                if (playerInGate == senderPlayer)
+                {
+                    continue;
+                }
+
                 var playerSession = GetNetworkSession(playerInGate.RemoteEndPoint);
                 playerSession.SendPacket(new NtcLayerBinary(senderPlayer.SelectedHunter.SaveID, unknownField2,
                     layerBinary.UnknownField3, layerBinary.UnknownField4));
