@@ -86,6 +86,8 @@ namespace MHTriServer.Server.Packets
 
         public virtual void HandleReqLayerStart(NetworkSession session, ReqLayerStart reqLayerStart) => throw new NotImplementedException();
 
+        public virtual void HandleReqLayerUp(NetworkSession session, ReqLayerUp reqLayerUp) => throw new NotImplementedException();
+
         public virtual void HandleReqLayerUserList(NetworkSession session, ReqLayerUserList reqLayerUserList) => throw new NotImplementedException();
 
         public virtual void HandleReqLayerUserListData(NetworkSession session, ReqLayerUserListData reqLayerUserListData) => throw new NotImplementedException();

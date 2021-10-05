@@ -865,13 +865,32 @@ namespace MHTriServer.Server
 
             var player = session.GetPlayer();
             var selectedCity = player.SelectedCity;
+            var selectedHunter = player.SelectedHunter;
+
+            var hunterData = new LayerUserData() 
+            {
+                Name = selectedHunter.HunterName,
+                CapcomID = selectedHunter.SaveID,
+                // TODO: Other fields?
+            };
+
             var leader = selectedCity.Leader;
             var leaderSession = GetNetworkSession(leader.RemoteEndPoint);
             var leaderHunter = leader.SelectedHunter;
 
-            // session.SendPacket(new NtcLayerHost(cityData, leaderHunter.SaveID, leaderHunter.HunterName));
+            leaderSession.SendPacket(new NtcLayerIn(selectedHunter.SaveID, hunterData));
 
             session.SendPacket(new AnsLayerHost(cityData, leaderHunter.SaveID, leaderHunter.HunterName));
+        }
+
+        public override void HandleReqLayerUp(NetworkSession session, ReqLayerUp reqLayerUp)
+        {
+            // Received when the player can't connect to the city's host
+            var player = session.GetPlayer();
+
+            RemoveFromCity(player);
+
+            session.SendPacket(new AnsLayerUp());
         }
 
         public override void HandleReqLayerMediationList(NetworkSession session, ReqLayerMediationList reqLayerMediationList)
@@ -1089,6 +1108,7 @@ namespace MHTriServer.Server
                 return false;
             }
 
+            // TODO: At this point we should disconnect the user?
             // TODO: Notify other user of this user departure
             player.SelectedGate.PlayerInGate.Remove(player);
             player.SelectedGate = null;
