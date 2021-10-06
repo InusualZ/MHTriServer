@@ -521,10 +521,9 @@ namespace MHTriServer.Server
         public override void HandleNtcLayerBinary(NetworkSession session, NtcLayerBinary layerBinary)
         {
             // We don't know the actual purpose of this packet, we only know that
-            // we must re-transmit it content to the other players in the gate
+            // we must re-transmit it content to the other players in the layer
 
             var senderPlayer = session.GetPlayer();
-            var gate = senderPlayer.SelectedGate;
 
             var unknownField2 = new NtcBinaryCompoundData()
             {
@@ -533,17 +532,68 @@ namespace MHTriServer.Server
                 Name = senderPlayer.SelectedHunter.HunterName
             };
 
-            // Should we include the player in cities?
-            foreach (var playerInGate in gate.PlayerInGate.Concat(gate.PlayersInCity))
+            if (senderPlayer.SelectedCity != null)
             {
-                if (playerInGate == senderPlayer)
+                var city = senderPlayer.SelectedCity;
+                foreach (var playerInCity in city.Players)
                 {
-                    continue;
-                }
+                    if (playerInCity == senderPlayer)
+                    {
+                        continue;
+                    }
 
-                var playerSession = GetNetworkSession(playerInGate.RemoteEndPoint);
-                playerSession.SendPacket(new NtcLayerBinary(senderPlayer.SelectedHunter.SaveID, unknownField2,
+                    var playerSession = GetNetworkSession(playerInCity.RemoteEndPoint);
+                    playerSession.SendPacket(new NtcLayerBinary(senderPlayer.SelectedHunter.SaveID, unknownField2,
+                        layerBinary.UnknownField3, layerBinary.UnknownField4));
+                }
+            }
+            else if (senderPlayer.SelectedGate != null)
+            {
+                var gate = senderPlayer.SelectedGate;
+                foreach (var playerInGate in gate.PlayerInGate)
+                {
+                    if (playerInGate == senderPlayer)
+                    {
+                        continue;
+                    }
+
+                    var playerSession = GetNetworkSession(playerInGate.RemoteEndPoint);
+                    playerSession.SendPacket(new NtcLayerBinary(senderPlayer.SelectedHunter.SaveID, unknownField2,
+                        layerBinary.UnknownField3, layerBinary.UnknownField4));
+                }
+            }
+        }
+
+        public override void HandleNtcLayerBinary2(NetworkSession session, NtcLayerBinary2 layerBinary)
+        {
+            // We don't know the actual purpose of this packet, we only know that
+            // we must re-transmit it content to the other players in the layer
+
+            var senderPlayer = session.GetPlayer();
+
+            var unknownField2 = new NtcBinaryCompoundData()
+            {
+                UnknownField1 = 0,
+                CapcomID = senderPlayer.SelectedHunter.SaveID,
+                Name = senderPlayer.SelectedHunter.HunterName
+            };
+
+            if (senderPlayer.SelectedCity != null)
+            {
+                var city = senderPlayer.SelectedCity;
+                var partnerPlayer = city.Players.FirstOrDefault(p => p.SelectedHunter.SaveID == layerBinary.PartnerId);
+                // todo: handle partner being null
+
+                unknownField2.CapcomID = layerBinary.PartnerId;
+                unknownField2.Name = partnerPlayer.SelectedHunter.HunterName;
+
+                var partnerSession = GetNetworkSession(partnerPlayer.RemoteEndPoint);
+                partnerSession.SendPacket(new NtcLayerBinary2(layerBinary.PartnerId, unknownField2,
                     layerBinary.UnknownField3, layerBinary.UnknownField4));
+            }
+            else
+            {
+                Debug.Assert(false);
             }
         }
 

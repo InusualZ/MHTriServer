@@ -150,6 +150,7 @@ namespace MHTriServer.Server.Packets
             RegisterWith<NtcCircleMatchStart>(NtcCircleMatchStart.PACKET_ID);
             RegisterWith<NtcCollectionLog>(NtcCollectionLog.PACKET_ID);
             RegisterWith<NtcLayerBinary>(NtcLayerBinary.PACKET_ID);
+            RegisterWith<NtcLayerBinary2>(NtcLayerBinary2.PACKET_ID);
             RegisterWith<NtcLayerChat>(NtcLayerChat.PACKET_ID);
             RegisterWith<NtcLayerHost>(NtcLayerHost.PACKET_ID);
             RegisterWith<NtcLayerIn>(NtcLayerIn.PACKET_ID);
