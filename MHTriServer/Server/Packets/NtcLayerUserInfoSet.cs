@@ -6,7 +6,7 @@ namespace MHTriServer.Server.Packets
 {
     public class NtcLayerUserInfoSet : Packet
     {
-        public const uint PACKET_ID = 0x64201000;
+        public const uint PACKET_ID = 0x64601000;
 
         public string CapcomID { get; private set; }
 
