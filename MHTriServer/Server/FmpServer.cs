@@ -447,14 +447,49 @@ namespace MHTriServer.Server
                     ContainUnknownField3 = true,
                     UnknownField3 = f.UnknownField2
                 };
-            }).ToList(); ;
+            }).ToList();
 
             if (reqLayerChildInfo.Index < 1)
             {
                 // Index should not be < 1, it (probably) means that the game want to know if anything have changed
                 // in the layer that we are in
 
-                // TODO: What should we update here?
+                // These field are read, unknown fields
+                layerData.UnknownField17 = 120;
+                layerData.UnknownField18 = 1;
+
+                if (player.SelectedCity != null)
+                {
+                    var city = player.SelectedCity;
+
+                    layerData.Name = city.Name;
+                    layerData.Index = (short)city.Id;
+                    layerData.CurrentPopulation = (uint)city.CurrentPopulation;
+                    layerData.MaxPopulation = (uint)city.MaxPopulation;
+                    layerData.UnknownField7 = 0xff; // ???
+                    layerData.InCityPopulation = (uint)city.Players.Count - (uint)city.DepartedPlayer;
+                    layerData.State = LayerData.StateEnum.Enable;
+                }
+                else if (player.SelectedGate != null)
+                {
+                    var gate = player.SelectedGate;
+                    layerData.Name = gate.Name;
+                    layerData.Index = (short)gate.Id;
+                    layerData.CurrentPopulation = (uint)gate.CurrentPopulation;
+                    layerData.MaxPopulation = (uint)gate.MaxPopulation;
+                    layerData.UnknownField7 = 0xff; // ???
+                    layerData.InCityPopulation = (uint)gate.InCityPopulation;
+                    layerData.State = LayerData.StateEnum.Enable;
+
+                }
+                else if (player.SelectedServer != null)
+                {
+                    // Don't update server info
+                }
+                else
+                {
+                    Debug.Assert(false);
+                }
             }
             else if (player.SelectedGate == null)
             {
@@ -513,6 +548,10 @@ namespace MHTriServer.Server
                 layerData.UnknownField7 = 0xff; // ???
                 layerData.InCityPopulation = (uint)city.Players.Count - (uint)city.DepartedPlayer;
                 layerData.State = LayerData.StateEnum.Enable;
+            }
+            else
+            {
+                Debug.Assert(false);
             }
 
             session.SendPacket(new AnsLayerChildInfo(1, layerData, extraProperties));
