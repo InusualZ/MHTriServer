@@ -154,6 +154,7 @@ namespace MHTriServer.Server.Packets
             RegisterWith<NtcLayerChat>(NtcLayerChat.PACKET_ID);
             RegisterWith<NtcLayerHost>(NtcLayerHost.PACKET_ID);
             RegisterWith<NtcLayerIn>(NtcLayerIn.PACKET_ID);
+            RegisterWith<NtcLayerInfoSet>(NtcLayerInfoSet.PACKET_ID);
             RegisterWith<NtcLayerUserInfoSet>(NtcLayerUserInfoSet.PACKET_ID);
             RegisterWith<NtcLayerUserNum>(NtcLayerUserNum.PACKET_ID);
             RegisterWith<NtcLayerUserPosition>(NtcLayerUserPosition.PACKET_ID);
