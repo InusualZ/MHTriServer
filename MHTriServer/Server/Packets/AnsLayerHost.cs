@@ -4,9 +4,9 @@ using MHTriServer.Utils;
 
 namespace MHTriServer.Server.Packets
 {
-    public class NtcLayerHost : Packet
+    public class AnsLayerHost : Packet
     {
-        public const uint PACKET_ID = 0x64411000;
+        public const uint PACKET_ID = 0x64410200;
 
         public UnkShortArrayStruct CityData { get; private set;  }
 
@@ -14,10 +14,10 @@ namespace MHTriServer.Server.Packets
 
         public string LeaderName { get; private set; }
 
-        public NtcLayerHost(UnkShortArrayStruct cityData, string leaderCapcomID, string leaderName) : base(PACKET_ID)
+        public AnsLayerHost(UnkShortArrayStruct cityData, string leaderCapcomID, string leaderName) : base(PACKET_ID)
             => (CityData, LeaderCapcomID, LeaderName) = (cityData, leaderCapcomID, leaderName);
 
-        public NtcLayerHost(uint id, ushort size, ushort counter) : base(id, size, counter) { }
+        public AnsLayerHost(uint id, ushort size, ushort counter) : base(id, size, counter) { }
 
         public override void Serialize(BEBinaryWriter writer)
         {
