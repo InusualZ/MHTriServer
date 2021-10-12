@@ -789,7 +789,7 @@ namespace MHTriServer.Server
 
         public override void HandleReqLayerDown(NetworkSession session, ReqLayerDown reqLayerDown)
         {
-            session.SendPacket(new AnsLayerDown(2));
+            session.SendPacket(new AnsLayerDown(reqLayerDown.LayerIndex));
         }
 
         public override void HandleReqUserBinaryNotice(NetworkSession session, ReqUserBinaryNotice reqUserBinaryNotice)
