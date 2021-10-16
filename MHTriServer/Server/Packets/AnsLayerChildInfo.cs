@@ -9,21 +9,21 @@ namespace MHTriServer.Server.Packets
     {
         public const uint PACKET_ID = 0x64230200;
 
-        public ushort UnknownField { get; private set; }
+        public short LayerIndex { get; private set; }
 
         public LayerData ChildInfo { get; private set; }
 
         public List<UnkByteIntStruct> UnknownField3 { get; private set; }
 
-        public AnsLayerChildInfo(ushort unknownField, LayerData layerData, List<UnkByteIntStruct> unknownField3) : base(PACKET_ID)
-            => (UnknownField, ChildInfo, UnknownField3) = (unknownField, layerData, unknownField3);
+        public AnsLayerChildInfo(short unknownField, LayerData layerData, List<UnkByteIntStruct> unknownField3) : base(PACKET_ID)
+            => (LayerIndex, ChildInfo, UnknownField3) = (unknownField, layerData, unknownField3);
 
         public AnsLayerChildInfo(uint id, ushort size, ushort counter) : base(id, size, counter) { }
 
         public override void Serialize(BEBinaryWriter writer)
         {
             base.Serialize(writer);
-            writer.Write(UnknownField);
+            writer.Write(LayerIndex);
             ChildInfo.Serialize(writer);
 
             UnkByteIntStruct.SerializeArray(UnknownField3, writer);
@@ -32,14 +32,14 @@ namespace MHTriServer.Server.Packets
         public override void Deserialize(BEBinaryReader reader)
         {
             Debug.Assert(ID == PACKET_ID);
-            UnknownField = reader.ReadUInt16();
+            LayerIndex = reader.ReadInt16();
             ChildInfo = CompoundList.Deserialize<LayerData>(reader);
             UnknownField3 = UnkByteIntStruct.DeserializeArray(reader);
         }
 
         public override string ToString()
         {
-            var str = $":\n\tUnknownField {UnknownField}\n\tChildInfo\n\t{ChildInfo})\n\tUnknownField3({UnknownField3.Count})";
+            var str = $":\n\tLayerIndex {LayerIndex}\n\tChildInfo\n\t{ChildInfo})\n\tUnknownField3({UnknownField3.Count})";
             for (var i = 0; i < UnknownField3.Count; ++i)
             {
                 var data = UnknownField3[i];

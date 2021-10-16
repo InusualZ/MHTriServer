@@ -328,7 +328,7 @@ namespace MHTriServer.Server
                 UnknownField13 = 13,
                 State = LayerData.StateEnum.Enable,
                 UnknownField17 = 14,
-                UnknownField18 = 1
+                ContainOtherPlayer = selectedServer.Players.FirstOrDefault(p => p != player) != default,
             };
 
             session.SendPacket(new AnsLayerStart(data));
@@ -430,14 +430,17 @@ namespace MHTriServer.Server
         {
             var player = session.GetPlayer();
 
+            // The client, completely ignore the Index field in the LayerData Struct and overwrite with this packet field
+            // if layerIndex == 0, all the other field except UnknownField12, would be ignored by the client
+            var layerIndex = reqLayerChildInfo.Index;
+
             // This data would replace some field sent with ReqLayerStart/ReqLayerChildListData
             var layerData = new LayerData()
             {
-                // if Index == 0, all the other field except UnknownField12, would be ignored by the client
-                Index = reqLayerChildInfo.Index,
-
                 // This field would be sent when the game send the packet `ReqLayerDown`
+                // These field are read, unknown fields
                 UnknownField12 = 1,
+                UnknownField17 = 120
             };
 
             var extraProperties = reqLayerChildInfo.UnknownField2.Select(f => {
@@ -454,37 +457,34 @@ namespace MHTriServer.Server
                 // Index should not be < 1, it (probably) means that the game want to know if anything have changed
                 // in the layer that we are in
 
-                // These field are read, unknown fields
-                layerData.UnknownField17 = 120;
-                layerData.UnknownField18 = 1;
-
                 if (player.SelectedCity != null)
                 {
                     var city = player.SelectedCity;
 
                     layerData.Name = city.Name;
-                    layerData.Index = (short)city.Id;
                     layerData.CurrentPopulation = (uint)city.CurrentPopulation;
                     layerData.MaxPopulation = (uint)city.MaxPopulation;
                     layerData.UnknownField7 = 0xff; // ???
                     layerData.InCityPopulation = (uint)city.Players.Count - (uint)city.DepartedPlayer;
                     layerData.State = LayerData.StateEnum.Enable;
+                    layerData.ContainOtherPlayer = city.Leader != player;
                 }
                 else if (player.SelectedGate != null)
                 {
                     var gate = player.SelectedGate;
                     layerData.Name = gate.Name;
-                    layerData.Index = (short)gate.Id;
                     layerData.CurrentPopulation = (uint)gate.CurrentPopulation;
                     layerData.MaxPopulation = (uint)gate.MaxPopulation;
                     layerData.UnknownField7 = 0xff; // ???
                     layerData.InCityPopulation = (uint)gate.InCityPopulation;
                     layerData.State = LayerData.StateEnum.Enable;
+                    layerData.ContainOtherPlayer = gate.PlayerInGate.Count + gate.PlayersInCity.Count() > 1;
 
                 }
                 else if (player.SelectedServer != null)
                 {
                     // Don't update server info
+                    layerIndex = 0;
                 }
                 else
                 {
@@ -510,14 +510,6 @@ namespace MHTriServer.Server
 
                 player.SelectedGate = gate;
                 gate.PlayerInGate.Add(player);
-
-                layerData.Name = gate.Name;
-                layerData.Index = (short)gate.Id;
-                layerData.CurrentPopulation = (uint)gate.CurrentPopulation + 1;
-                layerData.MaxPopulation = (uint)gate.MaxPopulation;
-                layerData.UnknownField7 = 0xff; // ???
-                layerData.InCityPopulation = (uint)gate.InCityPopulation;
-                layerData.State = LayerData.StateEnum.Enable;
             }
             else if (player.SelectedCity == null)
             {
@@ -537,24 +529,30 @@ namespace MHTriServer.Server
 
                 player.SelectedCity = city;
                 gate.PlayerInGate.Remove(player);
+                city.Players.Add(player);
 
-                // How do I notify to the host this new player?
-                player.SelectedCity.Players.Add(player);
+                // Notify the leader of the city, that a user is joining
 
-                layerData.Name = city.Name;
-                layerData.Index = (short)city.Id;
-                layerData.CurrentPopulation = (uint)city.CurrentPopulation + 1;
-                layerData.MaxPopulation = (uint)city.MaxPopulation;
-                layerData.UnknownField7 = 0xff; // ???
-                layerData.InCityPopulation = (uint)city.Players.Count - (uint)city.DepartedPlayer;
-                layerData.State = LayerData.StateEnum.Enable;
+                var selectedHunter = player.SelectedHunter;
+                var hunterData = new LayerUserData()
+                {
+                    Name = selectedHunter.HunterName,
+                    CapcomID = selectedHunter.SaveID,
+                    // TODO: Other fields?
+                };
+
+                var leader = city.Leader;
+                var leaderSession = GetNetworkSession(leader.RemoteEndPoint);
+                var leaderHunter = leader.SelectedHunter;
+
+                leaderSession.SendPacket(new NtcLayerIn(selectedHunter.SaveID, hunterData));
             }
             else
             {
                 Debug.Assert(false);
             }
 
-            session.SendPacket(new AnsLayerChildInfo(1, layerData, extraProperties));
+            session.SendPacket(new AnsLayerChildInfo(layerIndex, layerData, extraProperties));
         }
 
         public override void HandleNtcLayerBinary(NetworkSession session, NtcLayerBinary layerBinary)
@@ -570,6 +568,8 @@ namespace MHTriServer.Server
                 CapcomID = senderPlayer.SelectedHunter.SaveID,
                 Name = senderPlayer.SelectedHunter.HunterName
             };
+
+            Log.Debug($"NtcLayerBianry by {senderPlayer.SelectedHunter.HunterName}");
 
             if (senderPlayer.SelectedCity != null)
             {
@@ -647,6 +647,11 @@ namespace MHTriServer.Server
             {
                 foreach (var playerInCity in player.SelectedCity.Players)
                 {
+                    if (playerInCity == player)
+                    {
+                        continue;
+                    }
+
                     var hunter = playerInCity.SelectedHunter;
                     currentUsers.Add(new LayerUserData()
                     {
@@ -661,6 +666,11 @@ namespace MHTriServer.Server
                 var gate = player.SelectedGate;
                 foreach (var playerInGate in gate.PlayerInGate.Concat(gate.PlayersInCity))
                 {
+                    if (playerInGate == player)
+                    {
+                        continue;
+                    }
+
                     var hunter = playerInGate.SelectedHunter;
                     currentUsers.Add(new LayerUserData()
                     {
@@ -672,6 +682,7 @@ namespace MHTriServer.Server
             }
             else if (player.SelectedServer != null)
             {
+                Debug.Assert(false);
                 // TODO: Should we really send the player that are connected to the server?
                 var hunter = player.SelectedHunter;
                 currentUsers.Add(new LayerUserData()
@@ -743,6 +754,9 @@ namespace MHTriServer.Server
                             UnknownField7 = 0xff, // ???
                             InCityPopulation = (uint)gate.InCityPopulation,
                             State = LayerData.StateEnum.Enable,
+                            // These field are read, unknown fields
+                            UnknownField17 = 120,
+                            ContainOtherPlayer = gate.PlayerInGate.Count + gate.PlayersInCity.Count() > 0
                         }
                     });
                 }
@@ -774,6 +788,9 @@ namespace MHTriServer.Server
                             UnknownField7 = 0xff, // ???
                             InCityPopulation = (uint)(city.CurrentPopulation - city.DepartedPlayer),
                             State = state,
+                            // These field are read, unknown fields
+                            UnknownField17 = 120,
+                            ContainOtherPlayer = city.Players.Count > 0,
                         }
                     });
                 }
@@ -967,8 +984,7 @@ namespace MHTriServer.Server
             var leaderSession = GetNetworkSession(leader.RemoteEndPoint);
             var leaderHunter = leader.SelectedHunter;
 
-            leaderSession.SendPacket(new NtcLayerIn(selectedHunter.SaveID, hunterData));
-
+            // leaderSession.SendPacket(new NtcLayerHost(cityData, leaderHunter.SaveID, leaderHunter.HunterName));
             session.SendPacket(new AnsLayerHost(cityData, leaderHunter.SaveID, leaderHunter.HunterName));
         }
 

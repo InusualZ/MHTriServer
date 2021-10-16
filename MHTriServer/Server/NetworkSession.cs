@@ -213,7 +213,7 @@ namespace MHTriServer.Server
                 return;
             }
 
-            const long PING_FATAL_TIMEOUT_MS = 1 * /* minutes */ 60 /* seconds */ * 1000;
+            const long PING_FATAL_TIMEOUT_MS = 30 * /* minutes */ 60 /* seconds */ * 1000;
             if (m_LastReceived.ElapsedMilliseconds >= PING_FATAL_TIMEOUT_MS)
             {
                 Close(Constants.INACTIVITY_MESSAGE);

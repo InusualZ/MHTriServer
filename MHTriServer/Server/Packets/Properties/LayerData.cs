@@ -65,7 +65,7 @@ namespace MHTriServer.Server.Packets.Properties
 
         public uint UnknownField17 { get => Get<uint>(FIELD_17); set => Set(FIELD_17, value); }
 
-        public byte UnknownField18 { get => Get<byte>(FIELD_18); set => Set(FIELD_18, value); }
+        public bool ContainOtherPlayer { get => Get<byte>(FIELD_18) == 0x01; set => Set(FIELD_18, (byte)(value ? 0x01 : 0x00)); }
 
         // Any value that you put here, when the client receive it. It would substract one
         public byte UnknownField21 { get => Get<byte>(FIELD_21); set => Set(FIELD_21, value); }
