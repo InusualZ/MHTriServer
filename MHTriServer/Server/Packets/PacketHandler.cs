@@ -16,6 +16,8 @@ namespace MHTriServer.Server.Packets
 
         public virtual void HandleNtcLayerChat(NetworkSession session, NtcLayerChat layerChat) => throw new NotImplementedException();
 
+        public virtual void HandleNtcLayerUserPosition(NetworkSession session, NtcLayerUserPosition layerUserPosition) => throw new NotImplementedException();
+
         public virtual void HandleReqAnnounce(NetworkSession session, ReqAnnounce reqAnnounce) => throw new NotImplementedException();
 
         public virtual void HandleReqAuthenticationToken(NetworkSession session, ReqAuthenticationToken reqAuthenticationToken) => throw new NotImplementedException();

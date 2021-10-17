@@ -988,6 +988,25 @@ namespace MHTriServer.Server
             session.SendPacket(new AnsLayerHost(cityData, leaderHunter.SaveID, leaderHunter.HunterName));
         }
 
+        public override void HandleNtcLayerUserPosition(NetworkSession session, NtcLayerUserPosition layerUserPosition)
+        {
+            var player = session.GetPlayer();
+
+            var selectedHunter = player.SelectedHunter;
+            var selectedCity = player.SelectedCity;
+
+            foreach (var playerInCity in selectedCity.Players)
+            {
+                if (playerInCity == player)
+                {
+                    continue;
+                }
+
+                var otherSession = GetNetworkSession(playerInCity.RemoteEndPoint);
+                otherSession.SendPacket(new NtcLayerUserPosition(player.SelectedHunter.HunterName, layerUserPosition.UnknownField1, layerUserPosition.UnknownField2));
+            }
+        }
+
         public override void HandleReqLayerUp(NetworkSession session, ReqLayerUp reqLayerUp)
         {
             // Received when the player can't connect to the city's host
