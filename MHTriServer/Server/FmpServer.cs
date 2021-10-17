@@ -467,7 +467,7 @@ namespace MHTriServer.Server
                     layerData.UnknownField7 = 0xff; // ???
                     layerData.InCityPopulation = (uint)city.Players.Count - (uint)city.DepartedPlayer;
                     layerData.State = LayerData.StateEnum.Enable;
-                    layerData.ContainOtherPlayer = city.Leader != player;
+                    layerData.ContainOtherPlayer = true;
                 }
                 else if (player.SelectedGate != null)
                 {
@@ -645,20 +645,38 @@ namespace MHTriServer.Server
             var currentUsers = new List<LayerUserData>();
             if (player.SelectedCity != null)
             {
-                foreach (var playerInCity in player.SelectedCity.Players)
-                {
-                    if (playerInCity == player)
-                    {
-                        continue;
-                    }
 
-                    var hunter = playerInCity.SelectedHunter;
+                var city = player.SelectedCity;
+                if (city.Leader == player)
+                {
+                    // This whole if statement block is doubtful. We are doing this, because is the only way that the
+                    // game let the host actually accept new players in. This probably need a little bit better
+                    // understanding of some field
+                    var hunter = player.SelectedHunter;
                     currentUsers.Add(new LayerUserData()
                     {
                         CapcomID = hunter.SaveID,
                         Name = hunter.HunterName,
                         // TODO: Do others field too
                     });
+                }
+                else
+                {
+                    foreach (var playerInCity in city.Players)
+                    {
+                        if (playerInCity == player)
+                        {
+                            continue;
+                        }
+
+                        var hunter = playerInCity.SelectedHunter;
+                        currentUsers.Add(new LayerUserData()
+                        {
+                            CapcomID = hunter.SaveID,
+                            Name = hunter.HunterName,
+                            // TODO: Do others field too
+                        });
+                    }
                 }
             }
             else if (player.SelectedGate != null)
