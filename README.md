@@ -1,3 +1,7 @@
+# See [MH3SP](https://github.com/sepalani/MH3SP) for a more up to complete implementation.
+
+<hr/>
+
 # MHTri Server
 Monster Hunter Tri Custom Server Implementation
 ## *HELP WANTED*
